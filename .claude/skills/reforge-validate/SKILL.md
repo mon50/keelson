@@ -35,8 +35,10 @@ allowed-tools: Read, Glob
 
 ## Output Contract
 
-- If no errors exist, output exactly `✔ valid`.
+- If no errors, warnings, or infos exist, output exactly `✔ valid`.
 - If any error exists, output one `✖ incomplete: ...` line per failure.
+- If any warning exists, output one `⚠ warning: ...` line per warning.
+- If any info exists, output one `ℹ info: ...` line per info.
 - Keep the status marker literal for consistency. Localize the explanation text after the marker.
 - Use the same literal success marker in both languages:
   - English success: `✔ valid`
@@ -87,7 +89,16 @@ allowed-tools: Read, Glob
    - 6サブフィールドがすべて存在し、かつ string である場合、このStep 3は `TECH_MISSING_FIELD` を `errors` に追加せず通過する。
 4. Step 4: meta.approved検証
    - `meta.approved` がbooleanで存在することを検証する。
-   - plan/impl 実行前提の検証で `meta.approved` が `false` の場合はゲート違反として報告する。
+   - `meta.approved` の値を読み取り、承認状態として `true` / `false` を記録する。
+   - `meta.approved` が `false` の場合、`infos` リストへ次の情報を追加する。
+     - code: `NOT_APPROVED`
+     - severity: `info`
+     - path: `meta.approved`
+     - 英語メッセージ形式: `meta.approved is false; run /reforge:render to review and approve the UI prototype`
+     - 日本語メッセージ形式: `meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください`
+   - `NOT_APPROVED` は `error` ではなく `info` として分類し、通常の `/reforge:validate` では `errors` リストに追加しない。
+   - plan/impl 実行要求時に `meta.approved` が `false` の場合は承認ゲート違反のエラーとして扱い、`/reforge:plan` と `/reforge:impl` を実行しない。
+   - `meta.approved: false` のスペックでは、通常 validate の出力に `NOT_APPROVED` 情報が報告されることを確認する。
 5. Step 5: 参照整合性検証
    - `views` 内の `entity` 参照が `entities` に存在することを検証する。
    - `flows` 内で明示された entity 参照が `entities` に存在することを検証する。
@@ -95,8 +106,11 @@ allowed-tools: Read, Glob
    - `.reforge/questions.json` が存在しない場合は質問検証をスキップする。
    - 存在する場合は `pending` / `answered` の形式を検証し、`pending` に未解決質問が残っていれば報告する。
 7. Step 7: 結果報告
-   - Step 2〜6 の検証エラーは最初の1件で停止せず、すべて収集してから返す。
-   - エラーがなければ `✔ valid` を返す。エラーがある場合は1件ごとに `✖ incomplete: ...` 行を返す。
+   - Step 2〜6 の `errors` / `warnings` / `infos` は最初の1件で停止せず、すべて収集してから返す。
+   - `errors` がある場合は1件ごとに `✖ incomplete: ...` 行を返す。
+   - `warnings` がある場合は1件ごとに `⚠ warning: ...` 行を返す。
+   - `infos` がある場合は1件ごとに `ℹ info: ...` 行を返す。`NOT_APPROVED` は `ℹ info: [NOT_APPROVED] ...` として報告する。
+   - `errors` / `warnings` / `infos` がすべて空の場合に限り `✔ valid` を返す。
 
 ## spec.json Schema Comment
 
@@ -406,7 +420,7 @@ Use these phrasings so validation stays consistent.
 - `meta.lang is required`
 - `meta.lang '<value>' is not valid. Allowed values: "en", "ja"`
 - `meta.approved is required and must be boolean`
-- `meta.approved is false; run /reforge:render and approve the UI prototype before /reforge:plan or /reforge:impl`
+- `meta.approved is false; run /reforge:render to review and approve the UI prototype`
 - `tech.<FieldName> is required`
 - `entity '<EntityName>' must define a fields object`
 - `field '<EntityName>.<FieldName>' is missing required type`
@@ -438,7 +452,7 @@ Use these phrasings so validation stays consistent.
 - `meta.lang は必須です`
 - `meta.lang '<value>' は無効です。使用できる値は "en" と "ja" のみです`
 - `meta.approved は必須で、boolean でなければなりません`
-- `meta.approved が false です。/reforge:plan または /reforge:impl の前に /reforge:render でUIプロトタイプを承認してください`
+- `meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください`
 - `tech.<FieldName> は必須です`
 - `エンティティ '<EntityName>' には fields オブジェクトが必要です`
 - `フィールド '<EntityName>.<FieldName>' には type が必要です`
@@ -460,9 +474,17 @@ Use these phrasings so validation stays consistent.
 
 Use these as anchors when validating.
 
-### Valid Minimal Starter
+### Complete Starter Before Approval
 
 - `spec.json` contains `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, all `tech` fields, and empty `entities`, `flows`, `views`.
+- `meta.approved` is `false`.
+- `questions.json` is absent, or present with empty `pending` and `answered`.
+- Result: one info line reporting `NOT_APPROVED` and prompting `/reforge:render`.
+
+### Valid Approved Spec
+
+- `spec.json` contains `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, all `tech` fields, and empty `entities`, `flows`, `views`.
+- `meta.approved` is `true`.
 - `questions.json` is absent, or present with empty `pending` and `answered`.
 - Result: `✔ valid`
 
@@ -471,6 +493,7 @@ Use these as anchors when validating.
 - `meta.approved` is `false` by default.
 - `/reforge:plan` and `/reforge:impl` must not execute while `meta.approved` is `false`.
 - `/reforge:plan` and `/reforge:impl` may execute only after `meta.approved` is `true`.
+- If the caller requested plan/impl execution, `meta.approved: false` is an error gate even though ordinary validate reports `NOT_APPROVED` as info.
 
 ### Invalid Language
 

@@ -342,6 +342,37 @@ describe('reforge-validate skill documentation contracts', () => {
     }
   });
 
+  it('documents Step 4 meta.approved info reporting and plan/impl error gate', () => {
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const step4 = extractValidationStep(markdown, 4);
+
+      expect(step4, `${skillPath} must document Step 4`).not.toBe('');
+      expect(step4, `${skillPath} Step 4 must read the meta.approved value`).toMatch(
+        /`meta\.approved` の値を読み取/
+      );
+      expect(step4, `${skillPath} Step 4 must add false approval to an info list`).toMatch(
+        /`meta\.approved` が `false` の場合.*`NOT_APPROVED`.*`info`.*リスト/s
+      );
+      expect(step4, `${skillPath} Step 4 must not classify NOT_APPROVED as an error`).toMatch(
+        /`NOT_APPROVED` は `error` ではなく `info`/
+      );
+      expect(step4, `${skillPath} Step 4 must tell the user to approve with render`).toContain('/reforge:render');
+      expect(step4, `${skillPath} Step 4 must define the plan/impl precondition error gate`).toMatch(
+        /plan\/impl 実行要求時.*`meta\.approved` が `false` の場合.*エラー/s
+      );
+      expect(step4, `${skillPath} Step 4 must define an observable false-spec report`).toMatch(
+        /`meta\.approved: false` のスペック.*`NOT_APPROVED`.*報告/s
+      );
+      expect(markdown, `${skillPath} must define NOT_APPROVED in the message catalog`).toContain(
+        '`NOT_APPROVED`'
+      );
+      expect(markdown, `${skillPath} must include the approval message text`).toContain(
+        '`meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください`'
+      );
+    }
+  });
+
   it('documents the complete .reforge directory contract and immutable path rule', () => {
     for (const documentationPath of reforgeDirectoryDocumentationPaths) {
       const absolutePath = resolve(process.cwd(), documentationPath);
