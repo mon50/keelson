@@ -20,6 +20,34 @@ import {
   TARGET_ENVIRONMENTS
 } from '../src/types';
 
+const validateSkillPaths = [
+  '.claude/skills/reforge-validate/SKILL.md',
+  '.agents/skills/reforge-validate/SKILL.md'
+];
+
+function parseJsonCodeBlocks(markdown: string): unknown[] {
+  return [...markdown.matchAll(/```json\s*\n([\s\S]*?)\n```/g)]
+    .map((match) => match[1])
+    .flatMap((block) => {
+      try {
+        return [JSON.parse(block) as unknown];
+      } catch {
+        return [];
+      }
+    });
+}
+
+function isCompleteSpecSample(value: unknown): value is SpecJson {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<Record<keyof SpecJson, unknown>>;
+  return ['meta', 'tech', 'entities', 'views', 'flows'].every((section) =>
+    Object.prototype.hasOwnProperty.call(candidate, section)
+  );
+}
+
 describe('installer shared contracts', () => {
   it('defines all supported target environments and their skill directories', () => {
     expect(TARGET_ENVIRONMENTS).toEqual(['claude-code', 'codex']);
@@ -120,6 +148,53 @@ describe('spec.json shared contracts', () => {
     expect(fieldTypes).toEqual(['string', 'number', 'date', 'enum', 'text', 'boolean']);
     expect(spec.meta.approved).toBe(false);
     expect(spec.entities.report.fields.status.options).toEqual(['draft', 'submitted']);
+  });
+});
+
+describe('reforge-validate skill documentation contracts', () => {
+  it('keeps the Claude Code and Codex validate skill documentation in sync', () => {
+    const [claudeMarkdown, codexMarkdown] = validateSkillPaths.map((skillPath) =>
+      readFileSync(resolve(process.cwd(), skillPath), 'utf8')
+    );
+
+    expect(codexMarkdown).toBe(claudeMarkdown);
+  });
+
+  it('documents the complete spec.json sample, field constraints, and approval gate', () => {
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const samples = parseJsonCodeBlocks(markdown);
+      const completeSpec = samples.find(isCompleteSpecSample);
+
+      expect(completeSpec, `${skillPath} must include a parseable complete spec.json sample`).toBeTruthy();
+      expect(completeSpec?.meta.approved).toBe(false);
+      expect(Object.keys(completeSpec?.tech ?? {})).toEqual([
+        'frontend',
+        'backend',
+        'database',
+        'orm',
+        'styling',
+        'testing'
+      ]);
+
+      const fields = completeSpec?.entities.report.fields ?? {};
+      expect(Object.values(fields).map((field) => field.type).sort()).toEqual([
+        'boolean',
+        'date',
+        'enum',
+        'number',
+        'string',
+        'text'
+      ]);
+
+      for (const fieldType of ['string', 'number', 'date', 'enum', 'text', 'boolean']) {
+        expect(markdown).toMatch(new RegExp(`\\|\\s*\`${fieldType}\`\\s*\\|`));
+      }
+
+      expect(markdown).toContain('`meta.approved` のデフォルト値は `false`');
+      expect(markdown).toContain('`meta.approved: false` の間は `/reforge:plan` と `/reforge:impl` を実行してはならない');
+      expect(markdown).toContain('`meta.approved: true` の場合に限り `/reforge:plan` と `/reforge:impl` を実行できる');
+    }
   });
 });
 
