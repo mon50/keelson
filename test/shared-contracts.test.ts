@@ -406,6 +406,46 @@ describe('reforge-validate skill documentation contracts', () => {
     }
   });
 
+  it('documents Step 6 pending questions warnings and Step 7 final reporting', () => {
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const step6 = extractValidationStep(markdown, 6);
+      const step7 = extractValidationStep(markdown, 7);
+
+      expect(step6, `${skillPath} must document Step 6`).not.toBe('');
+      expect(step6, `${skillPath} Step 6 must read questions.json`).toContain('`.reforge/questions.json`');
+      expect(step6, `${skillPath} Step 6 must count pending questions`).toMatch(/`pending`.*(?:件数|count)/s);
+      expect(step6, `${skillPath} Step 6 must add pending questions to warnings`).toMatch(
+        /`pending`.*1 件以上.*`warnings`/s
+      );
+      expect(step6, `${skillPath} Step 6 must define PENDING_QUESTIONS`).toContain('`PENDING_QUESTIONS`');
+      expect(step6, `${skillPath} Step 6 must define the English pending message`).toContain(
+        '<N> unresolved question(s) remain in questions.json pending queue'
+      );
+      expect(step6, `${skillPath} Step 6 must define the Japanese pending message`).toContain(
+        'questions.json の pending キューに未解決の質問が <N> 件残っています'
+      );
+
+      expect(step7, `${skillPath} must document Step 7`).not.toBe('');
+      expect(step7, `${skillPath} Step 7 must collect all result lists`).toMatch(
+        /`errors`.*`warnings`.*`infos`/s
+      );
+      expect(step7, `${skillPath} Step 7 must output valid when there are no errors`).toMatch(
+        /`errors` が 0 件.*`✔ valid`/s
+      );
+      expect(step7, `${skillPath} Step 7 must output invalid when errors exist`).toMatch(
+        /`errors` が 1 件以上.*`✖ invalid`/s
+      );
+      expect(step7, `${skillPath} Step 7 must output warnings`).toContain('`⚠ warning: ...`');
+      expect(step7, `${skillPath} Step 7 must output NOT_APPROVED infos`).toContain(
+        '`ℹ info: [NOT_APPROVED] ...`'
+      );
+      expect(step6, `${skillPath} Step 6 must describe a valid no-pending sample`).toMatch(
+        /`pending`.*0 件.*`✔ valid`/s
+      );
+    }
+  });
+
   it('documents the complete .reforge directory contract and immutable path rule', () => {
     for (const documentationPath of reforgeDirectoryDocumentationPaths) {
       const absolutePath = resolve(process.cwd(), documentationPath);

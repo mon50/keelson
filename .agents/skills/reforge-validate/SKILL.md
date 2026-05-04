@@ -36,7 +36,7 @@ allowed-tools: Read, Glob
 ## Output Contract
 
 - If no errors, warnings, or infos exist, output exactly `✔ valid`.
-- If any error exists, output one `✖ incomplete: ...` line per failure.
+- If any error exists, output one `✖ invalid: ...` line per failure.
 - If any warning exists, output one `⚠ warning: ...` line per warning.
 - If any info exists, output one `ℹ info: ...` line per info.
 - Keep the status marker literal for consistency. Localize the explanation text after the marker.
@@ -117,16 +117,25 @@ allowed-tools: Read, Glob
      - 英語メッセージ形式: `entity reference '<EntityName>' not found in entities section`
      - 日本語メッセージ形式: `entities セクションにエンティティ参照 '<EntityName>' が見つかりません`
    - view と flow の無効参照は最初の1件で停止せず、すべて確認して `errors` リストに全件追加する。
-   - 無効なentity参照を含むスペック（例: `entities` に `report` のみ存在し、`views.reportForm.entity` と `flows.submitReport.targetEntity` が `missingReport` を参照する）では、`REF_INTEGRITY_VIEW` と `REF_INTEGRITY_FLOW` の両方が `✖ incomplete: ...` 行として報告されることを確認する。
+   - 無効なentity参照を含むスペック（例: `entities` に `report` のみ存在し、`views.reportForm.entity` と `flows.submitReport.targetEntity` が `missingReport` を参照する）では、`REF_INTEGRITY_VIEW` と `REF_INTEGRITY_FLOW` の両方が `✖ invalid: ...` 行として報告されることを確認する。
 6. Step 6: questions.json検証
    - `.reforge/questions.json` が存在しない場合は質問検証をスキップする。
-   - 存在する場合は `pending` / `answered` の形式を検証し、`pending` に未解決質問が残っていれば報告する。
+   - 存在する場合は `pending` / `answered` の形式を検証し、`pending` と `answered` が配列であることを確認する。
+   - `pending` 配列の件数を数える。`pending` が 0 件で、かつ `errors` / `warnings` / `infos` がすべて空の場合は Step 7 で `✔ valid` を返せる。
+   - `pending` が 1 件以上の場合、未解決質問ありとして `warnings` リストへ次の警告を追加する。
+     - code: `PENDING_QUESTIONS`
+     - severity: `warning`
+     - path: `questions.pending`
+     - count: `<N>`
+     - 英語メッセージ形式: `<N> unresolved question(s) remain in questions.json pending queue`
+     - 日本語メッセージ形式: `questions.json の pending キューに未解決の質問が <N> 件残っています`
+   - `pending` 質問は validation warning として扱い、schema / tech / reference の `errors` とは分離する。
 7. Step 7: 結果報告
    - Step 2〜6 の `errors` / `warnings` / `infos` は最初の1件で停止せず、すべて収集してから返す。
-   - `errors` がある場合は1件ごとに `✖ incomplete: ...` 行を返す。
-   - `warnings` がある場合は1件ごとに `⚠ warning: ...` 行を返す。
+   - `errors` が 0 件で、`warnings` / `infos` も空の場合は `✔ valid` を返す。
+   - `errors` が 1 件以上ある場合は1件ごとに `✖ invalid` マーカーを持つ `✖ invalid: ...` 行を返し、エラー一覧をすべて表示する。
+   - `warnings` がある場合は1件ごとに `⚠ warning: ...` 行を返す。`PENDING_QUESTIONS` は `⚠ warning: [PENDING_QUESTIONS] ...` として報告する。
    - `infos` がある場合は1件ごとに `ℹ info: ...` 行を返す。`NOT_APPROVED` は `ℹ info: [NOT_APPROVED] ...` として報告する。
-   - `errors` / `warnings` / `infos` がすべて空の場合に限り `✔ valid` を返す。
 
 ## spec.json Schema Comment
 
@@ -519,9 +528,9 @@ Use these as anchors when validating.
 ### Localized Failure Output
 
 - If `meta.lang` is omitted or `en` and `meta.name` is missing:
-  - `✖ incomplete: meta.name is required`
+  - `✖ invalid: meta.name is required`
 - If `meta.lang` is `ja` and `meta.name` is missing:
-  - `✖ incomplete: meta.name は必須です`
+  - `✖ invalid: meta.name は必須です`
 
 ### Invalid Field Type
 
