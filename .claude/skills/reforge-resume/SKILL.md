@@ -67,6 +67,24 @@ Before responding, verify:
 - `pending` does not contain duplicate unresolved questions for the same normalized `resolves` set.
 - The response includes lifecycle stage, changed artifacts, pending count, and the next gate.
 
+## 質問機能プロトコル
+
+全 reforge-engine スキルは `.reforge/questions.json` を共有ストレージとして扱い、1回の実行で提示する質問は1問だけにする。
+
+1. Step 1: 取得
+   - 既存の `pending` があれば最優先の1件だけを取得する。
+   - 新規質問を作る場合は `id`、`phase`、`question`、`type`、`resolves` を必ず持たせる。
+   - `phase` は `meta`、`tech`、`data`、`views`、`flows` のいずれかにする。
+2. Step 2: 提示
+   - AskUserQuestion が利用できる場合はその1問だけを提示する。
+   - AskUserQuestion が利用できない場合はチャットで1問だけ質問し、そこで停止する。
+3. Step 3: 反映
+   - 回答は `resolves` に列挙された JSON パスだけへ反映する。
+   - 回答が不足している場合は `SPEC_PATH` を変更せず、同じ質問を `pending` に残す。
+4. Step 4: 移動
+   - 解決済みの質問を `pending` から削除し、`answer` を付けて `answered` へ追加する。
+   - 次の質問が必要な場合でも同じ実行内では提示せず、次回実行へ回す。
+
 ## Command Flow
 
 ### Navigator Decision Tree

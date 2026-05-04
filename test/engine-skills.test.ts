@@ -31,6 +31,8 @@ const planSkillPaths = [
   '.agents/skills/reforge-plan/SKILL.md'
 ];
 
+const questionProtocolSkillPaths = [...initSkillPaths, ...resumeSkillPaths, ...updateSkillPaths];
+
 const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'] as const;
 
 function readMarkdown(skillPath: string): string {
@@ -47,6 +49,16 @@ function parseJsonCodeBlocks(markdown: string): unknown[] {
         return [];
       }
     });
+}
+
+function extractSecondLevelSection(markdown: string, heading: string): string {
+  const start = markdown.indexOf(heading);
+  if (start === -1) {
+    return '';
+  }
+
+  const nextHeading = markdown.indexOf('\n## ', start + heading.length);
+  return nextHeading === -1 ? markdown.slice(start) : markdown.slice(start, nextHeading);
 }
 
 function isSpecJson(value: unknown): value is SpecJson {
@@ -313,5 +325,33 @@ describe('reforge-plan engine skill contracts', () => {
         }
       ]);
     }
+  });
+});
+
+describe('reforge question protocol consistency', () => {
+  it('uses one identical question handling protocol section in init, resume, and update', () => {
+    const sections = questionProtocolSkillPaths.map((skillPath) => {
+      const markdown = readMarkdown(skillPath);
+      const section = extractSecondLevelSection(markdown, '## 質問機能プロトコル');
+
+      expect(section, `${skillPath} must include the shared question protocol section`).not.toBe('');
+      return { skillPath, section };
+    });
+
+    const [canonical] = sections;
+
+    for (const { skillPath, section } of sections) {
+      expect(section, `${skillPath} must match the canonical protocol text`).toBe(canonical.section);
+    }
+
+    expect(canonical.section).toContain('Step 1: 取得');
+    expect(canonical.section).toContain('Step 2: 提示');
+    expect(canonical.section).toContain('Step 3: 反映');
+    expect(canonical.section).toContain('Step 4: 移動');
+    expect(canonical.section).toMatch(/1問|one question/i);
+    expect(canonical.section).toContain('`resolves`');
+    expect(canonical.section).toContain('`pending`');
+    expect(canonical.section).toContain('`answered`');
+    expect(canonical.section).toContain('`.reforge/questions.json`');
   });
 });
