@@ -422,4 +422,47 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /選択した `spec\.tech\.testing` に対応するコマンド[\s\S]*失敗した場合[\s\S]*完了報告しない/
     );
   });
+
+  it('documents marking the selected tasks.json task in_progress before implementation starts', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## tasks.json Status Management Procedure');
+    expect(markdown).toMatch(
+      /実装処理を開始する前[\s\S]*対象entityタスク[\s\S]*`status` を `"pending"` から `"in_progress"` に更新/
+    );
+    expect(markdown).toMatch(
+      /`"in_progress"` に更新した後[\s\S]*DB[\s\S]*API[\s\S]*UI[\s\S]*テスト/
+    );
+    expect(markdown.indexOf('`status` を `"pending"` から `"in_progress"` に更新')).toBeLessThan(
+      markdown.indexOf('DB Migration Generation Procedure')
+    );
+  });
+
+  it('documents marking the selected tasks.json task done only after db, api, ui, and test work completes', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /DB[\s\S]*API[\s\S]*UI[\s\S]*テスト[\s\S]*全サブタスク[\s\S]*完了/
+    );
+    expect(markdown).toMatch(
+      /全サブタスク[\s\S]*完了[\s\S]*対象entityタスク[\s\S]*`status` を `"in_progress"` から `"done"` に更新/
+    );
+    expect(markdown.indexOf('`status` を `"in_progress"` から `"done"` に更新')).toBeGreaterThan(
+      markdown.indexOf('Test File Generation Procedure')
+    );
+  });
+
+  it('makes tasks.json status updates verifiable before and after implementation', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /開始前確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "in_progress"`/
+    );
+    expect(markdown).toMatch(
+      /完了後確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "done"`/
+    );
+    expect(markdown).toMatch(
+      /status更新[\s\S]*確認できない場合[\s\S]*実装を進めない|完了報告しない/
+    );
+  });
 });
