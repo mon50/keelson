@@ -195,4 +195,76 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /Prisma[\s\S]*`prisma\/migrations\/\{timestamp\}_\{entity\}\/migration\.sql`/
     );
   });
+
+  it('documents CRUD API generation from the selected backend framework', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## CRUD API Endpoint Generation Procedure');
+    expect(markdown).toMatch(
+      /`spec\.tech\.backend` を読み取り[\s\S]*CRUD APIエンドポイント生成に使うバックエンドフレームワークを確定する/
+    );
+    expect(markdown).toMatch(
+      /Create[\s\S]*Read[\s\S]*Update[\s\S]*Delete/
+    );
+  });
+
+  it('requires every entity field in API request and response payloads', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]\.fields` の全フィールドをAPIリクエストとレスポンスの両方に含める/
+    );
+    expect(markdown).toMatch(
+      /POST[\s\S]*PUT\/PATCH[\s\S]*GET[\s\S]*全フィールド/
+    );
+    expect(markdown).toMatch(
+      /作成・更新リクエスト[\s\S]*レスポンスDTO[\s\S]*全フィールド/
+    );
+  });
+
+  it('reflects entity-referencing flows into API business logic', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.flows`[\s\S]*対象entityを参照するflow[\s\S]*APIのビジネスロジック/
+    );
+    expect(markdown).toMatch(
+      /flowの `steps`[\s\S]*バリデーション[\s\S]*状態遷移[\s\S]*副作用/
+    );
+  });
+
+  it('lists CRUD API file path and code patterns for major backends', () => {
+    const markdown = readImplSkill();
+
+    const backendPatterns = [
+      ['Next.js API Routes', 'src/app/api/{entity}/route.ts'],
+      ['Express', 'src/routes/{entity}.ts'],
+      ['FastAPI', 'app/routers/{entity}.py'],
+      ['Rails', 'app/controllers/{entities}_controller.rb'],
+      ['NestJS', 'src/{entity}/{entity}.controller.ts']
+    ];
+
+    for (const [backend, pathPattern] of backendPatterns) {
+      expect(markdown).toContain(backend);
+      expect(markdown).toContain(pathPattern);
+    }
+
+    for (const codePattern of ['export async function GET', 'router.post', '@router.post', 'def create', '@Post()']) {
+      expect(markdown).toContain(codePattern);
+    }
+  });
+
+  it('makes API field coverage verifiable against spec entity fields', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /APIフィールドカバレッジ確認/
+    );
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]\.fields` のキー一覧[\s\S]*リクエストDTO[\s\S]*レスポンスDTO[\s\S]*差分/
+    );
+    expect(markdown).toMatch(
+      /不足フィールドが1つでもある場合[\s\S]*未完了/
+    );
+  });
 });

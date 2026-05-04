@@ -78,3 +78,81 @@ DBマイグレーションは、ゲート通過後に `spec.tech.database` と `
 | Sequelize | `migrations/{timestamp}-create-{entity}.js` | `queryInterface.createTable` と `queryInterface.dropTable` を記述する。 |
 | SQLAlchemy | `alembic/versions/{revision}_create_{entity}.py` | Alembic revisionとして `upgrade` / `downgrade` を記述する。 |
 | ActiveRecord | `db/migrate/{timestamp}_create_{entity}.rb` | Rails migration classとして `create_table` と必要な制約を記述する。 |
+
+## CRUD API Endpoint Generation Procedure
+
+CRUD APIエンドポイントは、ゲート通過後に `spec.tech.backend` を読み取り、CRUD APIエンドポイント生成に使うバックエンドフレームワークを確定する。選択したフレームワークのファイルパス、ルーティング規約、リクエストパース方式、レスポンス形式に合わせて Create / Read / Update / Delete を実装する。
+
+1. `spec.tech.backend` の値からバックエンド種別を決め、下表のパスパターンとコードパターンを選ぶ。
+2. `spec.entities[entity].fields` の全フィールドをAPIリクエストとレスポンスの両方に含める。
+   - 作成・更新リクエストでは、`spec.entities[entity].fields` の全フィールドを入力DTO、バリデーション、永続化データに含める。
+   - レスポンスDTOでは、単体取得、一覧取得、作成、更新のレスポンスに全フィールドを含める。
+   - POST と PUT/PATCH は全フィールドを受け取り、GET は全フィールドを返す。DELETE は削除結果または削除済みentityの識別情報を返す。
+   - spec.jsonに存在しないフィールドはリクエスト/レスポンスに追加しない。
+3. 各フィールドの `type`、`required`、`options` をAPI層のバリデーションに反映する。
+   - `required: true` は作成リクエストで必須にする。
+   - `type: "enum"` は `options` の全値だけを許可する。
+   - 更新リクエストで部分更新を許す場合でも、更新可能フィールドの集合は `spec.entities[entity].fields` の全フィールドと一致させる。
+4. `spec.flows` を読み取り、対象entityを参照するflowだけを抽出し、APIのビジネスロジックに反映する。
+   - flowの `steps` をAPIのバリデーション、状態遷移、副作用に割り当てる。
+   - 例: `draft` から `submitted` へのflowがある場合、更新APIで許可する状態遷移と不正遷移のエラー処理を実装する。
+   - flowにentity参照がない場合はAPIへ推測ロジックを追加しない。
+5. 生成後にAPIフィールドカバレッジ確認を行う。
+   - `spec.entities[entity].fields` のキー一覧を作成し、リクエストDTO、レスポンスDTO、永続化処理で使われているフィールド一覧との差分を確認する。
+   - 不足フィールドが1つでもある場合はAPI生成を未完了として扱い、追加実装してから完了報告する。
+
+主要バックエンドのCRUD APIファイルパスとコードパターン:
+
+| Backend | パスパターン | コードパターン |
+| --- | --- | --- |
+| Next.js API Routes | `src/app/api/{entity}/route.ts` | `export async function GET`, `export async function POST`, `export async function PUT`, `export async function DELETE` を定義し、各handlerで全フィールドを扱う。 |
+| Express | `src/routes/{entity}.ts` | `router.get`, `router.post`, `router.put`, `router.delete` を定義し、`req.body` から全フィールドを検証して返す。 |
+| FastAPI | `app/routers/{entity}.py` | `@router.get`, `@router.post`, `@router.put`, `@router.delete` とPydantic modelで全フィールドを定義する。 |
+| Rails | `app/controllers/{entities}_controller.rb` | `def index`, `def show`, `def create`, `def update`, `def destroy` とstrong parametersで全フィールドを許可する。 |
+| NestJS | `src/{entity}/{entity}.controller.ts` | `@Get()`, `@Post()`, `@Put()`, `@Delete()` とDTO classで全フィールドを定義する。 |
+
+Next.js API Routes の最小パターン:
+
+```ts
+export async function GET() {
+  // spec.entities[entity].fields の全フィールドを返す
+}
+
+export async function POST(request: Request) {
+  // bodyから全フィールドを読み取り、required/options/flowを検証して保存する
+}
+```
+
+Express の最小パターン:
+
+```ts
+router.post('/{entity}', async (req, res) => {
+  // req.bodyから全フィールドを読み取り、作成結果として全フィールドを返す
+});
+```
+
+FastAPI の最小パターン:
+
+```py
+@router.post('/{entity}')
+def create(payload: EntityPayload):
+    # Pydantic modelで全フィールドを受け取り、全フィールドを返す
+    return payload
+```
+
+Rails の最小パターン:
+
+```rb
+def create
+  # params.require(:entity).permit(...) に全フィールドを含める
+end
+```
+
+NestJS の最小パターン:
+
+```ts
+@Post()
+create(@Body() payload: CreateEntityDto) {
+  // DTOに全フィールドを含め、作成結果として全フィールドを返す
+}
+```
