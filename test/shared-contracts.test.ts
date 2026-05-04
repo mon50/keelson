@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -25,6 +25,27 @@ const validateSkillPaths = [
   '.agents/skills/reforge-validate/SKILL.md'
 ];
 
+const reforgeDirectoryDocumentationPaths = [...validateSkillPaths, 'README.md'];
+
+const reforgeStandardFiles = [
+  {
+    path: '.reforge/spec.json',
+    role: /プロダクト仕様|Single Source of Truth/
+  },
+  {
+    path: '.reforge/spec.previous.json',
+    role: /直前のspecスナップショット|diff|差分/
+  },
+  {
+    path: '.reforge/questions.json',
+    role: /質問キュー|pending|answered/
+  },
+  {
+    path: '.reforge/tasks.json',
+    role: /実装タスクキュー|タスク|entity/
+  }
+];
+
 function parseJsonCodeBlocks(markdown: string): unknown[] {
   return [...markdown.matchAll(/```json\s*\n([\s\S]*?)\n```/g)]
     .map((match) => match[1])
@@ -35,6 +56,16 @@ function parseJsonCodeBlocks(markdown: string): unknown[] {
         return [];
       }
     });
+}
+
+function extractSecondLevelSection(markdown: string, heading: string): string {
+  const start = markdown.indexOf(heading);
+  if (start === -1) {
+    return '';
+  }
+
+  const nextHeading = markdown.indexOf('\n## ', start + heading.length);
+  return nextHeading === -1 ? markdown.slice(start) : markdown.slice(start, nextHeading);
 }
 
 function isCompleteSpecSample(value: unknown): value is SpecJson {
@@ -181,6 +212,35 @@ describe('reforge-validate skill documentation contracts', () => {
     );
 
     expect(codexMarkdown).toBe(claudeMarkdown);
+  });
+
+  it('documents the complete .reforge directory contract and immutable path rule', () => {
+    for (const documentationPath of reforgeDirectoryDocumentationPaths) {
+      const absolutePath = resolve(process.cwd(), documentationPath);
+
+      expect(existsSync(absolutePath), `${documentationPath} must exist`).toBe(true);
+
+      const markdown = readFileSync(absolutePath, 'utf8');
+      const relevantSection = validateSkillPaths.includes(documentationPath)
+        ? extractSecondLevelSection(markdown, '## Prerequisites')
+        : markdown;
+
+      if (validateSkillPaths.includes(documentationPath)) {
+        expect(relevantSection, `${documentationPath} must include a Prerequisites section`).not.toBe('');
+      }
+
+      expect(relevantSection).toContain('`.reforge/`');
+      expect(relevantSection).toContain('`.reforge/` 配下のパスは変更してはならない');
+
+      for (const standardFile of reforgeStandardFiles) {
+        expect(relevantSection, `${documentationPath} must document ${standardFile.path}`).toContain(
+          `\`${standardFile.path}\``
+        );
+        expect(relevantSection, `${documentationPath} must explain the role of ${standardFile.path}`).toMatch(
+          standardFile.role
+        );
+      }
+    }
   });
 
   it('documents the complete spec.json sample, field constraints, and approval gate', () => {

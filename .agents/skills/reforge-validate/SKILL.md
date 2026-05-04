@@ -13,10 +13,23 @@ allowed-tools: Read, Glob
 - Read `.reforge/spec.json` as the required validation target.
 - Read `.reforge/questions.json` only when the file exists.
 
+## Prerequisites
+
+<!-- `.reforge/` 配下のパスは変更してはならない。全コンポーネントが標準パスとして依存するため。 -->
+
+- `.reforge/` は Reforge ワークスペースファイルの標準ディレクトリである。validate はこの標準パスを前提に読み取り、別パスを推測しない。
+- 標準ファイル:
+  - `.reforge/spec.json`: プロダクト仕様の Single Source of Truth。`meta`, `tech`, `entities`, `views`, `flows` を保持する。
+  - `.reforge/spec.previous.json`: 直前の spec スナップショット。diff 操作で現在の `spec.json` と比較するために使う。
+  - `.reforge/questions.json`: 質問キュー。`pending` と `answered` を保持し、全コマンドが不明点の追加・解決状態を共有する。
+  - `.reforge/tasks.json`: 実装タスクキュー。`/reforge:plan` が entity 単位タスクを生成し、`/reforge:impl` が消化する。
+- `.reforge/` 配下のパスは変更してはならない。engine / renderer / impl / installer / validate が同じ標準パスに依存する。
+
 ## Canonical Paths
 
 - `REFORGE_DIR = ".reforge"`
 - `SPEC_PATH = ".reforge/spec.json"`
+- `PREVIOUS_SPEC_PATH = ".reforge/spec.previous.json"`
 - `QUESTIONS_PATH = ".reforge/questions.json"`
 - `TASKS_PATH = ".reforge/tasks.json"`
 
