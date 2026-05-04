@@ -72,6 +72,26 @@ export interface SpecJson {
   flows: Record<string, FlowDefinition>;
 }
 
+export type QuestionPhase = 'meta' | 'tech' | 'data' | 'views' | 'flows';
+
+export interface PendingQuestion {
+  id: string;
+  phase: QuestionPhase;
+  question: string;
+  type: string;
+  /** JSON paths resolved by the answer. */
+  resolves: string[];
+}
+
+export interface AnsweredQuestion extends PendingQuestion {
+  answer: string;
+}
+
+export interface QuestionsJson {
+  pending: PendingQuestion[];
+  answered: AnsweredQuestion[];
+}
+
 export const ENV_SKILL_DIR = {
   'claude-code': '.claude/skills',
   codex: '.agents/skills'

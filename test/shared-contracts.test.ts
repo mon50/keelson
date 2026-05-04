@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import type { FieldType, SpecJson } from '../src/types';
+import type { FieldType, QuestionPhase, QuestionsJson, SpecJson } from '../src/types';
 
 import {
   ALL_SKILLS,
@@ -111,5 +111,47 @@ describe('spec.json shared contracts', () => {
     expect(fieldTypes).toEqual(['string', 'number', 'date', 'enum', 'text', 'boolean']);
     expect(spec.meta.approved).toBe(false);
     expect(spec.entities.report.fields.status.options).toEqual(['draft', 'submitted']);
+  });
+});
+
+describe('questions.json shared contracts', () => {
+  it('exports the TypeScript contract types for questions.json', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/types.ts'), 'utf8');
+    const expectedExports = ['PendingQuestion', 'AnsweredQuestion', 'QuestionsJson'];
+
+    expect(source).toMatch(/export\s+type\s+QuestionPhase\s*=/);
+
+    for (const exportName of expectedExports) {
+      expect(source).toMatch(new RegExp(`export\\s+(?:interface|type)\\s+${exportName}\\b`));
+    }
+  });
+
+  it('accepts a complete questions.json sample with all supported phases', () => {
+    const phases: QuestionPhase[] = ['meta', 'tech', 'data', 'views', 'flows'];
+    const questions: QuestionsJson = {
+      pending: [
+        {
+          id: 'define_tech_frontend',
+          phase: 'tech',
+          question: 'フロントエンドフレームワークは何を使いますか？',
+          type: 'single_choice',
+          resolves: ['tech.frontend']
+        }
+      ],
+      answered: [
+        {
+          id: 'define_entity_name',
+          phase: 'data',
+          question: '管理する主なデータ（エンティティ）の名前は？',
+          type: 'text',
+          resolves: ['entities'],
+          answer: 'report'
+        }
+      ]
+    };
+
+    expect(phases).toEqual(['meta', 'tech', 'data', 'views', 'flows']);
+    expect(questions.pending[0].resolves).toEqual(['tech.frontend']);
+    expect(questions.answered[0].answer).toBe('report');
   });
 });
