@@ -340,4 +340,86 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /対象entityに一致するview typeごと[\s\S]*コンポーネントファイルが存在することを確認/
     );
   });
+
+  it('documents executable test generation from spec.tech.testing', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## Test File Generation Procedure');
+    expect(markdown).toMatch(
+      /`spec\.tech\.testing` を読み取り[\s\S]*単体テスト[\s\S]*APIテスト[\s\S]*テストフレームワークを確定/
+    );
+    expect(markdown).toMatch(
+      /生成後[\s\S]*テストファイルが存在[\s\S]*実行可能であることを確認/
+    );
+  });
+
+  it('lists unit and API test path patterns for Vitest, Jest, pytest, and RSpec', () => {
+    const markdown = readImplSkill();
+
+    const testingPathPatterns = [
+      ['Vitest', 'src/test/{entity}/api.test.ts'],
+      ['Vitest', 'src/test/{entity}/components.test.tsx'],
+      ['Jest', '__tests__/{entity}/api.test.ts'],
+      ['Jest', '__tests__/{entity}/components.test.tsx'],
+      ['pytest', 'tests/test_{entity}_api.py'],
+      ['pytest', 'tests/test_{entity}_unit.py'],
+      ['RSpec', 'spec/requests/{entities}_spec.rb'],
+      ['RSpec', 'spec/models/{entity}_spec.rb']
+    ];
+
+    for (const [framework, pathPattern] of testingPathPatterns) {
+      expect(markdown).toContain(framework);
+      expect(markdown).toContain(pathPattern);
+    }
+  });
+
+  it('requires validation tests for every spec entity field', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]\.fields` の各フィールド[\s\S]*バリデーションテスト/
+    );
+    expect(markdown).toMatch(
+      /`required: true`[\s\S]*欠落時のエラー[\s\S]*`type`[\s\S]*型不一致[\s\S]*`type: "enum"`[\s\S]*`options` 以外/
+    );
+    expect(markdown).toMatch(
+      /フィールドごとの正常系[\s\S]*異常系/
+    );
+  });
+
+  it('requires API CRUD operation tests with field coverage assertions', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /APIのCRUD操作テスト/
+    );
+    expect(markdown).toMatch(
+      /Create[\s\S]*Read[\s\S]*Update[\s\S]*Delete/
+    );
+    expect(markdown).toMatch(
+      /POST[\s\S]*GET[\s\S]*PUT\/PATCH[\s\S]*DELETE/
+    );
+    expect(markdown).toMatch(
+      /CRUD[\s\S]*レスポンス[\s\S]*`spec\.entities\[entity\]\.fields` の全フィールド/
+    );
+  });
+
+  it('documents framework-specific commands to verify generated tests are executable', () => {
+    const markdown = readImplSkill();
+
+    const executionCommands = [
+      'npx vitest run src/test/{entity}/api.test.ts',
+      'npx jest __tests__/{entity}/api.test.ts',
+      'pytest tests/test_{entity}_api.py',
+      'bundle exec rspec spec/requests/{entities}_spec.rb'
+    ];
+
+    for (const command of executionCommands) {
+      expect(markdown).toContain(command);
+    }
+
+    expect(markdown).toMatch(
+      /選択した `spec\.tech\.testing` に対応するコマンド[\s\S]*失敗した場合[\s\S]*完了報告しない/
+    );
+  });
 });

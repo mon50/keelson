@@ -225,3 +225,64 @@ Svelte の最小パターン:
   }
 </script>
 ```
+
+## Test File Generation Procedure
+
+テストファイルは、ゲート通過後に `spec.tech.testing` を読み取り、単体テストとAPIテストのテストフレームワークを確定してから生成する。選択したフレームワークのファイルパス、import方式、実行コマンドに合わせる。spec.jsonに存在しないテスト対象やフィールドは追加しない。
+
+1. `spec.tech.testing` の値からテストフレームワークを決め、下表のパスパターンと実行コマンドを選ぶ。
+2. 単体テストを生成する。
+   - `spec.entities[entity].fields` の各フィールドについてバリデーションテストを作成する。
+   - 各フィールドの `type`、`required`、`options` をテストケースに反映する。
+   - `required: true` は欠落時のエラーを検証し、任意フィールドは欠落またはnull相当値の許容を検証する。
+   - `type` は型不一致の拒否を検証する。`type: "enum"` は `options` 以外の値を拒否し、`options` の全値を受け入れることを検証する。
+   - フィールドごとの正常系と異常系を最低1件ずつ含める。
+3. APIのCRUD操作テストを生成する。
+   - Create / Read / Update / Delete の各操作を、対象バックエンドのHTTPまたはhandler呼び出しパターンで検証する。
+   - POST は全フィールドを含む作成リクエストと必須フィールド欠落の失敗を検証する。
+   - GET は一覧取得または単体取得で全フィールドが返ることを検証する。
+   - PUT/PATCH は更新可能フィールドの変更と、型不一致またはenum不正値の失敗を検証する。
+   - DELETE は削除結果または削除済みentityの識別情報が返ることを検証する。
+   - CRUDの各レスポンスに `spec.entities[entity].fields` の全フィールドが含まれることをアサートする。DELETEが全フィールドを返さない設計の場合は、削除対象の識別情報と削除後GETの非存在結果を検証する。
+4. 生成後、テストファイルが存在し、選択した `spec.tech.testing` に対応するコマンドで実行可能であることを確認する。
+   - テストコマンドが失敗した場合は完了報告しない。失敗内容に基づいてテストまたは生成コードを修正し、再実行する。
+   - 実行コマンドがプロジェクト内に既に定義されている場合は既存コマンドを優先し、下表のフレームワーク別コマンドは対象テスト単体の確認に使う。
+
+主要テストフレームワークのファイルパスパターンと実行コマンド:
+
+| Testing | 単体テスト | APIテスト | 実行確認 |
+| --- | --- | --- | --- |
+| Vitest | `src/test/{entity}/components.test.tsx` | `src/test/{entity}/api.test.ts` | `npx vitest run src/test/{entity}/api.test.ts` |
+| Jest | `__tests__/{entity}/components.test.tsx` | `__tests__/{entity}/api.test.ts` | `npx jest __tests__/{entity}/api.test.ts` |
+| pytest | `tests/test_{entity}_unit.py` | `tests/test_{entity}_api.py` | `pytest tests/test_{entity}_api.py` |
+| RSpec | `spec/models/{entity}_spec.rb` | `spec/requests/{entities}_spec.rb` | `bundle exec rspec spec/requests/{entities}_spec.rb` |
+
+Vitest の最小パターン:
+
+```ts
+import { describe, expect, it } from 'vitest';
+
+describe('{entity} validation', () => {
+  it('validates each spec.entities[entity].fields entry', () => {
+    // required/type/options の正常系と異常系をフィールドごとに検証する
+  });
+});
+```
+
+pytest の最小パターン:
+
+```py
+def test_create_rejects_missing_required_field():
+    # POST相当の入力で required フィールド欠落を検証する
+    assert True
+```
+
+RSpec の最小パターン:
+
+```rb
+RSpec.describe 'entities API', type: :request do
+  it 'returns all spec fields on create' do
+    # POSTのレスポンスに全フィールドが含まれることを検証する
+  end
+end
+```
