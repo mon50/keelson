@@ -67,6 +67,17 @@ AskUserQuestionは既知情報の明確化に限り使用できる。AskUserQues
 
 `"in_progress"` に更新した後でのみ、DB、API、UI、テストの各サブタスク実装を開始する。
 
+## Implementation Error Rollback Procedure
+
+DB、API、UI、テストのいずれかの実装または検証で失敗し、実装中にエラーが発生した場合は、完了報告や `"done"` 更新を行う前に `.reforge/tasks.json` の対象entityタスクの `status` を `"in_progress"` から `"pending"` に戻す。tasks.json の更新は対象タスクだけに限定し、可能な限り一時内容を書いてから置き換えるなど atomic に行い、エラー後に `status: "in_progress"` のまま残さない。
+
+1. 発生したエラーメッセージを記録し、どのサブタスク（DB / API / UI / テスト / 検証）で失敗したかを特定する。
+2. `.reforge/tasks.json` を再読み取りし、対象entityタスクの現在の `status` が `"in_progress"` であることを確認する。
+3. 対象entityタスクだけの `status` を `"pending"` に戻す。
+4. ロールバック後確認として `.reforge/tasks.json` を再読み取りし、対象entityタスクが `status: "pending"` になっていることを確認する。
+5. `status: "pending"` を確認できない場合は完了報告しない。ロールバック失敗として、現在のtasks.json状態と元のエラーメッセージをユーザーに報告する。
+6. `status: "pending"` を確認できた場合は、エラーメッセージとロールバック理由をユーザーに報告する。ロールバック理由には、実装失敗後に tasks.json の `status` が `"in_progress"` のまま残ることを防ぐため、対象entityタスクを再実行可能な `"pending"` に戻したことを含める。
+
 ## DB Migration Generation Procedure
 
 DBマイグレーションは、ゲート通過後に `spec.tech.database` と `spec.tech.orm` の組み合わせに基づくDBマイグレーションファイルとして生成する。database と ORM の組み合わせを先に確定し、その組み合わせに対応するファイルパスと生成方式を選ぶ。

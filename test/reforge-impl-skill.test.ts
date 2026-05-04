@@ -465,4 +465,41 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /status更新[\s\S]*確認できない場合[\s\S]*実装を進めない|完了報告しない/
     );
   });
+
+  it('documents rolling back the selected task from in_progress to pending when implementation fails', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## Implementation Error Rollback Procedure');
+    expect(markdown).toMatch(
+      /実装中にエラーが発生した場合[\s\S]*対象entityタスク[\s\S]*`status` を `"in_progress"` から `"pending"` に戻す/
+    );
+    expect(markdown).toMatch(
+      /DB[\s\S]*API[\s\S]*UI[\s\S]*テスト[\s\S]*いずれかの実装または検証で失敗/
+    );
+    expect(markdown.indexOf('Implementation Error Rollback Procedure')).toBeGreaterThan(
+      markdown.indexOf('tasks.json Status Management Procedure')
+    );
+  });
+
+  it('requires reporting the error message and rollback reason to the user', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /エラーメッセージ[\s\S]*ロールバック理由[\s\S]*ユーザーに報告/
+    );
+    expect(markdown).toMatch(
+      /ロールバック理由[\s\S]*`status` が `"in_progress"` のまま残ることを防ぐ/
+    );
+  });
+
+  it('makes the post-error pending rollback verifiable in tasks.json', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /ロールバック後確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*再読み取り[\s\S]*対象entityタスク[\s\S]*`status: "pending"`/
+    );
+    expect(markdown).toMatch(
+      /`status: "pending"` を確認できない場合[\s\S]*完了報告しない/
+    );
+  });
 });
