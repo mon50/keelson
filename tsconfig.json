@@ -11,6 +11,6 @@
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["bin/**/*.ts"],
+  "include": ["bin/**/*.ts", "src/**/*.ts"],
   "exclude": ["dist", "node_modules", "reforge-renderer", "test"]
 }
