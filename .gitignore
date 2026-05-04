@@ -1,0 +1,24 @@
+# Reforge workspace state (per-project, not part of the OSS distribution)
+.reforge/
+
+# Kiro SDLC development tooling (not part of the OSS product)
+.kiro/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node.js build and dependency artifacts
+node_modules/
+dist/
+reforge-renderer/node_modules/
+reforge-renderer/dist/
