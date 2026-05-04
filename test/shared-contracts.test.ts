@@ -68,6 +68,21 @@ function extractSecondLevelSection(markdown: string, heading: string): string {
   return nextHeading === -1 ? markdown.slice(start) : markdown.slice(start, nextHeading);
 }
 
+function extractFrontmatter(markdown: string): Record<string, string> {
+  const match = /^---\n([\s\S]*?)\n---/.exec(markdown);
+  if (!match) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    match[1]
+      .split('\n')
+      .map((line) => line.match(/^([^:]+):\s*(.*)$/))
+      .filter((line): line is RegExpMatchArray => Boolean(line))
+      .map((line) => [line[1], line[2]])
+  );
+}
+
 function isCompleteSpecSample(value: unknown): value is SpecJson {
   if (!value || typeof value !== 'object') {
     return false;
@@ -212,6 +227,39 @@ describe('reforge-validate skill documentation contracts', () => {
     );
 
     expect(codexMarkdown).toBe(claudeMarkdown);
+  });
+
+  it('defines the validate skill frontmatter and explicit Step 1 through Step 7 skeleton', () => {
+    const expectedSteps = [
+      'Step 1: ファイル読み取り',
+      'Step 2: スキーマ準拠検証',
+      'Step 3: techセクション検証',
+      'Step 4: meta.approved検証',
+      'Step 5: 参照整合性検証',
+      'Step 6: questions.json検証',
+      'Step 7: 結果報告'
+    ];
+
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const frontmatter = extractFrontmatter(markdown);
+      const validationFlow = extractSecondLevelSection(markdown, '## Validation Flow');
+
+      expect(frontmatter, `${skillPath} must define the validate skill frontmatter`).toMatchObject({
+        name: 'reforge-validate',
+        'allowed-tools': 'Read, Glob'
+      });
+      expect(frontmatter.description, `${skillPath} must describe the validate command`).toMatch(
+        /\/reforge:validate|spec\.json/
+      );
+
+      let previousStepPosition = -1;
+      for (const step of expectedSteps) {
+        const stepPosition = validationFlow.indexOf(step);
+        expect(stepPosition, `${skillPath} must document ${step}`).toBeGreaterThan(previousStepPosition);
+        previousStepPosition = stepPosition;
+      }
+    }
   });
 
   it('documents the complete .reforge directory contract and immutable path rule', () => {

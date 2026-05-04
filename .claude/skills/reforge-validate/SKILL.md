@@ -1,6 +1,6 @@
 ---
 name: reforge-validate
-description: Validate a Reforge spec from .reforge/spec.json and the optional .reforge/questions.json queue.
+description: /reforge:validate で .reforge/spec.json と任意の .reforge/questions.json を検証し、全エラーを一括報告する。
 allowed-tools: Read, Glob
 ---
 
@@ -48,22 +48,28 @@ allowed-tools: Read, Glob
 
 ## Validation Flow
 
-1. Check whether `.reforge/spec.json` exists.
-2. Parse `.reforge/spec.json` as JSON.
-3. If the required file is missing or unreadable JSON, report that failure and stop. No downstream spec checks are possible without a parsed spec object.
-4. Determine the response language from `meta.lang`.
-5. Collect all remaining validation errors before responding:
-   - top-level structure
-   - `meta`
-   - `tech`
-   - `entities`
-   - field definitions
-   - `flows`
-   - `views`
-   - `meta.approved` gate status
-   - optional `questions.json`
-   - entity-reference integrity inside `views` and `flows`
-6. Return `✔ valid` when the error list is empty. Otherwise return one `✖ incomplete: ...` line per error.
+1. Step 1: ファイル読み取り
+   - `.reforge/spec.json` の存在を確認し、JSONとして読み取る。
+   - `.reforge/questions.json` は存在する場合のみ読み取り対象にする。
+   - 必須の `spec.json` が存在しない、またはJSONとして解析できない場合は、その失敗を報告して停止する。解析済みのspec objectなしでは後続検証を実行できない。
+2. Step 2: スキーマ準拠検証
+   - `meta.lang` から応答言語を決定する。
+   - トップレベル構造、`meta`、`entities`、field定義、`flows`、`views` の必須構造と型を検証する。
+3. Step 3: techセクション検証
+   - `tech` セクションが存在することを確認する。
+   - `tech.frontend`, `tech.backend`, `tech.database`, `tech.orm`, `tech.styling`, `tech.testing` の6サブフィールドがすべてstringで存在することを検証する。
+4. Step 4: meta.approved検証
+   - `meta.approved` がbooleanで存在することを検証する。
+   - plan/impl 実行前提の検証で `meta.approved` が `false` の場合はゲート違反として報告する。
+5. Step 5: 参照整合性検証
+   - `views` 内の `entity` 参照が `entities` に存在することを検証する。
+   - `flows` 内で明示された entity 参照が `entities` に存在することを検証する。
+6. Step 6: questions.json検証
+   - `.reforge/questions.json` が存在しない場合は質問検証をスキップする。
+   - 存在する場合は `pending` / `answered` の形式を検証し、`pending` に未解決質問が残っていれば報告する。
+7. Step 7: 結果報告
+   - Step 2〜6 の検証エラーは最初の1件で停止せず、すべて収集してから返す。
+   - エラーがなければ `✔ valid` を返す。エラーがある場合は1件ごとに `✖ incomplete: ...` 行を返す。
 
 ## spec.json Schema Comment
 
