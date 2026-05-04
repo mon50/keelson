@@ -65,8 +65,26 @@ allowed-tools: Read, Glob
    - `.reforge/spec.json` のサンプルに `meta`, `tech`, `entities`, `views`, `flows` がすべて存在する場合、このStep 2は `SCHEMA_MISSING_SECTION` を `errors` に追加せず通過する。
    - トップレベル構造、`meta`、`tech`、`entities`、field定義、`flows`、`views` の必須構造と型を検証する。
 3. Step 3: techセクション検証
-   - `tech` セクションが存在することを確認する。
-   - `tech.frontend`, `tech.backend`, `tech.database`, `tech.orm`, `tech.styling`, `tech.testing` の6サブフィールドがすべてstringで存在することを検証する。
+   - `tech` セクションが存在することを確認する。`tech` セクションが欠如している場合は、Step 2 の `SCHEMA_MISSING_SECTION` エラーとして `errors` に追加済みであることを確認する。
+     - code: `SCHEMA_MISSING_SECTION`
+     - path: `tech`
+     - 英語メッセージ形式: `top-level section 'tech' is required`
+     - 日本語メッセージ形式: `トップレベルセクション 'tech' は必須です`
+   - `tech` が欠如している、または object ではない場合でも後続Stepの検証は継続する。存在しない `tech` からサブフィールド値を推測して補完してはならない。
+   - `tech` が object として存在する場合、次の6サブフィールドの存在を1つずつ確認する。
+     - `frontend` (`tech.frontend`)
+     - `backend` (`tech.backend`)
+     - `database` (`tech.database`)
+     - `orm` (`tech.orm`)
+     - `styling` (`tech.styling`)
+     - `testing` (`tech.testing`)
+   - 欠如している tech サブフィールドごとに `errors` リストへ次のエラーを追加し、最初の欠如で停止せず残りの tech サブフィールド確認と後続Stepの検証を継続する。
+     - code: `TECH_MISSING_FIELD`
+     - path: `tech.<FieldName>`
+     - field: `<FieldName>`
+     - 英語メッセージ形式: `tech.<FieldName> is required`
+     - 日本語メッセージ形式: `tech.<FieldName> は必須です`
+   - 6サブフィールドがすべて存在し、かつ string である場合、このStep 3は `TECH_MISSING_FIELD` を `errors` に追加せず通過する。
 4. Step 4: meta.approved検証
    - `meta.approved` がbooleanで存在することを検証する。
    - plan/impl 実行前提の検証で `meta.approved` が `false` の場合はゲート違反として報告する。

@@ -307,6 +307,41 @@ describe('reforge-validate skill documentation contracts', () => {
     }
   });
 
+  it('documents Step 3 tech section completeness checks and field-level errors', () => {
+    const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'];
+
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const step3 = extractValidationStep(markdown, 3);
+
+      expect(step3, `${skillPath} must document Step 3`).not.toBe('');
+      expect(step3, `${skillPath} Step 3 must mention the tech section`).toContain('`tech`');
+
+      for (const field of requiredTechFields) {
+        expect(step3, `${skillPath} Step 3 must require tech.${field}`).toContain(`\`${field}\``);
+        expect(step3, `${skillPath} Step 3 must identify missing tech.${field}`).toContain(`tech.${field}`);
+      }
+
+      expect(step3, `${skillPath} Step 3 must accumulate missing tech fields in errors`).toContain('`errors`');
+      expect(step3, `${skillPath} Step 3 must continue after missing tech fields`).toMatch(
+        /継続|停止しない|止まらない/
+      );
+      expect(step3, `${skillPath} Step 3 must define TECH_MISSING_FIELD`).toContain('`TECH_MISSING_FIELD`');
+      expect(step3, `${skillPath} Step 3 must define the English missing-tech-field message format`).toContain(
+        'tech.<FieldName> is required'
+      );
+      expect(step3, `${skillPath} Step 3 must define the Japanese missing-tech-field message format`).toContain(
+        'tech.<FieldName> は必須です'
+      );
+      expect(step3, `${skillPath} Step 3 must describe absent tech-section behavior`).toMatch(
+        /`tech` セクションが欠如|techセクションが欠如/
+      );
+      expect(step3, `${skillPath} Step 3 must describe an observable missing-tech-section error`).toMatch(
+        /トップレベルセクション 'tech' は必須です|top-level section 'tech' is required/
+      );
+    }
+  });
+
   it('documents the complete .reforge directory contract and immutable path rule', () => {
     for (const documentationPath of reforgeDirectoryDocumentationPaths) {
       const absolutePath = resolve(process.cwd(), documentationPath);
