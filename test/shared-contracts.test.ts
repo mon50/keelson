@@ -373,6 +373,39 @@ describe('reforge-validate skill documentation contracts', () => {
     }
   });
 
+  it('documents Step 5 reference integrity checks for views and flows', () => {
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const step5 = extractValidationStep(markdown, 5);
+
+      expect(step5, `${skillPath} must document Step 5`).not.toBe('');
+      expect(step5, `${skillPath} Step 5 must build the entity key set from entities`).toMatch(
+        /`entities`.*(?:キー|key).*集合/s
+      );
+      expect(step5, `${skillPath} Step 5 must inspect every view entry entity field`).toMatch(
+        /`views`.*(?:各|すべて).*エントリ.*`entity`/s
+      );
+      expect(step5, `${skillPath} Step 5 must require view entity references to exist in entities`).toMatch(
+        /`views\.<ViewName>\.entity`.*`entities`.*存在/s
+      );
+      expect(step5, `${skillPath} Step 5 must accumulate invalid view references in errors`).toMatch(
+        /`REF_INTEGRITY_VIEW`.*`errors`|`errors`.*`REF_INTEGRITY_VIEW`/s
+      );
+      expect(step5, `${skillPath} Step 5 must inspect flow entity references`).toMatch(
+        /`flows`.*entity.*参照.*`entities`.*存在/s
+      );
+      expect(step5, `${skillPath} Step 5 must accumulate invalid flow references in errors`).toMatch(
+        /`REF_INTEGRITY_FLOW`.*`errors`|`errors`.*`REF_INTEGRITY_FLOW`/s
+      );
+      expect(step5, `${skillPath} Step 5 must keep collecting after each invalid reference`).toMatch(
+        /(?:停止せず|継続|全件).*`errors`/s
+      );
+      expect(step5, `${skillPath} Step 5 must describe observable invalid-reference errors`).toMatch(
+        /無効なentity参照.*`REF_INTEGRITY_VIEW`.*`REF_INTEGRITY_FLOW`/s
+      );
+    }
+  });
+
   it('documents the complete .reforge directory contract and immutable path rule', () => {
     for (const documentationPath of reforgeDirectoryDocumentationPaths) {
       const absolutePath = resolve(process.cwd(), documentationPath);

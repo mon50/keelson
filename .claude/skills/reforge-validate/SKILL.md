@@ -100,8 +100,24 @@ allowed-tools: Read, Glob
    - plan/impl 実行要求時に `meta.approved` が `false` の場合は承認ゲート違反のエラーとして扱い、`/reforge:plan` と `/reforge:impl` を実行しない。
    - `meta.approved: false` のスペックでは、通常 validate の出力に `NOT_APPROVED` 情報が報告されることを確認する。
 5. Step 5: 参照整合性検証
-   - `views` 内の `entity` 参照が `entities` に存在することを検証する。
-   - `flows` 内で明示された entity 参照が `entities` に存在することを検証する。
+   - `entities` のキー集合を正規の entity 名一覧として作成する。`entities` が欠如している、または object ではない場合でも、このStep 5で参照先を推測して補完してはならない。
+   - `views` の各エントリの `entity` フィールドを確認する。`views.<ViewName>.entity` が string であり、その値が `entities` のキー集合に存在することを検証する。
+   - `views.<ViewName>.entity` が `entities` に存在しない場合は、無効な view entity 参照として `errors` リストへ次のエラーを追加する。
+     - code: `REF_INTEGRITY_VIEW`
+     - path: `views.<ViewName>.entity`
+     - entity: `<EntityName>`
+     - 英語メッセージ形式: `entity reference '<EntityName>' not found in entities section`
+     - 日本語メッセージ形式: `entities セクションにエンティティ参照 '<EntityName>' が見つかりません`
+   - `flows` 内で entity 名が参照されている場合、その entity 参照が `entities` のキー集合に存在することを検証する。flow 内の明示的な entity 参照として、`entity`, `entities`, `sourceEntity`, `targetEntity`, `fromEntity`, `toEntity` キーを再帰的に確認する。
+   - singular reference key は string entity 名として扱い、plural reference key は string entity 名の配列として扱う。自由記述の `steps` 文字列など、明示的な entity 参照キー以外の文字列を entity 名だと推測してはならない。
+   - `flows` 内の entity 参照が `entities` に存在しない場合は、無効な flow entity 参照として `errors` リストへ次のエラーを追加する。
+     - code: `REF_INTEGRITY_FLOW`
+     - path: `flows.<FlowName>.<ReferencePath>`
+     - entity: `<EntityName>`
+     - 英語メッセージ形式: `entity reference '<EntityName>' not found in entities section`
+     - 日本語メッセージ形式: `entities セクションにエンティティ参照 '<EntityName>' が見つかりません`
+   - view と flow の無効参照は最初の1件で停止せず、すべて確認して `errors` リストに全件追加する。
+   - 無効なentity参照を含むスペック（例: `entities` に `report` のみ存在し、`views.reportForm.entity` と `flows.submitReport.targetEntity` が `missingReport` を参照する）では、`REF_INTEGRITY_VIEW` と `REF_INTEGRITY_FLOW` の両方が `✖ incomplete: ...` 行として報告されることを確認する。
 6. Step 6: questions.json検証
    - `.reforge/questions.json` が存在しない場合は質問検証をスキップする。
    - 存在する場合は `pending` / `answered` の形式を検証し、`pending` に未解決質問が残っていれば報告する。
