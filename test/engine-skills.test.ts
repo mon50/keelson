@@ -1,8 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import type { QuestionsJson, SpecJson } from '../src/types';
+import type { QuestionsJson, SpecJson, TasksJson } from '../src/types';
+
+import { ALL_SKILLS, SKILL_COMMAND } from '../src/types';
 
 const initSkillPaths = [
   '.claude/skills/reforge-init/SKILL.md',
@@ -22,6 +24,11 @@ const updateSkillPaths = [
 const diffSkillPaths = [
   '.claude/skills/reforge-diff/SKILL.md',
   '.agents/skills/reforge-diff/SKILL.md'
+];
+
+const planSkillPaths = [
+  '.claude/skills/reforge-plan/SKILL.md',
+  '.agents/skills/reforge-plan/SKILL.md'
 ];
 
 const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'] as const;
@@ -84,6 +91,15 @@ function isTechQuestionsSample(value: unknown): value is QuestionsJson {
 
   const questionIds = value.pending.map((question) => question.id);
   return requiredTechFields.every((field) => questionIds.includes(`define_tech_${field}`));
+}
+
+function isTasksJson(value: unknown): value is TasksJson {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<TasksJson>;
+  return Array.isArray(candidate.tasks);
 }
 
 describe('reforge-init engine skill contracts', () => {
@@ -250,6 +266,52 @@ describe('reforge-update and reforge-diff engine skill contracts', () => {
       expect(markdown, `${skillPath} must document the unchanged message`).toMatch(
         /前回スナップショット以降に変更はありません|No changes/
       );
+    }
+  });
+});
+
+describe('reforge-plan engine skill contracts', () => {
+  it('keeps Claude Code and Codex plan skill documentation in sync', () => {
+    for (const skillPath of planSkillPaths) {
+      expect(existsSync(resolve(process.cwd(), skillPath)), `${skillPath} must exist`).toBe(true);
+    }
+
+    const [claudeMarkdown, codexMarkdown] = planSkillPaths.map(readMarkdown);
+
+    expect(codexMarkdown).toBe(claudeMarkdown);
+  });
+
+  it('registers reforge-plan as an installable command skill', () => {
+    const skillCommand: Partial<Record<string, string>> = SKILL_COMMAND;
+
+    expect([...ALL_SKILLS]).toContain('reforge-plan');
+    expect(skillCommand['reforge-plan']).toBe('plan');
+  });
+
+  it('documents the approval gate and TasksJson generation from every entity', () => {
+    for (const skillPath of planSkillPaths) {
+      const markdown = readMarkdown(skillPath);
+      const samples = parseJsonCodeBlocks(markdown);
+      const tasksSample = samples.find(isTasksJson);
+
+      expect(markdown, `${skillPath} must refuse planning before approval`).toMatch(
+        /meta\.approved[\s\S]*(?:false|`false`)[\s\S]*(?:refuse|拒否|実行しない)/
+      );
+      expect(markdown, `${skillPath} must guide render for approval`).toContain('/reforge:render');
+      expect(tasksSample?.tasks, `${skillPath} must include a parseable tasks.json sample`).toEqual([
+        {
+          id: 'report',
+          entity: 'report',
+          status: 'pending',
+          subtasks: ['db', 'api', 'ui', 'test']
+        },
+        {
+          id: 'user',
+          entity: 'user',
+          status: 'pending',
+          subtasks: ['db', 'api', 'ui', 'test']
+        }
+      ]);
     }
   });
 });

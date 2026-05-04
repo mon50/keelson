@@ -139,12 +139,13 @@ describe('installer shared contracts', () => {
     expect(Object.keys(ENV_SKILL_DIR).sort()).toEqual([...TARGET_ENVIRONMENTS].sort());
   });
 
-  it('defines the complete installable skill list including renderer', () => {
+  it('defines the complete installable skill list including plan and renderer', () => {
     expect(ALL_SKILLS).toEqual([
       'reforge-init',
       'reforge-resume',
       'reforge-update',
       'reforge-diff',
+      'reforge-plan',
       'reforge-validate',
       'reforge-render'
     ]);
@@ -156,6 +157,7 @@ describe('installer shared contracts', () => {
       'reforge-resume': 'resume',
       'reforge-update': 'update',
       'reforge-diff': 'diff',
+      'reforge-plan': 'plan',
       'reforge-validate': 'validate',
       'reforge-render': 'render'
     });

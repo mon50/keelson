@@ -7,6 +7,7 @@ export const ALL_SKILLS = [
   'reforge-resume',
   'reforge-update',
   'reforge-diff',
+  'reforge-plan',
   'reforge-validate',
   'reforge-render'
 ] as const;
@@ -18,6 +19,7 @@ export const SKILL_COMMAND = {
   'reforge-resume': 'resume',
   'reforge-update': 'update',
   'reforge-diff': 'diff',
+  'reforge-plan': 'plan',
   'reforge-validate': 'validate',
   'reforge-render': 'render'
 } as const satisfies Record<SkillName, string>;
