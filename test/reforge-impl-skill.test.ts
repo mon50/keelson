@@ -59,4 +59,43 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /`meta\.approved` が `true` でない場合[\s\S]*仕様が承認されていません。`\/reforge:render` を実行して承認してください[\s\S]*停止/
     );
   });
+
+  it('documents the tasks.json gate before implementation starts', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain(
+      'tasks.jsonが見つかりません。`/reforge:plan` を実行してください'
+    );
+    expect(markdown).toMatch(
+      /`\.reforge\/tasks\.json` の存在を確認する。[\s\S]*tasks\.jsonが見つかりません。`\/reforge:plan` を実行してください[\s\S]*停止/
+    );
+    expect(markdown.indexOf('`.reforge/tasks.json` の存在を確認する。')).toBeGreaterThan(
+      markdown.indexOf('`meta.approved` が `true` であることを確認する。')
+    );
+  });
+
+  it('documents entity resolution from the first pending tasks.json task when omitted', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain(
+      'entity引数が省略された場合は、`.reforge/tasks.json` の `tasks` 配列を先頭から走査し、最初の `status: "pending"` タスクの `entity` を対象entityとして確定する。'
+    );
+    expect(markdown.indexOf('entity引数が省略された場合')).toBeGreaterThan(
+      markdown.indexOf('`.reforge/tasks.json` の存在を確認する。')
+    );
+    expect(markdown.indexOf('entity引数が省略された場合')).toBeLessThan(
+      markdown.indexOf('`spec.tech` の完全性を確認する。')
+    );
+  });
+
+  it('documents the blocking message when the selected entity has no task', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain(
+      'エンティティ `[entity]` のタスクが見つかりません。`/reforge:plan` を再実行してください'
+    );
+    expect(markdown).toMatch(
+      /対象entityを確定したら[\s\S]*tasks\.json[\s\S]*対応するタスク[\s\S]*エンティティ `\[entity\]` のタスクが見つかりません。`\/reforge:plan` を再実行してください[\s\S]*停止/
+    );
+  });
 });
