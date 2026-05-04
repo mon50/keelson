@@ -24,6 +24,54 @@ export const SKILL_COMMAND = {
 
 export type SkillCommand = (typeof SKILL_COMMAND)[SkillName];
 
+export type FieldType = 'string' | 'number' | 'date' | 'enum' | 'text' | 'boolean';
+
+export interface FieldDefinition {
+  type: FieldType;
+  required?: boolean;
+  /** Required when type is "enum". */
+  options?: string[];
+}
+
+export interface EntityDefinition {
+  fields: Record<string, FieldDefinition>;
+}
+
+export interface ViewDefinition {
+  type: string;
+  entity: string;
+  fields?: string[];
+}
+
+export interface FlowDefinition {
+  steps: string[];
+}
+
+export interface SpecMeta {
+  name: string;
+  version: string;
+  lang: string;
+  /** Defaults to false until the UI prototype is approved. */
+  approved: boolean;
+}
+
+export interface SpecTech {
+  frontend: string;
+  backend: string;
+  database: string;
+  orm: string;
+  styling: string;
+  testing: string;
+}
+
+export interface SpecJson {
+  meta: SpecMeta;
+  tech: SpecTech;
+  entities: Record<string, EntityDefinition>;
+  views: Record<string, ViewDefinition>;
+  flows: Record<string, FlowDefinition>;
+}
+
 export const ENV_SKILL_DIR = {
   'claude-code': '.claude/skills',
   codex: '.agents/skills'
