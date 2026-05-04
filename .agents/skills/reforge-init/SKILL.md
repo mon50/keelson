@@ -43,7 +43,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -60,7 +60,8 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
+- Any written `tech` object has `frontend`, `backend`, `database`, `orm`, `styling`, and `testing`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
@@ -69,18 +70,52 @@ Before responding, verify:
 
 ## Core Data Contracts
 
-### Minimal Spec Shape
+### Natural Language To SpecJson Draft
+
+自然言語のプロダクト説明から `.reforge/spec.json` を生成するときは、必ず reforge-core の `SpecJson` 完全形（`meta` / `tech` / `entities` / `views` / `flows`）でドラフトを書く。説明から明示された値だけを採用し、推測不能な `tech` サブフィールドは空文字のプレースホルダーにせず、対応する pending 質問で未確定として管理する。
+
+入力例: `日報アプリを作りたい。日報にはタイトル、本文、提出日、公開状態がある。一覧画面で日報を確認し、作成して提出する。`
+
+生成例:
 
 ```json
 {
   "meta": {
-    "name": "New Reforge Spec",
+    "name": "日報アプリ",
     "version": "0.1.0",
-    "lang": "en"
+    "lang": "ja",
+    "approved": false
   },
-  "entities": {},
-  "flows": {},
-  "views": {}
+  "tech": {
+    "frontend": "Next.js",
+    "backend": "Node.js",
+    "database": "PostgreSQL",
+    "orm": "Prisma",
+    "styling": "Tailwind CSS",
+    "testing": "Vitest"
+  },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "body": { "type": "text", "required": true },
+        "submittedAt": { "type": "date" },
+        "published": { "type": "boolean" }
+      }
+    }
+  },
+  "views": {
+    "reportList": {
+      "type": "list",
+      "entity": "report",
+      "fields": ["title", "submittedAt", "published"]
+    }
+  },
+  "flows": {
+    "submitReport": {
+      "steps": ["日報を作成する", "内容を確認する", "提出する"]
+    }
+  }
 }
 ```
 
@@ -93,10 +128,64 @@ Before responding, verify:
 }
 ```
 
+### Tech Questions Shape
+
+自然言語の説明から `tech.frontend` / `tech.backend` / `tech.database` / `tech.orm` / `tech.styling` / `tech.testing` のいずれかを推測不能な場合は、未確定の各サブフィールドごとに `questions.json` の `pending` へ質問を追加する。全フィールドが不明な場合の例:
+
+```json
+{
+  "pending": [
+    {
+      "id": "define_tech_frontend",
+      "phase": "tech",
+      "question": "フロントエンドフレームワークは何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.frontend"]
+    },
+    {
+      "id": "define_tech_backend",
+      "phase": "tech",
+      "question": "バックエンドは何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.backend"]
+    },
+    {
+      "id": "define_tech_database",
+      "phase": "tech",
+      "question": "データベースは何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.database"]
+    },
+    {
+      "id": "define_tech_orm",
+      "phase": "tech",
+      "question": "ORMまたはデータアクセス層は何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.orm"]
+    },
+    {
+      "id": "define_tech_styling",
+      "phase": "tech",
+      "question": "スタイリングには何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.styling"]
+    },
+    {
+      "id": "define_tech_testing",
+      "phase": "tech",
+      "question": "テストには何を使いますか？",
+      "type": "text",
+      "resolves": ["tech.testing"]
+    }
+  ],
+  "answered": []
+}
+```
+
 ### Question Entry
 
 - `id`: stable snake_case identifier.
-- `phase`: one of `meta`, `data`, `view`, `flow`, `update`, `review`.
+- `phase`: one of `meta`, `tech`, `data`, `views`, `flows`.
 - `question`: localized user-facing question.
 - `type`: one of `text`, `single_choice`, `multi_choice`, `multi_input`, `confirm`.
 - `resolves`: array of spec paths, such as `entities.report.fields`.
@@ -104,11 +193,10 @@ Before responding, verify:
 Question priority order:
 
 1. `meta`
-2. `data`
-3. `view`
-4. `flow`
-5. `update`
-6. `review`
+2. `tech`
+3. `data`
+4. `views`
+5. `flows`
 
 ## Command Flow
 
@@ -117,25 +205,28 @@ Question priority order:
 3. If `SPEC_PATH` already exists, do not overwrite it silently.
    - Ask one confirm question: overwrite existing spec or cancel.
    - If the user chooses overwrite and an existing spec is valid JSON, save it to `PREVIOUS_SPEC_PATH` before writing the new spec.
-4. Start from the minimal spec shape.
+4. Start from the full `SpecJson` draft shape.
 5. Set `meta.name` from the most explicit product/app name in the description. If no name is explicit, use a neutral name and create a `meta` question for the final name.
 6. Set `meta.version` to `"0.1.0"`.
-7. Set `meta.lang` from existing valid spec language when available; otherwise default to `"en"`.
-8. Extract only explicit entities, fields, views, and flows:
+7. Set `meta.lang` from existing valid spec language when available; otherwise infer from the description and default to `"ja"` when the user's language is Japanese.
+8. Set `meta.approved` to `false` on every new draft.
+9. Fill each `tech` sub-field only when the description states it explicitly; otherwise create the matching `define_tech_{field}` pending question.
+10. Extract only explicit entities, fields, views, and flows:
    - If an entity is explicitly named, add it.
    - If a field is explicitly named and its type is clear, add it.
    - If a field exists but type is unclear, create a question instead of guessing.
    - If a view or flow is not explicit, leave it absent and create the next needed question.
-9. Generate pending questions for missing decisions needed to complete a useful MVP spec.
-10. De-duplicate pending questions by normalized `resolves`.
-11. Write `SPEC_PATH` and `QUESTIONS_PATH` only after the Quality Gate passes.
-12. Present the highest-priority pending question if one exists; otherwise report that `/reforge:validate` can be run.
+11. Generate pending questions for missing decisions needed to complete a useful MVP spec.
+12. De-duplicate pending questions by normalized `resolves`.
+13. Write `SPEC_PATH` and `QUESTIONS_PATH` only after the Quality Gate passes.
+14. Present the highest-priority pending question if one exists; otherwise report that `/reforge:validate` can be run.
 
 ## Unknown Handling Rules
 
 Create questions rather than guessing for:
 
 - Primary entity name.
+- Tech stack fields: `tech.frontend`, `tech.backend`, `tech.database`, `tech.orm`, `tech.styling`, and `tech.testing`.
 - Entity fields.
 - Field types.
 - Required vs optional fields.
