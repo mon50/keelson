@@ -92,6 +92,21 @@ export interface QuestionsJson {
   answered: AnsweredQuestion[];
 }
 
+export type TaskStatus = 'pending' | 'in_progress' | 'done';
+
+export type Subtask = 'db' | 'api' | 'ui' | 'test';
+
+export interface TaskEntry {
+  id: string;
+  entity: string;
+  status: TaskStatus;
+  subtasks: Subtask[];
+}
+
+export interface TasksJson {
+  tasks: TaskEntry[];
+}
+
 export const ENV_SKILL_DIR = {
   'claude-code': '.claude/skills',
   codex: '.agents/skills'

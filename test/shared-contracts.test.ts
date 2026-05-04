@@ -2,7 +2,16 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import type { FieldType, QuestionPhase, QuestionsJson, SpecJson } from '../src/types';
+import type {
+  FieldType,
+  QuestionPhase,
+  QuestionsJson,
+  SpecJson,
+  Subtask,
+  TaskEntry,
+  TasksJson,
+  TaskStatus
+} from '../src/types';
 
 import {
   ALL_SKILLS,
@@ -153,5 +162,41 @@ describe('questions.json shared contracts', () => {
     expect(phases).toEqual(['meta', 'tech', 'data', 'views', 'flows']);
     expect(questions.pending[0].resolves).toEqual(['tech.frontend']);
     expect(questions.answered[0].answer).toBe('report');
+  });
+});
+
+describe('tasks.json shared contracts', () => {
+  it('exports the TypeScript contract types for tasks.json', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/types.ts'), 'utf8');
+    const expectedExports = ['TaskEntry', 'TasksJson'];
+
+    expect(source).toMatch(/export\s+type\s+TaskStatus\s*=/);
+    expect(source).toMatch(/export\s+type\s+Subtask\s*=/);
+
+    for (const exportName of expectedExports) {
+      expect(source).toMatch(new RegExp(`export\\s+(?:interface|type)\\s+${exportName}\\b`));
+    }
+  });
+
+  it('accepts a complete tasks.json sample with all supported statuses and subtasks', () => {
+    const statuses: TaskStatus[] = ['pending', 'in_progress', 'done'];
+    const subtasks: Subtask[] = ['db', 'api', 'ui', 'test'];
+    const task: TaskEntry = {
+      id: 'report',
+      entity: 'report',
+      status: 'pending',
+      subtasks
+    };
+    const tasksJson: TasksJson = {
+      tasks: [task]
+    };
+
+    expect(statuses).toEqual(['pending', 'in_progress', 'done']);
+    expect(tasksJson.tasks[0]).toEqual({
+      id: 'report',
+      entity: 'report',
+      status: 'pending',
+      subtasks: ['db', 'api', 'ui', 'test']
+    });
   });
 });
