@@ -48,6 +48,29 @@ function isCompleteSpecSample(value: unknown): value is SpecJson {
   );
 }
 
+function isCompleteQuestionsSample(value: unknown): value is QuestionsJson {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<Record<keyof QuestionsJson, unknown>>;
+  return (
+    Array.isArray(candidate.pending) &&
+    Array.isArray(candidate.answered) &&
+    candidate.pending.some((entry) => Boolean(entry) && typeof entry === 'object' && !('answer' in entry)) &&
+    candidate.answered.some((entry) => Boolean(entry) && typeof entry === 'object' && 'answer' in entry)
+  );
+}
+
+function isCompleteTasksSample(value: unknown): value is TasksJson {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<Record<keyof TasksJson, unknown>>;
+  return Array.isArray(candidate.tasks) && candidate.tasks.length > 0;
+}
+
 describe('installer shared contracts', () => {
   it('defines all supported target environments and their skill directories', () => {
     expect(TARGET_ENVIRONMENTS).toEqual(['claude-code', 'codex']);
@@ -194,6 +217,56 @@ describe('reforge-validate skill documentation contracts', () => {
       expect(markdown).toContain('`meta.approved` のデフォルト値は `false`');
       expect(markdown).toContain('`meta.approved: false` の間は `/reforge:plan` と `/reforge:impl` を実行してはならない');
       expect(markdown).toContain('`meta.approved: true` の場合に限り `/reforge:plan` と `/reforge:impl` を実行できる');
+    }
+  });
+
+  it('documents questions.json and tasks.json samples with shared value lists', () => {
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const samples = parseJsonCodeBlocks(markdown);
+      const questionsSample = samples.find(isCompleteQuestionsSample);
+      const tasksSample = samples.find(isCompleteTasksSample);
+
+      expect(questionsSample, `${skillPath} must include a parseable questions.json sample`).toBeTruthy();
+      expect(questionsSample?.pending[0]).toMatchObject({
+        id: 'define_tech_frontend',
+        phase: 'tech',
+        question: 'フロントエンドフレームワークは何を使いますか？',
+        type: 'single_choice',
+        resolves: ['tech.frontend']
+      });
+      expect(questionsSample?.answered[0]).toMatchObject({
+        id: 'define_entity_name',
+        phase: 'data',
+        question: '管理する主なデータ（エンティティ）の名前は？',
+        type: 'text',
+        resolves: ['entities'],
+        answer: 'report'
+      });
+
+      for (const phase of ['meta', 'tech', 'data', 'views', 'flows']) {
+        expect(markdown).toMatch(new RegExp(`\\|\\s*\`${phase}\`\\s*\\|`));
+      }
+
+      expect(tasksSample, `${skillPath} must include a parseable tasks.json sample`).toBeTruthy();
+      expect(tasksSample?.tasks[0]).toEqual({
+        id: 'report',
+        entity: 'report',
+        status: 'pending',
+        subtasks: ['db', 'api', 'ui', 'test']
+      });
+
+      for (const status of ['pending', 'in_progress', 'done']) {
+        expect(markdown).toMatch(new RegExp(`\\|\\s*\`${status}\`\\s*\\|`));
+      }
+
+      for (const subtask of ['db', 'api', 'ui', 'test']) {
+        expect(markdown).toMatch(new RegExp(`\\|\\s*\`${subtask}\`\\s*\\|`));
+      }
+
+      expect(markdown).toContain('`.reforge/questions.json`');
+      expect(markdown).toContain('`.reforge/tasks.json`');
+      expect(markdown).toContain('タスク粒度は entity 単位');
     }
   });
 });

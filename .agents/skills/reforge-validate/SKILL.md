@@ -18,6 +18,7 @@ allowed-tools: Read, Glob
 - `REFORGE_DIR = ".reforge"`
 - `SPEC_PATH = ".reforge/spec.json"`
 - `QUESTIONS_PATH = ".reforge/questions.json"`
+- `TASKS_PATH = ".reforge/tasks.json"`
 
 ## Output Contract
 
@@ -223,6 +224,37 @@ allowed-tools: Read, Glob
 
 ## questions.json Rules
 
+このセクションは `.reforge/questions.json` の正本コメントである。`questions.json` は全コマンド共有の質問キューであり、不明点を推測で補完せず `pending` に積み、回答後に `answered` へ移動する。
+
+### questions.json 完全サンプル
+
+```json
+{
+  "pending": [
+    {
+      "id": "define_tech_frontend",
+      "phase": "tech",
+      "question": "フロントエンドフレームワークは何を使いますか？",
+      "type": "single_choice",
+      "resolves": ["tech.frontend"]
+    }
+  ],
+  "answered": [
+    {
+      "id": "define_entity_name",
+      "phase": "data",
+      "question": "管理する主なデータ（エンティティ）の名前は？",
+      "type": "text",
+      "resolves": ["entities"],
+      "answer": "report"
+    }
+  ]
+}
+```
+
+### questions.json 形式
+
+- 保存パスは `.reforge/questions.json` であり、すべての Reforge コマンドが共有する。
 - If `.reforge/questions.json` does not exist, skip questions validation.
 - If the file exists, it must parse as a JSON object.
 - The root object must contain `pending` and `answered`.
@@ -233,8 +265,66 @@ allowed-tools: Read, Glob
   - `question` as string
   - `type` as string
   - `resolves` as an array of strings
+- `pending` の質問が回答されたら、同じ質問エントリに `answer` フィールドを追加して `answered` へ移動する。
 - If a question entry is missing `id`, refer to it by queue position such as `pending[0]` or `answered[2]` in the explanation text.
 - After format validation, require `pending` to be empty.
+
+### phase 有効値
+
+| 値 | 意味 |
+|---|---|
+| `meta` | `meta` セクションに関する質問 |
+| `tech` | `tech` セクションに関する質問 |
+| `data` | `entities` とデータモデルに関する質問 |
+| `views` | `views` セクションに関する質問 |
+| `flows` | `flows` セクションに関する質問 |
+
+## tasks.json Rules
+
+このセクションは `.reforge/tasks.json` の正本コメントである。`/reforge:plan` が entity 単位の実装タスクを生成し、`/reforge:impl` が `status` と `subtasks` を読み取って消化する。
+
+### tasks.json 完全サンプル
+
+```json
+{
+  "tasks": [
+    {
+      "id": "report",
+      "entity": "report",
+      "status": "pending",
+      "subtasks": ["db", "api", "ui", "test"]
+    }
+  ]
+}
+```
+
+### tasks.json 形式
+
+- 保存パスは `.reforge/tasks.json` である。
+- ルートオブジェクトはトップレベルに `tasks` 配列を持つ。
+- 各タスクエントリは object で、次のフィールドを必ず持つ。
+  - `id`: string
+  - `entity`: string
+  - `status`: `pending`, `in_progress`, `done` のいずれか
+  - `subtasks`: `db`, `api`, `ui`, `test` の配列
+- タスク粒度は entity 単位である。1つのタスクは単一 entity の DB、API、UI、テストをひとまとめに扱う。
+
+### status 有効値
+
+| 値 | 意味 |
+|---|---|
+| `pending` | 未着手 |
+| `in_progress` | 実装中 |
+| `done` | 完了 |
+
+### subtasks 有効値
+
+| 値 | 意味 |
+|---|---|
+| `db` | DBスキーマ / マイグレーション |
+| `api` | APIエンドポイント / サーバーロジック |
+| `ui` | UIコンポーネント / 画面 |
+| `test` | 自動テスト |
 
 ## Entity Reference Integrity
 
