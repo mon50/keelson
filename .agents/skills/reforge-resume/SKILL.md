@@ -20,6 +20,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - `SPEC_PATH = ".reforge/spec.json"`
 - `QUESTIONS_PATH = ".reforge/questions.json"`
 - `PREVIOUS_SPEC_PATH = ".reforge/spec.previous.json"`
+- `TASKS_PATH = ".reforge/tasks.json"`
 
 ## Prompt Kernel
 
@@ -42,7 +43,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -59,7 +60,7 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
@@ -68,22 +69,37 @@ Before responding, verify:
 
 ## Command Flow
 
-1. Read `SPEC_PATH`.
-   - If missing, block and report that `/reforge:init "<description>"` is required.
-   - If invalid JSON, block and report the file that must be fixed.
-2. Read `QUESTIONS_PATH`.
-   - If missing, block and report that the session cannot resume without question state.
-   - If invalid JSON, block and report the file that must be fixed.
-3. Validate that questions root has `pending` and `answered` arrays.
-4. Sort or select pending by dependency priority without reordering unless needed:
-   - `meta`, `data`, `view`, `flow`, `update`, `review`.
-5. If `pending` is empty:
-   - Report lifecycle stage `complete`.
-   - Report pending count `0`.
-   - Tell the user to run `/reforge:validate`.
-6. If `pending` has entries:
-   - Present exactly the first/highest-priority question.
-   - Do not present additional questions in the same response.
+### Navigator Decision Tree
+
+このナビゲーターは必ず下記の順序で状態を評価し、最初に一致した条件で停止する。後続条件を先に評価してはならない。
+
+1. `SPEC_PATH` missing
+   - `.reforge/spec.json` が存在しない場合は、`/reforge:init "<description>"` を案内して `blocked` として終了する。
+   - `SPEC_PATH` が invalid JSON の場合も、修正すべきファイルを報告して終了する。
+2. `QUESTIONS_PATH` pending
+   - `.reforge/questions.json` を読み取り、`pending` が1件以上ある場合は最優先の1件だけを AskUserQuestion で提示する。
+   - Present exactly one pending question. 同じ実行で2問目を提示してはならない。
+   - 回答を受け取った場合は `resolves` のJSONパスへ反映し、質問を `pending` から `answered` へ移動して終了する。
+3. `reforge-validate fails`
+   - pending が0件の場合に限り、reforge-core の検証規則に従って `SPEC_PATH` を確認する。
+   - 検証エラーがある場合はエラーを表示し、`/reforge:validate` で問題を解消するよう案内して終了する。
+4. `meta.approved` is `false`
+   - `meta.approved` が `false` か未設定の場合は、`/reforge:render` でUIプロトタイプを確認・承認するよう案内して終了する。
+5. `TASKS_PATH` missing
+   - `meta.approved` が `true` で `.reforge/tasks.json` が存在しない場合は、`/reforge:plan` を案内して終了する。
+6. `pending` or `in_progress` task exists
+   - `TASKS_PATH` に `status: "pending"` または `status: "in_progress"` のタスクがある場合は、最初の対象 `entity` で `/reforge:impl <entity>` を案内して終了する。
+7. `verification is not complete`
+   - すべてのタスクが `done` で、検証完了の証跡がない場合は `/reforge:verify` を案内して終了する。
+8. `project complete`
+   - すべてのタスクが `done` で検証完了の証跡がある場合のみ、プロジェクト完了を報告する。
+
+### State Reads
+
+1. Read `SPEC_PATH` before all other state files.
+2. Read `QUESTIONS_PATH` only after `SPEC_PATH` exists and is valid JSON.
+3. Read `TASKS_PATH` only after pending questions are empty, validation passes, and `meta.approved` is `true`.
+4. Do not invoke other Reforge skills directly. Read state, report the matching branch, and guide the user to the next command.
 
 ## Answer Application
 
@@ -117,4 +133,3 @@ Report concisely:
 - Next gate:
   - If pending count is 0: `/reforge:validate`.
   - If pending count is greater than 0: answer the single presented question or run `/reforge:resume`.
-

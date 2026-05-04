@@ -9,6 +9,11 @@ const initSkillPaths = [
   '.agents/skills/reforge-init/SKILL.md'
 ];
 
+const resumeSkillPaths = [
+  '.claude/skills/reforge-resume/SKILL.md',
+  '.agents/skills/reforge-resume/SKILL.md'
+];
+
 const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'] as const;
 
 function readMarkdown(skillPath: string): string {
@@ -122,6 +127,63 @@ describe('reforge-init engine skill contracts', () => {
         });
         expect(question.resolves).toEqual([question.id.replace('define_tech_', 'tech.')]);
       }
+    }
+  });
+});
+
+describe('reforge-resume engine skill contracts', () => {
+  it('keeps Claude Code and Codex resume skill documentation in sync', () => {
+    const [claudeMarkdown, codexMarkdown] = resumeSkillPaths.map(readMarkdown);
+
+    expect(codexMarkdown).toBe(claudeMarkdown);
+  });
+
+  it('documents navigator decisions in the required stop-at-first-match order', () => {
+    const expectedOrder = [
+      '`SPEC_PATH` missing',
+      '`QUESTIONS_PATH` pending',
+      'reforge-validate fails',
+      '`meta.approved` is `false`',
+      '`TASKS_PATH` missing',
+      '`pending` or `in_progress` task exists',
+      'verification is not complete',
+      'project complete'
+    ];
+
+    for (const skillPath of resumeSkillPaths) {
+      const markdown = readMarkdown(skillPath);
+      let previousPosition = -1;
+
+      expect(markdown, `${skillPath} must define the navigator as stop-at-first-match`).toMatch(
+        /stop at the first matching condition|最初に一致した条件で停止/
+      );
+
+      for (const marker of expectedOrder) {
+        const position = markdown.indexOf(marker);
+        expect(position, `${skillPath} must document navigator marker: ${marker}`).toBeGreaterThan(
+          previousPosition
+        );
+        previousPosition = position;
+      }
+    }
+  });
+
+  it('documents the observable guidance for init, question, render, and plan branches', () => {
+    for (const skillPath of resumeSkillPaths) {
+      const markdown = readMarkdown(skillPath);
+
+      expect(markdown, `${skillPath} must guide init when spec.json is missing`).toMatch(
+        /`SPEC_PATH` missing[\s\S]*\/reforge:init/
+      );
+      expect(markdown, `${skillPath} must present exactly one pending question`).toMatch(
+        /`QUESTIONS_PATH` pending[\s\S]*AskUserQuestion[\s\S]*exactly one|`QUESTIONS_PATH` pending[\s\S]*AskUserQuestion[\s\S]*1問/
+      );
+      expect(markdown, `${skillPath} must guide render when meta.approved is false`).toMatch(
+        /`meta\.approved` is `false`[\s\S]*\/reforge:render/
+      );
+      expect(markdown, `${skillPath} must guide plan when tasks.json is missing`).toMatch(
+        /`TASKS_PATH` missing[\s\S]*\/reforge:plan/
+      );
     }
   });
 });
