@@ -54,7 +54,16 @@ allowed-tools: Read, Glob
    - 必須の `spec.json` が存在しない、またはJSONとして解析できない場合は、その失敗を報告して停止する。解析済みのspec objectなしでは後続検証を実行できない。
 2. Step 2: スキーマ準拠検証
    - `meta.lang` から応答言語を決定する。
-   - トップレベル構造、`meta`、`entities`、field定義、`flows`、`views` の必須構造と型を検証する。
+   - `spec.json` がJSON objectであることを確認する。
+   - 必須最上位セクションとして `meta`, `tech`, `entities`, `views`, `flows` がすべて存在することを確認する。
+   - 欠如している必須最上位セクションごとに `errors` リストへ次のエラーを追加し、最初の欠如で停止せず残りのセクション確認と後続Stepの検証を継続する。
+     - code: `SCHEMA_MISSING_SECTION`
+     - path: `<SectionName>`
+     - 英語メッセージ形式: `top-level section '<SectionName>' is required`
+     - 日本語メッセージ形式: `トップレベルセクション '<SectionName>' は必須です`
+   - `meta`, `tech`, `entities`, `views`, `flows` はobjectでなければならない。存在するセクションだけ詳細構造を検証し、欠如セクションがあっても他セクションの検証は継続する。
+   - `.reforge/spec.json` のサンプルに `meta`, `tech`, `entities`, `views`, `flows` がすべて存在する場合、このStep 2は `SCHEMA_MISSING_SECTION` を `errors` に追加せず通過する。
+   - トップレベル構造、`meta`、`tech`、`entities`、field定義、`flows`、`views` の必須構造と型を検証する。
 3. Step 3: techセクション検証
    - `tech` セクションが存在することを確認する。
    - `tech.frontend`, `tech.backend`, `tech.database`, `tech.orm`, `tech.styling`, `tech.testing` の6サブフィールドがすべてstringで存在することを検証する。

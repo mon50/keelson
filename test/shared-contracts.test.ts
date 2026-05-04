@@ -68,6 +68,18 @@ function extractSecondLevelSection(markdown: string, heading: string): string {
   return nextHeading === -1 ? markdown.slice(start) : markdown.slice(start, nextHeading);
 }
 
+function extractValidationStep(markdown: string, stepNumber: number): string {
+  const validationFlow = extractSecondLevelSection(markdown, '## Validation Flow');
+  const heading = `${stepNumber}. Step ${stepNumber}:`;
+  const start = validationFlow.indexOf(heading);
+  if (start === -1) {
+    return '';
+  }
+
+  const nextHeading = validationFlow.indexOf(`\n${stepNumber + 1}. Step ${stepNumber + 1}:`, start + heading.length);
+  return nextHeading === -1 ? validationFlow.slice(start) : validationFlow.slice(start, nextHeading);
+}
+
 function extractFrontmatter(markdown: string): Record<string, string> {
   const match = /^---\n([\s\S]*?)\n---/.exec(markdown);
   if (!match) {
@@ -259,6 +271,39 @@ describe('reforge-validate skill documentation contracts', () => {
         expect(stepPosition, `${skillPath} must document ${step}`).toBeGreaterThan(previousStepPosition);
         previousStepPosition = stepPosition;
       }
+    }
+  });
+
+  it('documents Step 2 schema compliance checks and missing-section error collection', () => {
+    const requiredSections = ['meta', 'tech', 'entities', 'views', 'flows'];
+
+    for (const skillPath of validateSkillPaths) {
+      const markdown = readFileSync(resolve(process.cwd(), skillPath), 'utf8');
+      const step2 = extractValidationStep(markdown, 2);
+
+      expect(step2, `${skillPath} must document Step 2`).not.toBe('');
+
+      for (const section of requiredSections) {
+        expect(step2, `${skillPath} Step 2 must require ${section}`).toContain(`\`${section}\``);
+      }
+
+      expect(step2, `${skillPath} Step 2 must accumulate missing sections in errors`).toContain('`errors`');
+      expect(step2, `${skillPath} Step 2 must continue after missing sections`).toMatch(/継続|停止しない|止まらない/);
+      expect(step2, `${skillPath} Step 2 must define SCHEMA_MISSING_SECTION`).toContain(
+        '`SCHEMA_MISSING_SECTION`'
+      );
+      expect(step2, `${skillPath} Step 2 must define the English missing-section message format`).toContain(
+        "top-level section '<SectionName>' is required"
+      );
+      expect(step2, `${skillPath} Step 2 must define the Japanese missing-section message format`).toContain(
+        "トップレベルセクション '<SectionName>' は必須です"
+      );
+      expect(step2, `${skillPath} Step 2 must mention the complete-section .reforge/spec.json check`).toContain(
+        '`.reforge/spec.json`'
+      );
+      expect(step2, `${skillPath} Step 2 must describe the passing complete-section sample/check`).toMatch(
+        /すべて.*存在.*(?:通過|追加しない|エラーなし)/s
+      );
     }
   });
 
