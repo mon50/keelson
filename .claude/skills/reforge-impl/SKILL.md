@@ -156,3 +156,72 @@ create(@Body() payload: CreateEntityDto) {
   // DTOに全フィールドを含め、作成結果として全フィールドを返す
 }
 ```
+
+## UI Component Generation Procedure
+
+UIコンポーネントは、ゲート通過後に `spec.tech.frontend` を読み取り、UIコンポーネント生成に使うフロントエンドフレームワークを確定する。`spec.views` から `entity` が対象entityと一致するviewだけを抽出し、各viewの `type` が form / list / detail のどれかに一致するか確認してから対応コンポーネントを生成する。
+
+1. `spec.tech.frontend` の値からフロントエンド種別を決め、下表のパスパターンを選ぶ。
+2. `spec.views` のうち `entity` が対象entityと一致するviewだけを処理対象にする。
+   - `type: "form"` のviewから、viewの `fields` を入力項目として持つ form 入力コンポーネントを生成し、作成または更新APIを呼ぶ送信ハンドラーを実装する。
+   - `type: "list"` のviewから、viewの `fields` を表示する list 一覧コンポーネントを生成し、列、行またはカードとして一覧取得APIの結果を表示する。
+   - `type: "detail"` のviewから、viewの `fields` を表示する detail 詳細コンポーネントを生成し、読み取り表示として単体取得APIの結果を表示する。
+   - 未知のview typeがある場合は推測で生成せず、未対応typeとして報告する。
+3. 各コンポーネントは `spec.entities[entity].fields` の型、必須制約、enum optionsをUIに反映する。
+   - `required: true` は必須入力、必須表示、または空値エラーとして扱う。
+   - `type: "enum"` は `options` の全値だけを選べるselect、radio、または同等の入力UIにする。
+   - viewの `fields` にないフィールドを勝手に画面へ追加しない。
+4. `spec.tech.styling` を読み取り、スタイリング方式を確定する。
+   - Tailwind CSS の場合は `className` または対象フレームワークのclass属性へユーティリティクラスを直接指定し、フォーム、一覧、詳細表示の余白、入力、ボタン、エラー表示を構成する。
+   - CSS Modules の場合は `{Entity}Form.module.css`、`{Entity}List.module.css`、`{Entity}Detail.module.css` または `.module.scss` を併置し、コンポーネントから import してclassを参照する。
+   - その他のstyling値の場合は、既存プロジェクト内で同じstyling方式のコンポーネントを読み、同じ配置と命名に合わせる。spec.jsonにないデザイン要件は追加しない。
+5. `spec.flows` を読み取り、対象entityを参照するflowだけを抽出し、UIコンポーネントのハンドラーに反映する。
+   - flowの `steps` を form の onSubmit、list の行アクション onClick、detail の状態変更 onClick などのハンドラーへ割り当て、許可された状態遷移だけを実行する。
+   - 例: `draft` から `submitted` へのflowがある場合、formのonSubmitまたはdetailの送信ボタンで状態遷移を実行し、不正な状態遷移はUI上で無効化またはエラー表示する。
+   - flowにentity参照がない場合はUIへ推測ロジックを追加しない。
+6. UIコンポーネント生成確認を行う。
+   - 対象entityに一致するview typeごとに、form は `{Entity}Form`、list は `{Entity}List`、detail は `{Entity}Detail` のコンポーネントファイルが存在することを確認する。
+   - `spec.views` に form / list / detail が全て存在する場合は、3種類すべてのコンポーネントが生成されていることを確認する。
+   - 不足しているview typeのコンポーネントが1つでもある場合はUI生成を未完了として扱い、追加実装してから完了報告する。
+
+主要フロントエンドのUIコンポーネントファイルパスパターン:
+
+| Frontend | form | list | detail |
+| --- | --- | --- | --- |
+| Next.js | `src/components/{entity}/{Entity}Form.tsx` | `src/components/{entity}/{Entity}List.tsx` | `src/components/{entity}/{Entity}Detail.tsx` |
+| React | `src/components/{entity}/{Entity}Form.tsx` | `src/components/{entity}/{Entity}List.tsx` | `src/components/{entity}/{Entity}Detail.tsx` |
+| Vue | `src/components/{entity}/{Entity}Form.vue` | `src/components/{entity}/{Entity}List.vue` | `src/components/{entity}/{Entity}Detail.vue` |
+| Svelte | `src/lib/components/{entity}/{Entity}Form.svelte` | `src/lib/components/{entity}/{Entity}List.svelte` | `src/lib/components/{entity}/{Entity}Detail.svelte` |
+| Other | 既存プロジェクトのコンポーネント配置に合わせる | 既存プロジェクトのコンポーネント配置に合わせる | 既存プロジェクトのコンポーネント配置に合わせる |
+
+Next.js / React の最小パターン:
+
+```tsx
+export function EntityForm() {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    // view.fieldsの入力値を読み取り、required/options/flowを検証してAPIへ送信する
+  }
+
+  return <form onSubmit={onSubmit}>{/* view.fieldsの入力UI */}</form>;
+}
+```
+
+Vue の最小パターン:
+
+```vue
+<script setup lang="ts">
+async function onSubmit() {
+  // view.fieldsの入力値を読み取り、required/options/flowを検証してAPIへ送信する
+}
+</script>
+```
+
+Svelte の最小パターン:
+
+```svelte
+<script lang="ts">
+  async function onSubmit() {
+    // view.fieldsの入力値を読み取り、required/options/flowを検証してAPIへ送信する
+  }
+</script>
+```

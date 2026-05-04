@@ -267,4 +267,77 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /不足フィールドが1つでもある場合[\s\S]*未完了/
     );
   });
+
+  it('documents UI component generation for form, list, and detail views matching the entity', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## UI Component Generation Procedure');
+    expect(markdown).toMatch(
+      /`spec\.views`[\s\S]*`entity` が対象entityと一致するview[\s\S]*`type`[\s\S]*form[\s\S]*list[\s\S]*detail/
+    );
+    expect(markdown).toMatch(
+      /form[\s\S]*入力コンポーネント[\s\S]*送信ハンドラー/
+    );
+    expect(markdown).toMatch(
+      /list[\s\S]*一覧コンポーネント[\s\S]*行またはカード/
+    );
+    expect(markdown).toMatch(
+      /detail[\s\S]*詳細コンポーネント[\s\S]*読み取り表示/
+    );
+  });
+
+  it('lists UI component file path patterns for major frontend frameworks', () => {
+    const markdown = readImplSkill();
+
+    const frontendPatterns = [
+      ['Next.js', 'src/components/{entity}/{Entity}Form.tsx'],
+      ['React', 'src/components/{entity}/{Entity}List.tsx'],
+      ['Vue', 'src/components/{entity}/{Entity}Detail.vue'],
+      ['Svelte', 'src/lib/components/{entity}/{Entity}Form.svelte']
+    ];
+
+    for (const [frontend, pathPattern] of frontendPatterns) {
+      expect(markdown).toContain(frontend);
+      expect(markdown).toContain(pathPattern);
+    }
+  });
+
+  it('documents styling instructions from spec.tech.styling', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.tech\.styling`[\s\S]*スタイリング方式を確定/
+    );
+    expect(markdown).toMatch(
+      /Tailwind CSS[\s\S]*className[\s\S]*ユーティリティクラス/
+    );
+    expect(markdown).toMatch(
+      /CSS Modules[\s\S]*\.module\.(css|scss)[\s\S]*import/
+    );
+  });
+
+  it('reflects entity-referencing flows into UI component handlers', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.flows`[\s\S]*対象entityを参照するflow[\s\S]*UIコンポーネントのハンドラー/
+    );
+    expect(markdown).toMatch(
+      /flowの `steps`[\s\S]*onSubmit[\s\S]*onClick[\s\S]*状態遷移/
+    );
+  });
+
+  it('makes form, list, and detail component generation verifiable', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /UIコンポーネント生成確認/
+    );
+    expect(markdown).toMatch(
+      /form[\s\S]*\{Entity\}Form[\s\S]*list[\s\S]*\{Entity\}List[\s\S]*detail[\s\S]*\{Entity\}Detail/
+    );
+    expect(markdown).toMatch(
+      /対象entityに一致するview typeごと[\s\S]*コンポーネントファイルが存在することを確認/
+    );
+  });
 });
