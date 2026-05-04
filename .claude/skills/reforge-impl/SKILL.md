@@ -34,3 +34,24 @@ Implement one entity from the approved Reforge specification.
 
 entity引数の解析は `meta.approved` 確認後に行う。上記5つのゲートを全て通過した後でのみ、`.reforge/tasks.json` のステータス更新と実装を開始する。
 実装は `.reforge/spec.json` に存在する情報だけから行い、spec.jsonに存在しない情報の収集に AskUserQuestion を使用しない。
+
+## Zero-Context Read Protocol
+
+以下の読み取りは `.reforge/spec.json` のみを情報源として実行する。不足情報を推測して補完してはならない。
+
+1. `spec.tech` から技術スタックを読み取る。
+   - `frontend` を読み取り、UIコンポーネント生成に使うフレームワークを確定する。
+   - `backend` を読み取り、CRUD APIエンドポイント生成に使うフレームワークを確定する。
+   - `database` を読み取り、DBマイグレーションの対象DBを確定する。
+   - `orm` を読み取り、DBモデルとマイグレーション生成方式を確定する。
+   - `styling` を読み取り、UIコンポーネントのスタイル方式を確定する。
+   - `testing` を読み取り、単体テストとAPIテストのフレームワークを確定する。
+   - 6フィールドのいずれかが欠如している場合は「`/reforge:resume` を実行して仕様を完成させてください」と表示して停止する。
+2. `spec.entities[entity]` からDBテーブル定義、フィールド型、必須制約を読み取る。
+   - `spec.entities[entity]` が存在しない、または `fields` が空の場合は「`/reforge:resume` を実行してエンティティ定義を完成させてください」と表示して停止する。
+3. `spec.views` を読み取り、`entity` が対象entityと一致するviewだけを抽出する。
+   - 抽出したviewの `type` と `fields` をUIコンポーネント生成に使用する。
+4. `spec.flows` を読み取り、stepsまたはflow定義内で対象entityを参照するflowだけを抽出する。
+   - 抽出したflowの `steps` をAPIまたはUIコンポーネントのビジネスロジックに反映する。
+
+AskUserQuestionは既知情報の明確化に限り使用できる。AskUserQuestionをspec.jsonに存在しない情報の収集に使用しない。不足している `spec.tech`、`spec.entities[entity]`、`spec.views`、`spec.flows` の情報をAskUserQuestionで質問して補完してはならない。

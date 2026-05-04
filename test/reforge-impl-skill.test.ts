@@ -98,4 +98,40 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /対象entityを確定したら[\s\S]*tasks\.json[\s\S]*対応するタスク[\s\S]*エンティティ `\[entity\]` のタスクが見つかりません。`\/reforge:plan` を再実行してください[\s\S]*停止/
     );
   });
+
+  it('documents the zero-context read protocol for tech, entity, views, and flows', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## Zero-Context Read Protocol');
+
+    for (const field of ['frontend', 'backend', 'database', 'orm', 'styling', 'testing']) {
+      expect(markdown).toMatch(
+        new RegExp(`spec\\.tech[\\s\\S]*\`${field}\`[\\s\\S]*読み取`)
+      );
+    }
+
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]` からDBテーブル定義、フィールド型、必須制約を読み取る/
+    );
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]` が存在しない、または `fields` が空の場合[\s\S]*`\/reforge:resume` を実行してエンティティ定義を完成させてください[\s\S]*停止/
+    );
+    expect(markdown).toMatch(
+      /`spec\.views` を読み取り、`entity` が対象entityと一致するviewだけを抽出する/
+    );
+    expect(markdown).toMatch(
+      /`spec\.flows` を読み取り、stepsまたはflow定義内で対象entityを参照するflowだけを抽出する/
+    );
+  });
+
+  it('forbids AskUserQuestion for missing spec.json information in implementation steps', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /AskUserQuestion[\s\S]*spec\.jsonに存在しない情報の収集に使用しない/
+    );
+    expect(markdown).toMatch(
+      /不足している `spec\.tech`、`spec\.entities\[entity\]`、`spec\.views`、`spec\.flows` の情報をAskUserQuestionで質問して補完してはならない/
+    );
+  });
 });
