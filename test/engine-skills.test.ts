@@ -14,6 +14,16 @@ const resumeSkillPaths = [
   '.agents/skills/reforge-resume/SKILL.md'
 ];
 
+const updateSkillPaths = [
+  '.claude/skills/reforge-update/SKILL.md',
+  '.agents/skills/reforge-update/SKILL.md'
+];
+
+const diffSkillPaths = [
+  '.claude/skills/reforge-diff/SKILL.md',
+  '.agents/skills/reforge-diff/SKILL.md'
+];
+
 const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'] as const;
 
 function readMarkdown(skillPath: string): string {
@@ -183,6 +193,62 @@ describe('reforge-resume engine skill contracts', () => {
       );
       expect(markdown, `${skillPath} must guide plan when tasks.json is missing`).toMatch(
         /`TASKS_PATH` missing[\s\S]*\/reforge:plan/
+      );
+    }
+  });
+});
+
+describe('reforge-update and reforge-diff engine skill contracts', () => {
+  it('keeps Claude Code and Codex update and diff skill documentation in sync', () => {
+    const [claudeUpdateMarkdown, codexUpdateMarkdown] = updateSkillPaths.map(readMarkdown);
+    const [claudeDiffMarkdown, codexDiffMarkdown] = diffSkillPaths.map(readMarkdown);
+
+    expect(codexUpdateMarkdown).toBe(claudeUpdateMarkdown);
+    expect(codexDiffMarkdown).toBe(claudeDiffMarkdown);
+  });
+
+  it('documents minimal update diffs with a saved previous snapshot and unrelated fields preserved', () => {
+    for (const skillPath of updateSkillPaths) {
+      const markdown = readMarkdown(skillPath);
+      const specSamples = parseJsonCodeBlocks(markdown).filter(isSpecJson);
+      const previousSpec = specSamples.find((spec) =>
+        spec.entities.report?.fields.status?.options?.includes('draft')
+      );
+      const updatedSpec = specSamples.find((spec) =>
+        spec.entities.report?.fields.status?.options?.includes('archived')
+      );
+
+      expect(markdown, `${skillPath} must save the snapshot before writing spec.json`).toMatch(
+        /spec\.previous\.json[\s\S]*(?:before writing|書き込む前|更新前)/
+      );
+      expect(markdown, `${skillPath} must name the changed JSON path`).toContain(
+        'entities.report.fields.status.options'
+      );
+      expect(previousSpec, `${skillPath} must include the previous spec sample`).toBeTruthy();
+      expect(updatedSpec, `${skillPath} must include the updated spec sample`).toBeTruthy();
+      expect(updatedSpec?.meta, `${skillPath} must preserve unrelated meta fields`).toEqual(previousSpec?.meta);
+      expect(
+        updatedSpec?.entities.report?.fields.title,
+        `${skillPath} must preserve unrelated entity fields`
+      ).toEqual(previousSpec?.entities.report?.fields.title);
+      expect(updatedSpec?.views, `${skillPath} must preserve unrelated views`).toEqual(previousSpec?.views);
+      expect(updatedSpec?.flows, `${skillPath} must preserve unrelated flows`).toEqual(previousSpec?.flows);
+    }
+  });
+
+  it('documents JSON-path diff output between spec.previous.json and spec.json', () => {
+    for (const skillPath of diffSkillPaths) {
+      const markdown = readMarkdown(skillPath);
+
+      expect(markdown, `${skillPath} must read the previous snapshot`).toContain(
+        '`.reforge/spec.previous.json`'
+      );
+      expect(markdown, `${skillPath} must show a modified JSON path`).toContain(
+        '~ entities.report.fields.status.options[2]: undefined -> archived'
+      );
+      expect(markdown, `${skillPath} must show an added JSON path`).toContain('+ views.reportDetail');
+      expect(markdown, `${skillPath} must document the unchanged message`).toMatch(
+        /前回スナップショット以降に変更はありません|No changes/
       );
     }
   });

@@ -43,7 +43,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -60,7 +60,7 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
@@ -108,6 +108,98 @@ Before responding, verify:
 - For removal:
   - Treat broad removal as destructive and ask for confirmation unless the target path is exact.
 
+## Minimal Diff Example
+
+変更指示: `日報のstatusにarchivedを追加して`
+
+適用前の `SPEC_PATH` は、更新を書き込む前に必ず `PREVIOUS_SPEC_PATH`（`.reforge/spec.previous.json`）へ保存する。
+
+更新前:
+
+```json
+{
+  "meta": {
+    "name": "日報アプリ",
+    "version": "0.1.0",
+    "lang": "ja",
+    "approved": false
+  },
+  "tech": {
+    "frontend": "Next.js",
+    "backend": "Node.js",
+    "database": "PostgreSQL",
+    "orm": "Prisma",
+    "styling": "Tailwind CSS",
+    "testing": "Vitest"
+  },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "status": { "type": "enum", "options": ["draft", "submitted"] },
+        "body": { "type": "text" }
+      }
+    }
+  },
+  "views": {
+    "reportList": {
+      "type": "list",
+      "entity": "report",
+      "fields": ["title", "status"]
+    }
+  },
+  "flows": {
+    "submitReport": {
+      "steps": ["日報を作成する", "提出する"]
+    }
+  }
+}
+```
+
+更新後:
+
+```json
+{
+  "meta": {
+    "name": "日報アプリ",
+    "version": "0.1.0",
+    "lang": "ja",
+    "approved": false
+  },
+  "tech": {
+    "frontend": "Next.js",
+    "backend": "Node.js",
+    "database": "PostgreSQL",
+    "orm": "Prisma",
+    "styling": "Tailwind CSS",
+    "testing": "Vitest"
+  },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "status": { "type": "enum", "options": ["draft", "submitted", "archived"] },
+        "body": { "type": "text" }
+      }
+    }
+  },
+  "views": {
+    "reportList": {
+      "type": "list",
+      "entity": "report",
+      "fields": ["title", "status"]
+    }
+  },
+  "flows": {
+    "submitReport": {
+      "steps": ["日報を作成する", "提出する"]
+    }
+  }
+}
+```
+
+この例で変更してよい JSON パスは `entities.report.fields.status.options` のみ。`meta`、`tech`、`entities.report.fields.title`、`views`、`flows` は更新対象外として同一内容を保持する。
+
 ## Question Rules
 
 - New update questions use `phase: "update"` unless they clearly belong to `data`, `view`, or `flow`.
@@ -125,4 +217,3 @@ Report concisely:
 - Next gate:
   - If pending count is 0: `/reforge:validate`.
   - If pending count is greater than 0: answer the presented question or run `/reforge:resume`.
-

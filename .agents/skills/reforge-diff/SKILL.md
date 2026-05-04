@@ -20,6 +20,7 @@ allowed-tools: Read, Glob
 - `SPEC_PATH = ".reforge/spec.json"`
 - `QUESTIONS_PATH = ".reforge/questions.json"`
 - `PREVIOUS_SPEC_PATH = ".reforge/spec.previous.json"`
+- `PREVIOUS_SPEC_PATH` resolves to `.reforge/spec.previous.json`.
 
 ## Prompt Kernel
 
@@ -42,7 +43,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -59,7 +60,7 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
@@ -108,12 +109,23 @@ Pending questions: <N>
 Next gate: /reforge:validate if pending is 0, otherwise /reforge:resume
 ```
 
+Concrete example:
+
+```text
+Lifecycle: diff
+Pending questions: 0
++ views.reportDetail
+~ entities.report.fields.status.options[2]: undefined -> archived
+Next gate: /reforge:validate
+```
+
 If no changes:
 
 ```text
 Lifecycle: diff
 Pending questions: <N>
 No changes
+前回スナップショット以降に変更はありません
 Next gate: /reforge:validate if pending is 0, otherwise /reforge:resume
 ```
 
