@@ -134,4 +134,65 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /不足している `spec\.tech`、`spec\.entities\[entity\]`、`spec\.views`、`spec\.flows` の情報をAskUserQuestionで質問して補完してはならない/
     );
   });
+
+  it('documents DB migration generation from the database and ORM combination', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toContain('## DB Migration Generation Procedure');
+    expect(markdown).toMatch(
+      /`spec\.tech\.database` と `spec\.tech\.orm` の組み合わせ[\s\S]*DBマイグレーションファイル/
+    );
+    expect(markdown).toMatch(
+      /database と ORM の組み合わせを先に確定[\s\S]*ファイルパス[\s\S]*生成方式/
+    );
+  });
+
+  it('requires all entity fields including type, required, and options for migration schema generation', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.entities\[entity\]\.fields` の全フィールド/
+    );
+
+    for (const fieldProperty of ['type', 'required', 'options']) {
+      expect(markdown).toMatch(
+        new RegExp(`全フィールド[\\s\\S]*\`${fieldProperty}\``)
+      );
+    }
+
+    expect(markdown).toMatch(
+      /`required: true`[\s\S]*NOT NULL[\s\S]*`required` が `false` または未指定[\s\S]*NULL許可/
+    );
+    expect(markdown).toMatch(
+      /`type: "enum"`[\s\S]*`options` の全値/
+    );
+  });
+
+  it('lists DB migration path patterns for the major ORMs', () => {
+    const markdown = readImplSkill();
+
+    const ormPathPatterns = [
+      ['Prisma', 'prisma/migrations/{timestamp}_{entity}/migration.sql'],
+      ['TypeORM', 'src/migrations/{timestamp}-{Entity}.ts'],
+      ['Sequelize', 'migrations/{timestamp}-create-{entity}.js'],
+      ['SQLAlchemy', 'alembic/versions/{revision}_create_{entity}.py'],
+      ['ActiveRecord', 'db/migrate/{timestamp}_create_{entity}.rb']
+    ];
+
+    for (const [orm, pathPattern] of ormPathPatterns) {
+      expect(markdown).toContain(orm);
+      expect(markdown).toContain(pathPattern);
+    }
+  });
+
+  it('makes Prisma migrations verifiable under prisma/migrations', () => {
+    const markdown = readImplSkill();
+
+    expect(markdown).toMatch(
+      /`spec\.tech\.orm: "Prisma"`[\s\S]*`prisma\/migrations\/` 配下/
+    );
+    expect(markdown).toMatch(
+      /Prisma[\s\S]*`prisma\/migrations\/\{timestamp\}_\{entity\}\/migration\.sql`/
+    );
+  });
 });
