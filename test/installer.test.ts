@@ -3,8 +3,10 @@ import * as fs from 'node:fs';
 import * as fse from 'fs-extra';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { main } from '../bin/cli';
 import { install } from '../src/installer';
-import type { PackageAssets } from '../src/types';
+import { ALL_SKILLS } from '../src/types';
+import type { PackageAssets, SkillName } from '../src/types';
 
 const repoRoot = path.resolve(__dirname, '..');
 
@@ -16,6 +18,20 @@ function makeAssets(overrides?: Partial<PackageAssets>): PackageAssets {
     rendererServerDir: path.join(repoRoot, 'reforge-renderer/dist'),
     ...overrides
   };
+}
+
+function expectAllSkillsInstalled(cwd: string, rootDir: '.claude' | '.agents'): void {
+  for (const skillName of ALL_SKILLS) {
+    expect(fs.existsSync(path.join(cwd, rootDir, 'skills', skillName, 'SKILL.md'))).toBe(true);
+  }
+}
+
+function expectNoSkillsDir(cwd: string, rootDir: '.claude' | '.agents'): void {
+  expect(fs.existsSync(path.join(cwd, rootDir, 'skills'))).toBe(false);
+}
+
+function expectForwarding(resultSkills: readonly SkillName[] | undefined): void {
+  expect(resultSkills).toEqual([...ALL_SKILLS]);
 }
 
 describe('install()', () => {
@@ -60,6 +76,57 @@ describe('install()', () => {
     await install(tmpDir, { assets });
 
     expect(fs.existsSync(path.join(tmpDir, '.agents/skills'))).toBe(false);
+  });
+
+  it('.claude/ のみ存在する場合は Claude Code のみに9スキルを配置する', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.claude'));
+
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+
+    expect(result.success).toBe(true);
+    expectForwarding(result.forwardingInstalled['claude-code']);
+    expect(result.forwardingInstalled.codex).toBeUndefined();
+    expectAllSkillsInstalled(tmpDir, '.claude');
+    expectNoSkillsDir(tmpDir, '.agents');
+  });
+
+  it('.agents/ のみ存在する場合は Codex のみに9スキルを配置する', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.agents'));
+
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+
+    expect(result.success).toBe(true);
+    expect(result.forwardingInstalled['claude-code']).toBeUndefined();
+    expectForwarding(result.forwardingInstalled.codex);
+    expectNoSkillsDir(tmpDir, '.claude');
+    expectAllSkillsInstalled(tmpDir, '.agents');
+  });
+
+  it('.claude/ と .agents/ の両方が存在する場合は両方に9スキルを配置する', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.claude'));
+    await fse.ensureDir(path.join(tmpDir, '.agents'));
+
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+
+    expect(result.success).toBe(true);
+    expectForwarding(result.forwardingInstalled['claude-code']);
+    expectForwarding(result.forwardingInstalled.codex);
+    expectAllSkillsInstalled(tmpDir, '.claude');
+    expectAllSkillsInstalled(tmpDir, '.agents');
+  });
+
+  it('どちらの環境ディレクトリも存在しない場合は Claude Code のみに9スキルを配置する', async () => {
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+
+    expect(result.success).toBe(true);
+    expectForwarding(result.forwardingInstalled['claude-code']);
+    expect(result.forwardingInstalled.codex).toBeUndefined();
+    expectAllSkillsInstalled(tmpDir, '.claude');
+    expectNoSkillsDir(tmpDir, '.agents');
   });
 
   it('InstallResult.success === true が返る', async () => {
@@ -133,5 +200,27 @@ describe('install()', () => {
     expect(result.success).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, '.reforge/server/index.js'))).toBe(true);
     expect(result.forwardingInstalled['claude-code']).toHaveLength(9);
+  });
+
+  it('main(["install"], cwd) が exit code 0 を返し、インストールを完了する', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.claude'));
+
+    const stdout: string[] = [];
+    const originalWrite = process.stdout.write;
+    process.stdout.write = ((chunk: string | Uint8Array) => {
+      stdout.push(String(chunk));
+      return true;
+    }) as typeof process.stdout.write;
+
+    try {
+      await expect(main(['install'], tmpDir)).resolves.toBe(0);
+    } finally {
+      process.stdout.write = originalWrite;
+    }
+
+    expect(fs.existsSync(path.join(tmpDir, '.reforge/skills/reforge-init/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.reforge/server/index.js'))).toBe(true);
+    expectAllSkillsInstalled(tmpDir, '.claude');
+    expect(stdout.join('\n')).toContain('Available commands:');
   });
 });
