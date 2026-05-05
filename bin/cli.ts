@@ -2,6 +2,9 @@
 
 import process from 'node:process';
 
+import { install } from '../src/installer';
+import { report } from '../src/reporter';
+
 const MIN_NODE_MAJOR = 18;
 
 export function checkNodeVersion(version: string, minMajor: number): boolean {
@@ -30,8 +33,9 @@ export async function main(
     return 1;
   }
 
-  console.log(`Starting Reforge installer in ${cwd}`);
-  return 0;
+  const result = await install(cwd);
+  report(result);
+  return result.success ? 0 : 1;
 }
 
 if (require.main === module) {

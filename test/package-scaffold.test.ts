@@ -1,6 +1,7 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { checkNodeVersion, main } from '../bin/cli';
 
@@ -18,6 +19,16 @@ const packageJson = JSON.parse(
 };
 
 describe('root reforge package scaffold', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reforge-cli-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
   it('defines the npm package boundary for npx reforge install', () => {
     expect(packageJson.name).toBe('reforge');
     expect(packageJson.bin).toEqual({ reforge: './dist/bin/cli.js' });
@@ -46,19 +57,66 @@ describe('root reforge package scaffold', () => {
     expect(checkNodeVersion('v17.9.1', 18)).toBe(false);
   });
 
-  it('starts the install subcommand through the package entrypoint', async () => {
-    const output: string[] = [];
+  it('runs the install subcommand through the package entrypoint', async () => {
+    fs.mkdirSync(path.join(tmpDir, '.claude'));
+
+    const stdout: string[] = [];
     const originalLog = console.log;
-    console.log = (...args: unknown[]) => {
-      output.push(args.join(' '));
-    };
+    const originalWrite = process.stdout.write;
+    console.log = (...args: unknown[]) => stdout.push(args.join(' '));
+    process.stdout.write = ((chunk: string | Uint8Array) => {
+      stdout.push(String(chunk));
+      return true;
+    }) as typeof process.stdout.write;
 
     try {
-      await expect(main(['install'], repoRoot)).resolves.toBe(0);
+      await expect(main(['install'], tmpDir)).resolves.toBe(0);
     } finally {
       console.log = originalLog;
+      process.stdout.write = originalWrite;
     }
 
-    expect(output.join('\n')).toContain(`Starting Reforge installer in ${repoRoot}`);
+    expect(fs.existsSync(path.join(tmpDir, '.reforge/skills/reforge-init/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.claude/skills/reforge-init/SKILL.md'))).toBe(true);
+    expect(stdout.join('\n')).toContain('Available commands:');
+    expect(stdout.join('\n')).toContain('/reforge:init "<プロダクトの説明>"');
+  });
+
+  it('returns exit code 1 and reports install errors to stderr', async () => {
+    const fileCwd = path.join(tmpDir, 'not-a-directory');
+    fs.writeFileSync(fileCwd, '');
+
+    const stderr: string[] = [];
+    const originalError = console.error;
+    const originalWrite = process.stderr.write;
+    console.error = (...args: unknown[]) => stderr.push(args.join(' '));
+    process.stderr.write = ((chunk: string | Uint8Array) => {
+      stderr.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write;
+
+    try {
+      await expect(main(['install'], fileCwd)).resolves.toBe(1);
+    } finally {
+      console.error = originalError;
+      process.stderr.write = originalWrite;
+    }
+
+    expect(stderr.join('\n')).toContain('Error:');
+    expect(stderr.join('\n')).toContain(fileCwd);
+  });
+
+  it('prints usage and returns exit code 1 for unsupported subcommands', async () => {
+    const stderr: string[] = [];
+    const originalError = console.error;
+    console.error = (...args: unknown[]) => stderr.push(args.join(' '));
+
+    try {
+      await expect(main(['render'], tmpDir)).resolves.toBe(1);
+    } finally {
+      console.error = originalError;
+    }
+
+    expect(stderr.join('\n')).toContain('Usage: reforge install');
   });
 });
