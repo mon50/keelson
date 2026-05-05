@@ -127,7 +127,7 @@ export interface PackageAssets {
   packageRoot: string;
   coreSkillsDir: string;
   templatesDir: string;
-  rendererServerEntry: string;
+  rendererServerDir: string;
 }
 
 export interface InstallConfig {

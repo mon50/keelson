@@ -13,7 +13,7 @@ function makeAssets(overrides?: Partial<PackageAssets>): PackageAssets {
     packageRoot: path.resolve(__dirname, '..'),
     coreSkillsDir,
     templatesDir: path.resolve(__dirname, '../skills/templates'),
-    rendererServerEntry: path.resolve(__dirname, '../reforge-renderer/server.js'),
+    rendererServerDir: path.resolve(__dirname, '../reforge-renderer/server.js'),
     ...overrides
   };
 }
@@ -82,7 +82,7 @@ describe('copyRendererServer()', () => {
       packageRoot: '',
       coreSkillsDir: '',
       templatesDir: '',
-      rendererServerEntry: fakeRendererDir
+      rendererServerDir: fakeRendererDir
     };
 
     const cwd = path.join(tmpDir, 'project');
@@ -93,12 +93,12 @@ describe('copyRendererServer()', () => {
     expect(fs.existsSync(path.join(cwd, '.reforge/server/index.js'))).toBe(true);
   });
 
-  it('rendererServerEntry が存在しない場合は result.error が設定される（例外スローなし）', async () => {
+  it('rendererServerDir が存在しない場合は result.error が設定される（例外スローなし）', async () => {
     const assets: PackageAssets = {
       packageRoot: '',
       coreSkillsDir: '',
       templatesDir: '',
-      rendererServerEntry: '/nonexistent/renderer/dist'
+      rendererServerDir: '/nonexistent/renderer/dist'
     };
 
     const cwd = path.join(tmpDir, 'project');
@@ -116,7 +116,7 @@ describe('copyForwarders() - Claude Code', () => {
   const assets: PackageAssets = {
     packageRoot: '',
     coreSkillsDir: '',
-    rendererServerEntry: '',
+    rendererServerDir: '',
     templatesDir: path.resolve(__dirname, '../skills/templates')
   };
 
@@ -171,7 +171,7 @@ describe('copyForwarders() - Codex', () => {
   const assets: PackageAssets = {
     packageRoot: '',
     coreSkillsDir: '',
-    rendererServerEntry: '',
+    rendererServerDir: '',
     templatesDir: path.resolve(__dirname, '../skills/templates')
   };
 
