@@ -147,7 +147,9 @@ describe('installer shared contracts', () => {
       'reforge-diff',
       'reforge-plan',
       'reforge-validate',
-      'reforge-render'
+      'reforge-render',
+      'reforge-impl',
+      'reforge-verify'
     ]);
   });
 
@@ -159,7 +161,9 @@ describe('installer shared contracts', () => {
       'reforge-diff': 'diff',
       'reforge-plan': 'plan',
       'reforge-validate': 'validate',
-      'reforge-render': 'render'
+      'reforge-render': 'render',
+      'reforge-impl': 'impl [entity]',
+      'reforge-verify': 'verify'
     });
     expect(Object.keys(SKILL_COMMAND).sort()).toEqual([...ALL_SKILLS].sort());
   });

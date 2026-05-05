@@ -9,7 +9,9 @@ export const ALL_SKILLS = [
   'reforge-diff',
   'reforge-plan',
   'reforge-validate',
-  'reforge-render'
+  'reforge-render',
+  'reforge-impl',
+  'reforge-verify'
 ] as const;
 
 export type SkillName = (typeof ALL_SKILLS)[number];
@@ -21,7 +23,9 @@ export const SKILL_COMMAND = {
   'reforge-diff': 'diff',
   'reforge-plan': 'plan',
   'reforge-validate': 'validate',
-  'reforge-render': 'render'
+  'reforge-render': 'render',
+  'reforge-impl': 'impl [entity]',
+  'reforge-verify': 'verify'
 } as const satisfies Record<SkillName, string>;
 
 export type SkillCommand = (typeof SKILL_COMMAND)[SkillName];
