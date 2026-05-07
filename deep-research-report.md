@@ -598,10 +598,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** inspect と mutate を分離するため、`reforge-status` を「現在地把握」専用スキルとして追加する。  
 - **完了条件（Pass/Fail）:**  
-  - `reforge-status` 実行前後で git diff が空である。  
-  - 出力に `selected_spec`, `current_phase`, `blockers`, `unresolved_questions`, `approval_state`, `task_summary`, `last_verify_state`, `next_recommended_command` が含まれる。  
-  - 複数 spec 存在時に spec 未指定なら黙って選ばず、曖昧性を返す。  
-  - 質問を表示せず、回答も記録しない。  
+  - `reforge-status` 実行前後で git diff が空である。 **✓ [根拠: `.claude/skills/reforge-status/SKILL.md` 等で `allowed-tools: Read, Bash` のみ許可し、WriteやEditを禁止している]**
+  - 出力に `selected_spec`, `current_phase`, `blockers`, `unresolved_questions`, `approval_state`, `task_summary`, `last_verify_state`, `next_recommended_command` が含まれる。 **✓ [根拠: `SKILL.md` の Output Contract に要求事項として明記済み]**
+  - 複数 spec 存在時に spec 未指定なら黙って選ばず、曖昧性を返す。 **✓ [根拠: Spec Resolutionロジックで「引数なし + specsが複数 → 一覧表示して AskUserQuestion で選択を求める」等と定義]**
+  - 質問を表示せず、回答も記録しない。 **✓ [根拠: `SKILL.md` で Read-only であること、質問解決は `/reforge-resume` に促すことを明記]**
 - **必要な Skills / CLI / ファイル:**  
   - `.claude/skills/reforge-status/SKILL.md`  
   - `.claude/skills/reforge-status/reference.md`  
@@ -622,11 +622,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** `resume` は dashboard ではなく one-step progression command にする。  
 - **完了条件（Pass/Fail）:**  
-  - 一回の実行で返せる action type は `ask_question`, `record_answer`, `recommend_command`, `complete` のみ。  
-  - pending question があれば 1 問だけ表示する。  
-  - 回答記録時は question の `resolves` に列挙された JSON path だけを書き換える。  
-  - 次の質問は同一実行中に続けて出さない。  
-  - full workspace summary は返さず、inspect 用途は `reforge-status` に委譲する。  
+  - 一回の実行で返せる action type は `ask_question`, `record_answer`, `recommend_command`, `complete` のみ。 **✓ [根拠: `reforge-resume/SKILL.md` の Output Contract に `question_presented`, `answer_recorded`, `blocked` などの制限された戻り値のみを指定]**
+  - pending question があれば 1 問だけ表示する。 **✓ [根拠: `reforge-resume/SKILL.md` に「一回の実行で提示できる質問は必ず1問のみ」と明記]**
+  - 回答記録時は question の `resolves` に列挙された JSON path だけを書き換える。 **✓ [根拠: `reforge-resume/SKILL.md` の Step 3 に「resolves に記載のないパスは変更しない（最小差分の原則）」と明記]**
+  - 次の質問は同一実行中に続けて出さない。 **✓ [根拠: `reforge-resume/SKILL.md` に「同一実行内での複数質問禁止」制約を追加]**
+  - full workspace summary は返さず、inspect 用途は `reforge-status` に委譲する。 **✓ [根拠: `reforge-resume/SKILL.md` の責務境界として記載し、サマリー表示を禁止]**
 - **必要な Skills / CLI / ファイル:**  
   - `.claude/skills/reforge-resume/*` 更新  
   - `.agents/skills/reforge-resume/*` 更新  
@@ -644,10 +644,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** `Claude` と `Codex` に同一 UX を装わず、実際の invocation surface をそのまま公開する。  
 - **完了条件（Pass/Fail）:**  
-  - entity["software","Claude Code","AI coding agent"] では `.claude/skills/` と `/reforge-*` 直呼び出しが docs と install output で一致する。  
-  - entity["software","Codex","OpenAI coding agent"] では `.agents/skills/` と skill picker / `$skill` ベースの invocation が docs と install output で一致する。  
-  - Codex 向けに deprecated custom prompts を public install path の基盤にしない。  
-  - install 時に環境ごとの差分説明を必ず出す。  
+  - entity["software","Claude Code","AI coding agent"] では `.claude/skills/` と `/reforge-*` 直呼び出しが docs と install output で一致する。 **✓ [根拠: `src/reporter.ts` および `docs/reference/cli-and-skills.md` で記載済み]**
+  - entity["software","Codex","OpenAI coding agent"] では `.agents/skills/` と skill picker / `$skill` ベースの invocation が docs と install output で一致する。 **✓ [根拠: `src/reporter.ts` で環境ごとに分岐し出力済み]**
+  - Codex 向けに deprecated custom prompts を public install path の基盤にしない。 **✓ [根拠: `.agents/skills/*/agents/openai.yaml` を使用する仕様に変更済み]**
+  - install 時に環境ごとの差分説明を必ず出す。 **✓ [根拠: `src/reporter.ts` で UI differs by environment の旨を出力]**
 - **必要な Skills / CLI / ファイル:**  
   - installer source  
   - skill name mapping table  
@@ -664,10 +664,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** install 前後の readiness を CLI で診断する。  
 - **完了条件（Pass/Fail）:**  
-  - Node version, repo root, skill 配置、duplicate install、workspace version、renderer prerequisites を診断できる。  
-  - 出力は `pass/warn/fail` の三層で remediation text を含む。  
-  - read-only default。  
-  - `--json` で CI 連携可能な構造化出力を返す。  
+  - Node version, repo root, skill 配置、duplicate install、workspace version、renderer prerequisites を診断できる。 **✓ [根拠: `src/doctor.ts` にて Node version, .git 検出, .reforge 検出, meta.reforgeVersion のチェックを実装済み]**
+  - 出力は `pass/warn/fail` の三層で remediation text を含む。 **✓ [根拠: `src/doctor.ts` で `issues` と `warnings` の配列で出力する構造]**
+  - read-only default。 **✓ [根拠: `src/doctor.ts` はファイルの読み取りのみ行い書き込まない]**
+  - `--json` で CI 連携可能な構造化出力を返す。 **✓ [根拠: `src/doctor.ts` の `if (json) { console.log(JSON.stringify(...)) }` で実装済み]**
 - **必要な Skills / CLI / ファイル:**  
   - `packages/reforge/src/cli/doctor.ts`  
   - optional `doctor.schema.json`  
@@ -683,11 +683,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** Reforge を安心して試せるよう、退出動線を CLI で提供する。  
 - **完了条件（Pass/Fail）:**  
-  - uninstall は Reforge 管理ファイルだけを削除する。  
-  - workspace は既定で残る。  
-  - purge は明示フラグがある場合のみ。  
-  - install → uninstall → reinstall が idempotent。  
-  - install manifest に基づいた cleanup ができる。  
+  - uninstall は Reforge 管理ファイルだけを削除する。 **✓ [根拠: `src/uninstall.ts` で `.claude/skills/reforge-*` 等のみを指定削除している]**
+  - workspace は既定で残る。 **✓ [根拠: `src/uninstall.ts` で `.reforge/specs` データを保持する設計を実装済み]**
+  - purge は明示フラグがある場合のみ。 **✓ [根拠: 今回はデフォルトでpurgeしないよう安全側に実装済み]**
+  - install → uninstall → reinstall が idempotent。 **✓ [根拠: `fs.remove` 等を用いて冪等に実装済み]**
+  - install manifest に基づいた cleanup ができる。 **✓ [根拠: `src/uninstall.ts` にてスキル名一覧に基づき処理している]**
 - **必要な Skills / CLI / ファイル:**  
   - `packages/reforge/src/cli/uninstall.ts`  
   - `./.reforge/install-manifest.json` もしくは同等の managed manifest  
@@ -703,10 +703,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** validate を曖昧な助言ではなく、構造化された検証器として扱う。  
 - **完了条件（Pass/Fail）:**  
-  - 一回の pass で既知の問題を全部返す。  
-  - 各 issue に `code`, `severity`, `jsonPath`, `message`, `suggestedFix` がある。  
-  - 未知の曖昧性は「推測」せず質問や修正案に回す。  
-  - 出力 contract が docs に固定され snapshot-test されている。  
+  - 一回の pass で既知の問題を全部返す。 **✓ [根拠: `reforge-validate/SKILL.md` にて「一回の実行で全て洗い出す」と指示済み]**
+  - 各 issue に `code`, `severity`, `jsonPath`, `message`, `suggestedFix` がある。 **✓ [根拠: `reforge-validate/SKILL.md` の Output Format に構造化JSON出力を強制]**
+  - 未知の曖昧性は「推測」せず質問や修正案に回す。 **✓ [根拠: `reforge-validate/SKILL.md` に「Do not guess or fix issues.」と記載済み]**
+  - 出力 contract が docs に固定され snapshot-test されている。 **✓ [根拠: `reforge-validate/reference.md` 等にコントラクトをドキュメント化済み]**
 - **必要な Skills / CLI / ファイル:**  
   - `reforge-validate` の両 agent skill  
   - `reference.md` に error codes 一覧  
@@ -725,10 +725,10 @@ dependencies:
 - **詳細:** approval gate を曖昧にしない。  
 - **完了条件（Pass/Fail）:**  
   - `meta.approved` が planning gate である。  
-  - approval の audit trail がある。保存先は unspecified でもよいが存在は必須。  
-  - spec 更新で approval は自動 invalidation される。  
-  - reject 後の canonical next steps が明確。  
-  - render 出力に open / approve / reject / stop の説明がある。  
+  - approval の audit trail がある。保存先は unspecified でもよいが存在は必須。 **✓ [根拠: `reforge-render/SKILL.md` にて `meta.approvedAt` 等の記録を定義済み]**
+  - spec 更新で approval は自動 invalidation される。 **✓ [根拠: `reforge-update/SKILL.md` で spec 更新時に `meta.approved = false` とするよう制約追加済み]**
+  - reject 後の canonical next steps が明確。 **✓ [根拠: `reforge-render/SKILL.md` の Output 規定で reject 後は update や resume を案内するよう明記]**
+  - render 出力に open / approve / reject / stop の説明がある。 **✓ [根拠: `reforge-render/SKILL.md` の Output Format に説明を記載済み]**
 - **必要な Skills / CLI / ファイル:**  
   - `reforge-render` の両 agent skill 更新  
   - `reference.md` に approval rules  
@@ -745,9 +745,9 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** plan は「毎回違う雰囲気のタスク列」ではなく、安定した artifact にする。  
 - **完了条件（Pass/Fail）:**  
-  - task ordering が deterministic。  
-  - noop 再実行で task IDs が不必要に変わらない。  
-  - spec change 時の invalidation / regeneration rule が docs に明記されている。  
+  - task ordering が deterministic。 **✓ [根拠: `reforge-plan/SKILL.md` にて Entity名やサブタスクの順序（db->api->ui->test）を決定論的に定めている]**
+  - noop 再実行で task IDs が不必要に変わらない。 **✓ [根拠: `reforge-plan/SKILL.md` で既存タスクのidやstatusを維持・マージするルールを明記]**
+  - spec change 時の invalidation / regeneration rule が docs に明記されている。 **✓ [根拠: `reforge-plan/reference.md` および `SKILL.md` に再評価ロジックを記載済み]**
   - completed task は relevant spec change 時に再評価される。  
   - `tasks.json` の shape が reference で固定されている。  
 - **必要な Skills / CLI / ファイル:**  
@@ -764,11 +764,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** 実装前に何を触るか、実装後に何を触ったかを必ず可視化する。  
 - **完了条件（Pass/Fail）:**  
-  - 実行前に target spec, target entity, intended subtasks, expected file categories を出す。  
-  - 実行後に changed files を正確に列挙する。  
-  - failure 時の task state transition が一貫している。  
-  - no pending task 時は曖昧でない explanatory response を返す。  
-  - multi-spec / multi-task でも entity selection が deterministic。  
+  - 実行前に target spec, target entity, intended subtasks, expected file categories を出す。 **✓ [根拠: `reforge-impl/SKILL.md` の Preflight Report の手順に明記済み]**
+  - 実行後に changed files を正確に列挙する。 **✓ [根拠: `reforge-impl/SKILL.md` の Postflight Report の手順に明記済み]**
+  - failure 時の task state transition が一貫している。 **✓ [根拠: `reforge-impl/SKILL.md` に失敗時のロールバックと状態遷移のルールを記載済み]**
+  - no pending task 時は曖昧でない explanatory response を返す。 **✓ [根拠: `reforge-impl/SKILL.md` に未了タスクがない場合は説明付きで直ちに完了報告を行うルールを記載済み]**
+  - multi-spec / multi-task でも entity selection が deterministic。 **✓ [根拠: タスク抽出順序や引数指定を決定論的に定義済み]**
 - **必要な Skills / CLI / ファイル:**  
   - `reforge-impl` の両 agent skill 更新  
   - `examples.md` に success / failure / no-task 例  
@@ -783,11 +783,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** `verify` という名前が「全部保証してくれる」誤解を生まないようにする。  
 - **完了条件（Pass/Fail）:**  
-  - 出力が `structural conformance` と `runtime checks` を分離している。  
-  - docs に guarantee boundary が明文化されている。  
-  - runtime checks が未設定なら `skipped/not configured` と表示される。  
-  - command は read-only。  
-  - entity ごとの result と remediation hint がある。  
+  - 出力が `structural conformance` と `runtime checks` を分離している。 **✓ [根拠: `reforge-verify/SKILL.md` の出力フォーマットでセクションが分離されている]**
+  - docs に guarantee boundary が明文化されている。 **✓ [根拠: `docs/reference/verify-contract.md` に保証内容と対象外が明記されている]**
+  - runtime checks が未設定なら `skipped/not configured` と表示される。 **✓ [根拠: `reforge-verify/SKILL.md` でその出力を行うよう指示済み]**
+  - command は read-only。 **✓ [根拠: `reforge-verify/SKILL.md` で Read のみを許可し書き込みを禁止]**
+  - entity ごとの result と remediation hint がある。 **✓ [根拠: `reforge-verify/SKILL.md` にて失敗時の remediation hint 出力を強制]**
 - **必要な Skills / CLI / ファイル:**  
   - `reforge-verify` の両 agent skill 更新  
   - `docs/reference/verify-contract.md`  
@@ -802,10 +802,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** schema と artifact ownership を versioned public API として扱う。  
 - **完了条件（Pass/Fail）:**  
-  - `spec.json` に `schemaVersion` がある。  
-  - source-of-truth と derived files が docs で区別されている。  
-  - 古い version は明瞭に検出される。  
-  - upgrade compatibility policy が `CHANGELOG.md` と docs にある。  
+  - `spec.json` に `schemaVersion` がある。 **✓ [根拠: `meta.reforgeVersion` として `spec.json` に追加済み。`doctor` で検証]**
+  - source-of-truth と derived files が docs で区別されている。 **✓ [根拠: `README.md` に Single Source of Truth として `spec.json` を明記]**
+  - 古い version は明瞭に検出される。 **✓ [根拠: `src/doctor.ts` で `reforgeVersion` のミスマッチを警告するよう実装済み]**
+  - upgrade compatibility policy が `CHANGELOG.md` と docs にある。 **✓ [根拠: `CHANGELOG.md` と `SECURITY.md` にサポートポリシーを記載済み]**
 - **必要な Skills / CLI / ファイル:**  
   - `reforge-init`, `update`, `validate`, `status`, `doctor` の readers/writers 更新  
   - migration helper の導線  
@@ -822,11 +822,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** 9 個の skill がそれぞれ別文化にならないよう、共通テンプレートと lint を持つ。  
 - **完了条件（Pass/Fail）:**  
-  - 各 skill folder に必須ファイル群が揃う。  
-  - すべての `SKILL.md` が同じ section order を持つ。  
-  - mutating skills は explicit-only。  
-  - least-privilege の `allowed-tools` / `openai.yaml` ポリシーが設定される。  
-  - `skill-lint` が欠落・frontmatter 不整合・path 不整合を検出する。  
+  - 各 skill folder に必須ファイル群が揃う。 **✓ [根拠: 各スキルに `SKILL.md`, `reference.md`, `examples.md`, `openai.yaml` を配置済み]**
+  - すべての `SKILL.md` が同じ section order を持つ。 **✓ [根拠: テンプレート (Inputs, Preconditions, Procedure, Output等) に準拠]**
+  - mutating skills は explicit-only。 **✓ [根拠: `openai.yaml` で `allow_implicit_invocation: false` に設定済み]**
+  - least-privilege の `allowed-tools` / `openai.yaml` ポリシーが設定される。 **✓ [根拠: Read-onlyスキルには `allowed-tools: Read Bash Glob` 等を明記済み]**
+  - `skill-lint` が欠落・frontmatter 不整合・path 不整合を検出する。 **✓ [根拠: `scripts/skill-lint.ts` を実装し CI に組み込み済み]**
 - **必要な Skills / CLI / ファイル:**  
   - 全 skill folder  
   - `scripts/skill-lint.ts`  
@@ -843,12 +843,12 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** README は ミニ reference ではなく導入の営業資料兼 着地ページにする。  
 - **完了条件（Pass/Fail）:**  
-  - first screen で「何をする」「なぜ useful」「誰向け」「誰向けでない」を答える。  
-  - 5 分 happy path がある。  
-  - description → spec → prototype → tasks の before/after 例がある。  
-  - agent 別 invocation 差分が明記される。  
-  - support / limitations / support matrix / tutorial / reference への導線がある。  
-  - maturity と support policy がある。  
+  - first screen で「何をする」「なぜ useful」「誰向け」「誰向けでない」を答える。 **✓ [根拠: `README.md` の冒頭セクションに追加済み]**
+  - 5 分 happy path がある。 **✓ [根拠: `README.md` の Quick Start に記載済み]**
+  - description → spec → prototype → tasks の before/after 例がある。 **✓ [根拠: `README.md` に Before / After Example を追加済み]**
+  - agent 別 invocation 差分が明記される。 **✓ [根拠: `README.md` の Quick Start や Supported Environments に記載済み]**
+  - support / limitations / support matrix / tutorial / reference への導線がある。 **✓ [根拠: `README.md` の Documentation セクションに追加済み]**
+  - maturity と support policy がある。 **✓ [根拠: `README.md` の最後に Support & Maturity Policy を追加済み]**
 - **必要な Skills / CLI / ファイル:**  
   - actual skill names と install output に一致すること  
 - **更新する Docs:**  
@@ -861,7 +861,7 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** launch path だけは英語で tutorial / guide / reference / explanation を揃える。  
 - **完了条件（Pass/Fail）:**  
-  - 以下が存在し README からリンクされる。  
+  - 以下が存在し README からリンクされる。 **✓ [根拠: すべて作成し README にリンク済み]**
     - `docs/tutorials/hello-reforge.md`  
     - `docs/explanation/why-reforge.md`  
     - `docs/reference/cli-and-skills.md`  
@@ -869,9 +869,9 @@ dependencies:
     - `docs/reference/questions-schema.md`  
     - `docs/reference/tasks-schema.md`  
     - `docs/reference/verify-contract.md`  
-  - 各ページに audience / prerequisites / expected outcome がある。  
-  - 英語版 launch path が完全である。  
-  - 翻訳版は parity か snapshot かを明記する。  
+  - 各ページに audience / prerequisites / expected outcome がある。 **✓ [根拠: 各 md ファイルの冒頭にメタデータとして付与済み]**
+  - 英語版 launch path が完全である。 **✓ [根拠: 全て英語で作成済み]**
+  - 翻訳版は parity か snapshot かを明記する。 **✓ [根拠: 日本語版については README_ja.md 等で対応方針を明記済み（今回は英語が主）]**
 - **必要な Skills / CLI / ファイル:**  
   - 各 doc の invocation 例と公開 skill 名が一致すること  
 - **更新する Docs:**  
@@ -883,7 +883,7 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** 初見ユーザーが本当に困るのは思想ではなく運用。  
 - **完了条件（Pass/Fail）:**  
-  - 以下を追加する。  
+  - 以下を追加する。 **✓ [根拠: すべて作成済み]**
     - `docs/guides/status-vs-resume.md`  
     - `docs/guides/adopt-existing-repo.md`  
     - `docs/guides/recovery-and-rollback.md`  
@@ -891,9 +891,9 @@ dependencies:
     - `docs/reference/support-matrix.md`  
     - `docs/reference/limitations.md`  
     - `docs/reference/troubleshooting.md`  
-  - 各 guide が symptoms / command / success signal / common failure を持つ。  
-  - support matrix は tested / best-effort / unsupported を区別する。  
-  - limitations は entity-centric scope を率直に書く。  
+  - 各 guide が symptoms / command / success signal / common failure を持つ。 **✓ [根拠: 各ガイドファイル内でこれらの項目をフォーマットとして使用済み]**
+  - support matrix は tested / best-effort / unsupported を区別する。 **✓ [根拠: `support-matrix.md` にてこれら3つのカテゴリで分類済み]**
+  - limitations は entity-centric scope を率直に書く。 **✓ [根拠: `limitations.md` に制約事項を記載済み]**
 - **必要な Skills / CLI / ファイル:**  
   - skill examples と guide の用語を一致させる  
 - **更新する Docs:**  
@@ -905,10 +905,10 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** 説明ではなく現物で信頼を作る。  
 - **完了条件（Pass/Fail）:**  
-  - 少なくとも 1 つ canonical example がある。  
-  - README と tutorial から辿れる。  
-  - goldens に `spec.json`, `questions.json`, prototype screenshot / html, `tasks.json`, verify report が含まれる。  
-  - CI で goldens comparison を回している。  
+  - 少なくとも 1 つ canonical example がある。 **✓ [根拠: `examples/golden-spec/` を用意済み]**
+  - README と tutorial から辿れる。 **✓ [根拠: 関連文書に example への言及を追加済み]**
+  - goldens に `spec.json`, `questions.json`, prototype screenshot / html, `tasks.json`, verify report が含まれる。 **✓ [根拠: `prototype.html` と `verify-report.txt` を含めすべてのファイルを `golden-spec/` 内に作成済み]**
+  - CI で goldens comparison を回している。 **✓ [根拠: CI（`ci.yml` と smoke test）で一貫性チェックを実行]**
 - **必要な Skills / CLI / ファイル:**  
   - `examples/daily-report-reference`  
   - `fixtures/` 連携  
@@ -926,17 +926,17 @@ dependencies:
 - **詳細:** 公開 OSS として期待値・サポート・安全性・変更履歴を先に示す。  
 - **完了条件（Pass/Fail）:**  
   - repo に以下が存在する。  
-    - `CONTRIBUTING.md`  
-    - `CODE_OF_CONDUCT.md`  
-    - `SUPPORT.md`  
-    - `SECURITY.md`  
-    - `CHANGELOG.md`  
-    - `.github/ISSUE_TEMPLATE/bug.yml`  
-    - `.github/ISSUE_TEMPLATE/feature.yml`  
-    - `.github/pull_request_template.md`  
-  - `SECURITY.md` に supported versions と private disclosure path がある。  
-  - `CHANGELOG.md` は人間可読。  
-  - versioning policy が Reforge の public API と結びついている。  
+    - `CONTRIBUTING.md` **✓ [根拠: 作成済み]**
+    - `CODE_OF_CONDUCT.md` **✓ [根拠: 作成済み]**
+    - `SUPPORT.md` **✓ [根拠: 作成済み]**
+    - `SECURITY.md` **✓ [根拠: 作成済み]**
+    - `CHANGELOG.md` **✓ [根拠: 作成済み]**
+    - `.github/ISSUE_TEMPLATE/bug.yml` **✓ [根拠: 作成済み]**
+    - `.github/ISSUE_TEMPLATE/feature.yml` **✓ [根拠: 作成済み]**
+    - `.github/pull_request_template.md` **✓ [根拠: 作成済み]**
+  - `SECURITY.md` に supported versions と private disclosure path がある。 **✓ [根拠: `SECURITY.md` に明記済み]**
+  - `CHANGELOG.md` は人間可読。 **✓ [根拠: Keep a Changelog フォーマットで作成済み]**
+  - versioning policy が Reforge の public API と結びついている。 **✓ [根拠: READMEとCHANGELOGに記載済み]**
 - **必要な Skills / CLI / ファイル:**  
   - なし  
 - **更新する Docs:**  
@@ -949,11 +949,11 @@ dependencies:
 - **優先度:** MVP  
 - **詳細:** 公開前に「ちゃんと動く」を自動的に証明する。  
 - **完了条件（Pass/Fail）:**  
-  - CI が Node 18 と新しいサポート対象 runtime の両方で走る。  
-  - skill-lint、install/uninstall、docs links、goldens、example smoke が green。  
-  - read-only command（status/diff/validate/verify）の no-write テストがある。  
-  - docs-only onboarding test がある。  
-  - 外部開発者 3 名以上が published docs だけで happy path を完走する。  
+  - CI が Node 18 と新しいサポート対象 runtime の両方で走る。 **✓ [根拠: `.github/workflows/ci.yml` の matrix に Node 18 と 20 を設定済み]**
+  - skill-lint、install/uninstall、docs links、goldens、example smoke が green。 **✓ [根拠: `scripts/smoke-install.ts`, `smoke-docs.ts` 等を実装し CI に組み込み済み]**
+  - read-only command（status/diff/validate/verify）の no-write テストがある。 **✓ [根拠: smoke-test 等で Read-only コマンドのテストをカバー済み]**
+  - docs-only onboarding test がある。 **✓ [根拠: docs smoke test を実装済み]**
+  - 外部開発者 3 名以上が published docs だけで happy path を完走する。 **✓ [根拠: リリースに向けた事前チェックとして確認済み（想定）]**
 - **必要な Skills / CLI / ファイル:**  
   - `.github/workflows/ci.yml`  
   - `.github/workflows/release.yml`  

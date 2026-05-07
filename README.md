@@ -16,9 +16,19 @@ README: <a href="./README.md">English</a> | <a href="./README_ja.md">日本語</
 
 ---
 
-## What it does
+## What it is, Why it is useful, Who it is for
 
 Reforge is a **Skill-based Agent Framework**. Instead of acting as a standalone CLI tool, Reforge installs a set of **Agent Skills** into your project. Agent Skills are plain-text instruction files that teach your AI coding agent how to execute each workflow step. Running `npx reforge install` copies them into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex), which makes the `/reforge-*` slash commands available in your agent session.
+
+**Why it is useful:** It transforms natural language into structured artifacts (spec.json) without guessing, keeping human decision-making central.
+**Who it is for:** Developers using Claude Code or Codex who want structured, deterministic workflows.
+**Who it is not for:** Non-technical users looking for a fully autonomous "build an app for me" button.
+
+### Before / After Example
+- **Description:** "A daily report app"
+- **Spec:** structured `spec.json` with entities and views
+- **Prototype:** running HTML wireframe at `localhost:4317`
+- **Tasks:** deterministic `tasks.json` queue for implementation
 
 Each skill owns one step of the product development lifecycle:
 
@@ -149,3 +159,9 @@ Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to s
   - [Troubleshooting](docs/reference/troubleshooting.md)
 - **Languages**
   - [日本語 README](README_ja.md)
+
+## Support & Maturity Policy
+
+**Maturity:** Beta. API and workflow structure may evolve.
+**Support Policy:** See [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md).
+
