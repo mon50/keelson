@@ -128,6 +128,24 @@ Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to s
 
 ## Documentation
 
-- [Workflow Guide](docs/guides/workflow-guide.md) — step-by-step walkthrough of each phase
-- [Skill Reference](docs/reference/skill-reference.md) — per-skill inputs, outputs, and constraints
-- [日本語 README](README_ja.md)
+- **Tutorials & Explanations**
+  - [Hello Reforge](docs/tutorials/hello-reforge.md)
+  - [Why Reforge?](docs/explanation/why-reforge.md)
+- **Guides**
+  - [Workflow Guide](docs/guides/workflow-guide.md)
+  - [Status vs Resume](docs/guides/status-vs-resume.md)
+  - [Adopting an Existing Repo](docs/guides/adopt-existing-repo.md)
+  - [Recovery and Rollback](docs/guides/recovery-and-rollback.md)
+  - [Reviewing Prototypes](docs/guides/reviewing-prototypes.md)
+- **Reference**
+  - [CLI and Skills](docs/reference/cli-and-skills.md)
+  - [Skill Reference](docs/reference/skill-reference.md)
+  - [Spec Schema](docs/reference/spec-schema.md)
+  - [Questions Schema](docs/reference/questions-schema.md)
+  - [Tasks Schema](docs/reference/tasks-schema.md)
+  - [Verify Contract](docs/reference/verify-contract.md)
+  - [Support Matrix](docs/reference/support-matrix.md)
+  - [Limitations](docs/reference/limitations.md)
+  - [Troubleshooting](docs/reference/troubleshooting.md)
+- **Languages**
+  - [日本語 README](README_ja.md)
