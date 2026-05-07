@@ -1,29 +1,48 @@
 ---
 name: reforge-render
-description: Start the local Reforge renderer for .reforge/spec.json.
-allowed-tools: Read, Bash
+description: Start a local HTML prototype server from .reforge/spec.json and run the approval flow that writes meta.approved to spec.json.
+disable-model-invocation: true
+allowed-tools: Read Bash Write AskUserQuestion
 ---
 
-# reforge-render
+# Reforge Render
 
-## Core Rule
+## Inputs
+- Optional spec name: $ARGUMENTS
 
-- Think in English, respond to the user in the language specified by `.reforge/spec.json` when it can be read.
-- Do not generate or update Spec.Json.
-- Do not call an LLM at runtime for rendering.
-- Start only the local confirmation UI server.
+## Preconditions
+- Repository is open
+- Target spec can be resolved deterministically
 
-## Command Flow
+## Read set
+- .reforge/specs/<name>/spec.json
+- .reforge/specs/<name>/questions.json
 
-1. Confirm `.reforge/spec.json` exists in the current project.
-2. Start the renderer server:
-   - Prefer installed projects: `node .reforge/server/index.js`
-   - When developing this source repository and the built package exists: `node reforge-renderer/dist/index.js`
-3. Show the URL printed by the process to the user.
-4. Keep the process running so browser reload notifications can be delivered.
+## Write set
+- .reforge/specs/<name>/spec.json (only when recording approval)
 
-## Failure Handling
+## Procedure
+1. Resolve target spec deterministically.
+2. Read `spec.json`. If missing, report error.
+3. Warn if `questions.json` has pending questions.
+4. Start the server (find entry point from `.reforge/server/index.js` or `reforge-renderer/dist/index.js`).
+5. Wait for the server to start.
+6. Display instructions for the user:
+   - Provide the URL to open.
+   - Explain how to approve, reject, or stop the server.
+7. If the spec is already approved (`meta.approved` is true):
+   - Just preview it.
+8. If not approved, ask the user if they approve.
+9. If approved:
+   - Update `meta.approved` to `true`.
+   - Add an audit trail field `meta.approvedAt` (ISO string).
+   - Add an audit trail field `meta.approvedDigest` (a hash of the spec content or simple timestamp).
+   - Write `spec.json`.
+   - Recommend next command: `reforge-plan`.
+10. If rejected:
+   - Recommend next command: `reforge-update` followed by `reforge-validate` and `reforge-render`.
+11. Stop the server after receiving the user's decision.
 
-- If `.reforge/spec.json` is missing, report that `/reforge:init` must be run first.
-- If JSON parsing fails, report the parser error and stop.
-- If no renderer entrypoint exists, ask the user to install or build the renderer package before running again.
+## Additional resources
+- reference.md
+- examples.md

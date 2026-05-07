@@ -118,6 +118,8 @@ export const ENV_SKILL_DIR = {
   codex: '.agents/skills'
 } as const satisfies Record<TargetEnvironment, string>;
 
+export const SPECS_DIR = '.reforge/specs' as const;
+
 export interface SelectorOptions {
   input?: NodeJS.ReadableStream;
   output?: NodeJS.WritableStream;

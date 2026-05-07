@@ -8,15 +8,42 @@ argument-hint: [entity]
 
 Implement one entity from the approved Reforge specification.
 
+## Gate Order
+
+1. `SPEC_PATH` — spec.json の存在確認
+2. `meta.approved` — 承認済みかどうか確認
+3. `TASKS_PATH` — tasks.json の存在確認
+4. `spec.tech` — 技術スタックの完全性確認
+5. `spec.entities` — エンティティ定義の確認
+
+## Canonical Paths
+
+- `SPECS_DIR = ".reforge/specs"`
+- `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
+- `TASKS_PATH = ".reforge/specs/<name>/tasks.json"`
+
+## Spec Resolution (reforge-impl [<spec-name>] [<entity>])
+
+引数の解釈: 最初の引数が既存の `.reforge/specs/` ディレクトリ名と一致する場合は spec 名として扱い、次の引数を entity とする。一致しない場合は最初の引数を entity として扱う。
+
+1. spec 名が特定された場合 → `.reforge/specs/<name>/` が存在すれば使用、なければエラー報告して `blocked`。
+2. spec 名なし + `.reforge/specs/` 内の spec が 1 つ → 自動選択して続行。
+3. spec 名なし + specs が複数 → 一覧表示して AskUserQuestion で選択を求める。
+4. spec 名なし + specs が 0 → `/reforge-init "<説明>"` を案内して `blocked`。
+
+選択された spec 名を `<name>` として Canonical Paths を解決する。
+
 ## Source of Truth
 
-- Read `.reforge/spec.json` before any implementation work.
-- Read `.reforge/tasks.json` to identify and update the target entity task.
+- Run Spec Resolution to determine `<name>`, then read `SPEC_PATH` before any implementation work.
+- Read `TASKS_PATH` to identify and update the target entity task.
 - Do not depend on external libraries or helper scripts from this skill file.
 
 ## Execution Contract
 
 ゲートチェックは、tasks.jsonのステータス更新、DB/API/UI/テスト生成を含む全ての実装処理より前に必ず実行する。
+
+Spec Resolution を実行して `<name>` と `SPEC_PATH`、`TASKS_PATH` を確定する。その後、以下の5ゲートを順に実行する:
 
 1. `.reforge/spec.json` の存在を確認する。
    - 存在しない場合は「spec.jsonが見つかりません。`/reforge:init` を実行してください」と表示して停止する。
@@ -32,12 +59,12 @@ Implement one entity from the approved Reforge specification.
 5. `spec.entities[entity]` の定義を確認する。
    - entityが存在しない、または `fields` が空の場合は「`/reforge:resume` を実行してエンティティ定義を完成させてください」と表示して停止する。
 
-entity引数の解析は `meta.approved` 確認後に行う。上記5つのゲートを全て通過した後でのみ、`.reforge/tasks.json` のステータス更新と実装を開始する。
-実装は `.reforge/spec.json` に存在する情報だけから行い、spec.jsonに存在しない情報の収集に AskUserQuestion を使用しない。
+entity引数の解析は `meta.approved` 確認後に行う。上記5つのゲートを全て通過した後でのみ、`TASKS_PATH` のステータス更新と実装を開始する。
+実装は `SPEC_PATH` に存在する情報だけから行い、spec.jsonに存在しない情報の収集に AskUserQuestion を使用しない。
 
 ## Zero-Context Read Protocol
 
-以下の読み取りは `.reforge/spec.json` のみを情報源として実行する。不足情報を推測して補完してはならない。
+以下の読み取りは `SPEC_PATH` のみを情報源として実行する。不足情報を推測して補完してはならない。
 
 1. `spec.tech` から技術スタックを読み取る。
    - `frontend` を読み取り、UIコンポーネント生成に使うフレームワークを確定する。
@@ -58,23 +85,23 @@ AskUserQuestionは既知情報の明確化に限り使用できる。AskUserQues
 
 ## tasks.json Status Management Procedure
 
-上記ゲートを全て通過し、DB / API / UI / テストの実装処理を開始する前に、`.reforge/tasks.json` の対象entityタスクの `status` を `"pending"` から `"in_progress"` に更新する。
+上記ゲートを全て通過し、DB / API / UI / テストの実装処理を開始する前に、`TASKS_PATH` の対象entityタスクの `status` を `"pending"` から `"in_progress"` に更新する。
 
 1. 対象entityタスクの現在の `status` が `"pending"` であることを確認する。
-2. `.reforge/tasks.json` を編集し、対象entityタスクだけの `status` を `"in_progress"` に変更する。
-3. 開始前確認として `.reforge/tasks.json` を再読み取りし、対象entityタスクが `status: "in_progress"` になっていることを確認する。
+2. `TASKS_PATH` を編集し、対象entityタスクだけの `status` を `"in_progress"` に変更する。
+3. 開始前確認として `.reforge/tasks.json` (`TASKS_PATH`) を再読み取りし、対象entityタスクが `status: "in_progress"` になっていることを確認する。
 4. status更新を確認できない場合は実装を進めない。
 
 `"in_progress"` に更新した後でのみ、DB、API、UI、テストの各サブタスク実装を開始する。
 
 ## Implementation Error Rollback Procedure
 
-DB、API、UI、テストのいずれかの実装または検証で失敗し、実装中にエラーが発生した場合は、完了報告や `"done"` 更新を行う前に `.reforge/tasks.json` の対象entityタスクの `status` を `"in_progress"` から `"pending"` に戻す。tasks.json の更新は対象タスクだけに限定し、可能な限り一時内容を書いてから置き換えるなど atomic に行い、エラー後に `status: "in_progress"` のまま残さない。
+DB、API、UI、テストのいずれかの実装または検証で失敗し、実装中にエラーが発生した場合は、完了報告や `"done"` 更新を行う前に `TASKS_PATH` の対象entityタスクの `status` を `"in_progress"` から `"pending"` に戻す。tasks.json の更新は対象タスクだけに限定し、可能な限り一時内容を書いてから置き換えるなど atomic に行い、エラー後に `status: "in_progress"` のまま残さない。
 
 1. 発生したエラーメッセージを記録し、どのサブタスク（DB / API / UI / テスト / 検証）で失敗したかを特定する。
-2. `.reforge/tasks.json` を再読み取りし、対象entityタスクの現在の `status` が `"in_progress"` であることを確認する。
+2. `TASKS_PATH` を再読み取りし、対象entityタスクの現在の `status` が `"in_progress"` であることを確認する。
 3. 対象entityタスクだけの `status` を `"pending"` に戻す。
-4. ロールバック後確認として `.reforge/tasks.json` を再読み取りし、対象entityタスクが `status: "pending"` になっていることを確認する。
+4. ロールバック後確認として `.reforge/tasks.json` (`TASKS_PATH`) を再読み取りし、対象entityタスクが `status: "pending"` になっていることを確認する。
 5. `status: "pending"` を確認できない場合は完了報告しない。ロールバック失敗として、現在のtasks.json状態と元のエラーメッセージをユーザーに報告する。
 6. `status: "pending"` を確認できた場合は、エラーメッセージとロールバック理由をユーザーに報告する。ロールバック理由には、実装失敗後に tasks.json の `status` が `"in_progress"` のまま残ることを防ぐため、対象entityタスクを再実行可能な `"pending"` に戻したことを含める。
 
@@ -311,10 +338,10 @@ end
 
 ## Completion Status Update
 
-DB、API、UI、テストの全サブタスクが完了し、生成ファイルとテスト実行可能性を確認した後で、`.reforge/tasks.json` の対象entityタスクの `status` を `"in_progress"` から `"done"` に更新する。
+DB、API、UI、テストの全サブタスクが完了し、生成ファイルとテスト実行可能性を確認した後で、`TASKS_PATH` の対象entityタスクの `status` を `"in_progress"` から `"done"` に更新する。
 
 1. DBマイグレーション、CRUD APIエンドポイント、UIコンポーネント、単体テストおよびAPIテストの各確認が完了していることを確認する。
 2. 対象entityタスクの現在の `status` が `"in_progress"` であることを確認する。
-3. `.reforge/tasks.json` を編集し、対象entityタスクだけの `status` を `"done"` に変更する。
-4. 完了後確認として `.reforge/tasks.json` を再読み取りし、対象entityタスクが `status: "done"` になっていることを確認する。
+3. `TASKS_PATH` を編集し、対象entityタスクだけの `status` を `"done"` に変更する。
+4. 完了後確認として `.reforge/tasks.json` (`TASKS_PATH`) を再読み取りし、対象entityタスクが `status: "done"` になっていることを確認する。
 5. status更新を確認できない場合は完了報告しない。

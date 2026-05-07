@@ -17,10 +17,19 @@ allowed-tools: Read, Glob
 ## Canonical Paths
 
 - `REFORGE_DIR = ".reforge"`
-- `SPEC_PATH = ".reforge/spec.json"`
-- `QUESTIONS_PATH = ".reforge/questions.json"`
-- `PREVIOUS_SPEC_PATH = ".reforge/spec.previous.json"`
-- `PREVIOUS_SPEC_PATH` resolves to `.reforge/spec.previous.json`.
+- `SPECS_DIR = ".reforge/specs"`
+- `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
+- `QUESTIONS_PATH = ".reforge/specs/<name>/questions.json"`
+- `PREVIOUS_SPEC_PATH = ".reforge/specs/<name>/spec.previous.json"`
+
+## Spec Resolution (reforge-diff [<spec-name>])
+
+1. 引数で spec 名が渡された場合 → `.reforge/specs/<name>/` が存在すれば使用、なければエラー報告して `blocked`。
+2. 引数なし + `.reforge/specs/` 内の spec が 1 つ → 自動選択して続行。
+3. 引数なし + specs が複数 → 一覧表示して AskUserQuestion で選択を求める。
+4. 引数なし + specs が 0 → `/reforge-init "<説明>"` を案内して `blocked`。
+
+選択された spec 名を `<name>` として Canonical Paths を解決する。
 
 ## Prompt Kernel
 
@@ -43,7 +52,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -60,7 +69,7 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
@@ -73,8 +82,8 @@ Before responding, verify:
    - If missing, block and report that no current spec exists.
    - If invalid JSON, block and report the file that must be fixed.
 2. Determine response language from current spec `meta.lang`.
-3. Read `PREVIOUS_SPEC_PATH`.
-   - If missing, block and report that no previous snapshot exists. Suggest running `/reforge:update "<change>"` after a spec exists.
+3. Read `.reforge/spec.previous.json` (`PREVIOUS_SPEC_PATH`).
+   - If missing, block and report that no previous snapshot exists. Suggest running `/reforge-update "<change>"` after a spec exists.
    - If invalid JSON, block and report the file that must be fixed.
 4. Read `QUESTIONS_PATH` if present.
    - If missing or invalid, use pending count `0` but report that question state was unavailable when relevant.
@@ -106,17 +115,17 @@ Pending questions: <N>
 + <path>
 - <path>
 ~ <path>: <before> -> <after>
-Next gate: /reforge:validate if pending is 0, otherwise /reforge:resume
+Next gate: /reforge-validate if pending is 0, otherwise /reforge-resume
 ```
 
-Concrete example:
+Example output showing a typical update (adding `archived` option and new `reportDetail` view):
 
 ```text
 Lifecycle: diff
 Pending questions: 0
 + views.reportDetail
 ~ entities.report.fields.status.options[2]: undefined -> archived
-Next gate: /reforge:validate
+Next gate: /reforge-validate if pending is 0, otherwise /reforge-resume
 ```
 
 If no changes:
@@ -124,9 +133,8 @@ If no changes:
 ```text
 Lifecycle: diff
 Pending questions: <N>
-No changes
-前回スナップショット以降に変更はありません
-Next gate: /reforge:validate if pending is 0, otherwise /reforge:resume
+前回スナップショット以降に変更はありません（No changes）
+Next gate: /reforge-validate if pending is 0, otherwise /reforge-resume
 ```
 
 If blocked:

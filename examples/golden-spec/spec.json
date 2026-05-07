@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "name": "daily-report",
+    "version": "0.1.0",
+    "lang": "en",
+    "approved": true,
+    "reforgeVersion": "1.0.0"
+  },
+  "tech": {
+    "frontend": "Next.js",
+    "backend": "Next.js API Routes",
+    "database": "PostgreSQL",
+    "orm": "Prisma",
+    "styling": "Tailwind CSS",
+    "testing": "Vitest"
+  },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "content": { "type": "text", "required": true },
+        "status": { "type": "enum", "options": ["draft", "submitted"] }
+      }
+    }
+  },
+  "views": {
+    "reportList": {
+      "type": "list",
+      "entity": "report"
+    }
+  },
+  "flows": {}
+}

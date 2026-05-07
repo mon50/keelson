@@ -35,6 +35,15 @@ describe('HttpServer', () => {
     expect(missing.status).toBe(404);
   });
 
+  it('stops accepting connections after stop()', async () => {
+    const cwd = await makeWorkspace();
+    const server = createReforgeServer();
+    const address = await server.start({ cwd, port: 0 });
+    await server.stop();
+
+    await expect(fetch(`${address.url}/`)).rejects.toThrow();
+  });
+
   it('sends reload and error messages to SSE clients', async () => {
     const cwd = await makeWorkspace();
     const server = createReforgeServer();
@@ -72,6 +81,24 @@ describe('FileWatcher', () => {
     await new Promise((resolve) => setTimeout(resolve, 80));
     await writeFile(specPath, JSON.stringify({ ...dailyReportSpec(), extra: true }));
     await new Promise((resolve) => setTimeout(resolve, 160));
+    await watcher.stop();
+
+    expect(changes).toBe(1);
+  });
+
+  it('triggers onChange with default debounce (150ms) when no debounceMs is specified', async () => {
+    const cwd = await makeWorkspace();
+    const specPath = join(cwd, '.reforge/spec.json');
+    const watcher = createWatcher();
+    let changes = 0;
+    watcher.onChange(() => {
+      changes += 1;
+    });
+
+    watcher.start(specPath); // uses default 150ms debounce
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    await writeFile(specPath, JSON.stringify({ ...dailyReportSpec(), updated: true }));
+    await new Promise((resolve) => setTimeout(resolve, 500)); // wait > 150ms default
     await watcher.stop();
 
     expect(changes).toBe(1);

@@ -3,11 +3,11 @@ import { renderSpecProjection } from '../src/composer';
 import { renderField } from '../src/field-renderer';
 import { renderNonUiSpecContent } from '../src/non-ui-renderer';
 import { projectSpec } from '../src/projector';
-import { renderPrototypeAreaContent } from '../src/prototype-renderer';
+import { renderPrototypeAreaContent, renderUiView } from '../src/prototype-renderer';
 import { renderShell } from '../src/template';
 import type { NonUiProjection, ProjectedField, UiViewProjection } from '../src/types';
 import { assertSafeFragment, escapeHtml } from '../src/utils';
-import { dailyReportSpec } from './fixtures';
+import { dailyReportSpec, noUiSpec } from './fixtures';
 
 describe('HTML safety utilities', () => {
   it('escapes user-controlled strings', () => {
@@ -44,6 +44,11 @@ describe('renderField', () => {
     expect(html).toContain('type="checkbox"');
     expect(html).not.toContain('disabled');
     expect(html).toContain('data-sync-field="unknown"');
+  });
+
+  it('adds required attribute when field.required is true', () => {
+    const html = renderField({ name: 'name', label: '名前', type: 'string', required: true });
+    expect(html).toContain('required');
   });
 });
 
@@ -82,6 +87,38 @@ describe('shell and slot renderers', () => {
     expect(html).not.toContain('id="prototype-area"');
     expect(html).not.toContain('non-ui-spec-area');
     expect(html).not.toContain('DB・バックエンド');
+  });
+
+  it('renders form viewType with <form> and field-grid', () => {
+    const formItem = uiItems.find((item) => item.viewType === 'form')!;
+    const html = renderUiView(formItem, 'pc');
+    expect(html).toContain('<form');
+    expect(html).toContain('field-grid');
+  });
+
+  it('renders list viewType with <table>', () => {
+    const listItem = uiItems.find((item) => item.viewType === 'list')!;
+    const html = renderUiView(listItem, 'pc');
+    expect(html).toContain('<table');
+  });
+
+  it('renders detail viewType with <dl>', () => {
+    const detailItem = uiItems.find((item) => item.viewType === 'detail')!;
+    const html = renderUiView(detailItem, 'pc');
+    expect(html).toContain('<dl');
+  });
+
+  it('renders empty viewType with UIビュー未定義 message', () => {
+    const emptyProjection = projectSpec(noUiSpec());
+    const emptyItem = emptyProjection.items[0] as UiViewProjection;
+    const html = renderUiView(emptyItem, 'pc');
+    expect(html).toContain('UIビュー未定義');
+  });
+
+  it('wraps content in phone-frame for smp layout', () => {
+    const formItem = uiItems.find((item) => item.viewType === 'form')!;
+    const html = renderUiView(formItem, 'smp');
+    expect(html).toContain('phone-frame');
   });
 
   it('non-UI renderer returns only non-screen specification fragments', () => {

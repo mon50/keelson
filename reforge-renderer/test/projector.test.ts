@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { projectSpec } from '../src/projector';
+import type { UiViewProjection } from '../src/types';
 import { dailyReportSpec, noUiSpec } from './fixtures';
 
 describe('projectSpec', () => {
@@ -46,5 +47,21 @@ describe('projectSpec', () => {
 
   it('produces deterministic projections for the same spec', () => {
     expect(projectSpec(dailyReportSpec())).toEqual(projectSpec(dailyReportSpec()));
+  });
+
+  it('filters projected fields to only the names listed in view.fields', () => {
+    const projection = projectSpec(dailyReportSpec());
+    const listItem = projection.items.find((item) => item.id === 'view-reportList') as UiViewProjection;
+
+    // reportList.fields = ['date', 'content', 'status', 'submitted'] (4 of 6 entity fields)
+    expect(listItem.fields.map((f) => f.name)).toEqual(['date', 'content', 'status', 'submitted']);
+  });
+
+  it('reflects enum field options into ProjectedField.options', () => {
+    const projection = projectSpec(dailyReportSpec());
+    const formItem = projection.items.find((item) => item.id === 'view-reportForm') as UiViewProjection;
+    const statusField = formItem.fields.find((f) => f.name === 'status');
+
+    expect(statusField?.options).toEqual(['draft', 'submitted']);
   });
 });

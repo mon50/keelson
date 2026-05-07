@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reforge Render"
+  short_description: "Start a local HTML prototype server and approve the spec"
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools: []

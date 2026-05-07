@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reforge Update"
+  short_description: "Apply a natural-language change request to the spec"
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools: []

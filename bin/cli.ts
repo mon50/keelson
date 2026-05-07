@@ -27,15 +27,26 @@ export async function main(
     return 1;
   }
 
-  const [command] = argv;
-  if (command !== 'install') {
-    console.error('Usage: reforge install');
-    return 1;
+  const [command, ...args] = argv;
+  
+  if (command === 'install' || !command) {
+    const result = await install(cwd);
+    report(result);
+    return result.success ? 0 : 1;
   }
 
-  const result = await install(cwd);
-  report(result);
-  return result.success ? 0 : 1;
+  if (command === 'doctor') {
+    const { doctor } = await import('../src/doctor');
+    return doctor(cwd, args.includes('--json'));
+  }
+
+  if (command === 'uninstall') {
+    const { uninstall } = await import('../src/uninstall');
+    return uninstall(cwd, args.includes('--purge-workspace'));
+  }
+
+  console.error('Usage: reforge [install|doctor|uninstall]');
+  return 1;
 }
 
 if (require.main === module) {

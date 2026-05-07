@@ -7,10 +7,25 @@ allowed-tools: Read, Bash
 
 Verify that the implementation matches the approved Reforge specification. Read-only: this skill never writes or modifies files.
 
+## Canonical Paths
+
+- `SPECS_DIR = ".reforge/specs"`
+- `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
+- `TASKS_PATH = ".reforge/specs/<name>/tasks.json"`
+
+## Spec Resolution (reforge-verify [<spec-name>])
+
+1. 引数で spec 名が渡された場合 → `.reforge/specs/<name>/` が存在すれば使用、なければエラー報告して `blocked`。
+2. 引数なし + `.reforge/specs/` 内の spec が 1 つ → 自動選択して続行。
+3. 引数なし + specs が複数 → 一覧表示して AskUserQuestion で選択を求める。
+4. 引数なし + specs が 0 → `/reforge-init "<説明>"` を案内して `blocked`。
+
+選択された spec 名を `<name>` として Canonical Paths を解決する。
+
 ## Source of Truth
 
-- Read `.reforge/spec.json` to obtain the full entity and view definitions.
-- Read `.reforge/tasks.json` to check whether all tasks are marked `"done"`.
+- Run Spec Resolution to determine `<name>`, then read `SPEC_PATH` to obtain the full entity and view definitions.
+- Read `TASKS_PATH` to check whether all tasks are marked `"done"`.
 - Read generated implementation files to confirm they exist and cover the required fields.
 - Do not depend on external libraries or helper scripts from this skill file.
 
@@ -18,13 +33,14 @@ Verify that the implementation matches the approved Reforge specification. Read-
 
 このスキルは **`meta.approved` の状態に関わらず実行する**（informationalコマンド）。`meta.approved` が `false` でも実行をブロックしない。全照合項目を完了してから一括報告する（途中停止禁止）。
 
-1. `.reforge/spec.json` の存在を確認する。
-   - 存在しない場合は「spec.jsonが見つかりません。`/reforge:init` を実行してください」と表示して停止する。
-2. `spec.json` の `meta` と `entities` を読み取る（`meta.approved` の値は情報として記録するのみ）。
-3. `spec.tech` を読み取り、ファイルパスパターンを動的に決定する。
-4. 全 entity に対して照合チェックを実行する（詳細はEntityマッチングロジックセクション参照）。
-5. `.reforge/tasks.json` を読み取り、全タスクの `status` を確認する。
-6. 全照合完了後に一括レポートを出力する。
+1. Spec Resolution を実行して `<name>` と `SPEC_PATH`、`TASKS_PATH` を確定する。
+2. `SPEC_PATH` の存在を確認する。
+   - 存在しない場合は「spec.jsonが見つかりません。`/reforge-init` を実行してください」と表示して停止する。
+3. `SPEC_PATH` の `meta` と `entities` を読み取る（`meta.approved` の値は情報として記録するのみ）。
+4. `spec.tech` を読み取り、ファイルパスパターンを動的に決定する。
+5. 全 entity に対して照合チェックを実行する（詳細はEntityマッチングロジックセクション参照）。
+6. `TASKS_PATH` を読み取り、全タスクの `status` を確認する。
+7. 全照合完了後に一括レポートを出力する。
 
 ## Entity Matching Logic
 
@@ -99,7 +115,7 @@ UIコンポーネントパスの決定 (spec.tech.frontend + spec.tech.styling):
 
 ### tasks.json 全タスク完了確認
 
-全entityの照合チェック後に `.reforge/tasks.json` を読み取る。
+全entityの照合チェック後に `TASKS_PATH` を読み取る。
 - tasks.json が存在しない場合は `TASK_INCOMPLETE: tasks.json が見つかりません` として警告リストに追加する（重篤度: warning）。
 - tasks.json が存在する場合は全タスクの `status` を確認し、`"done"` でないタスクがあれば `TASK_INCOMPLETE: {entity}（status: {status}）` として警告リストに追加する（重篤度: warning）。
 
@@ -110,7 +126,7 @@ UIコンポーネントパスの決定 (spec.tech.frontend + spec.tech.styling):
 ```
 ## Reforge Verify Report
 
-Spec: .reforge/spec.json
+Spec: .reforge/specs/<name>/spec.json
 meta.approved: {true / false / (未設定)}
 
 ### Entity Verification

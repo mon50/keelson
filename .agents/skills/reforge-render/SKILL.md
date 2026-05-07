@@ -1,29 +1,25 @@
 ---
 name: reforge-render
-description: Start the local Reforge renderer for .reforge/spec.json.
-allowed-tools: Read, Bash
+description: Start a local HTML prototype server from .reforge/spec.json and run the approval flow.
 ---
 
-# reforge-render
+# Reforge Render
 
-## Core Rule
+Use this skill to review the UI prototype and approve the spec.
 
-- Think in English, respond to the user in the language specified by `.reforge/spec.json` when it can be read.
-- Do not generate or update Spec.Json.
-- Do not call an LLM at runtime for rendering.
-- Start only the local confirmation UI server.
+Inputs:
+- optional spec name
 
-## Command Flow
+Read:
+- .reforge/specs/<name>/spec.json
+- .reforge/specs/<name>/questions.json
 
-1. Confirm `.reforge/spec.json` exists in the current project.
-2. Start the renderer server:
-   - Prefer installed projects: `node .reforge/server/index.js`
-   - When developing this source repository and the built package exists: `node reforge-renderer/dist/index.js`
-3. Show the URL printed by the process to the user.
-4. Keep the process running so browser reload notifications can be delivered.
+Write:
+- .reforge/specs/<name>/spec.json (only when recording approval)
 
-## Failure Handling
-
-- If `.reforge/spec.json` is missing, report that `/reforge:init` must be run first.
-- If JSON parsing fails, report the parser error and stop.
-- If no renderer entrypoint exists, ask the user to install or build the renderer package before running again.
+Procedure:
+1. Start the server via `node .reforge/server/index.js` or `node reforge-renderer/dist/index.js`.
+2. Provide the URL to the user.
+3. Explain options: open, approve, reject, stop.
+4. If the user approves, write `meta.approved = true`, `meta.approvedAt`, and `meta.approvedDigest` to `spec.json`. Recommend `reforge-plan`.
+5. If the user rejects, stop the server and recommend `reforge-update`, then `reforge-validate`, then `reforge-render`.

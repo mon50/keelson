@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reforge Verify"
+  short_description: "Verify that the implementation matches the approved spec"
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools: []

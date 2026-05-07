@@ -18,9 +18,21 @@ argument-hint: "\"<change request>\""
 ## Canonical Paths
 
 - `REFORGE_DIR = ".reforge"`
-- `SPEC_PATH = ".reforge/spec.json"`
-- `QUESTIONS_PATH = ".reforge/questions.json"`
-- `PREVIOUS_SPEC_PATH = ".reforge/spec.previous.json"`
+- `SPECS_DIR = ".reforge/specs"`
+- `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
+- `QUESTIONS_PATH = ".reforge/specs/<name>/questions.json"`
+- `PREVIOUS_SPEC_PATH = ".reforge/specs/<name>/spec.previous.json"`
+
+## Spec Resolution (reforge-update [<spec-name>] "<change request>")
+
+引数の解釈: 最初の引数が既存の `.reforge/specs/` ディレクトリ名と一致する場合は spec 名として扱い、残りを change request とする。一致しない場合は引数全体を change request として扱う。
+
+1. spec 名が特定された場合 → `.reforge/specs/<name>/` が存在すれば使用、なければエラー報告して `blocked`。
+2. spec 名なし + `.reforge/specs/` 内の spec が 1 つ → 自動選択して続行。
+3. spec 名なし + specs が複数 → 一覧表示して AskUserQuestion で選択を求める。
+4. spec 名なし + specs が 0 → `/reforge-init "<説明>"` を案内して `blocked`。
+
+選択された spec 名を `<name>` として Canonical Paths を解決する。
 
 ## Prompt Kernel
 
@@ -43,7 +55,7 @@ Use this shared kernel for every reforge-engine command.
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
 - `one_question_only`: Present only the single highest-priority pending question.
-- `core_schema_compliant`: Writes must preserve `meta`, `tech`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
+- `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`.
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, ask one concise question in chat and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
 
@@ -60,46 +72,32 @@ Every run ends with exactly one of these outcomes:
 
 Before responding, verify:
 
-- Any written spec has `meta.name`, `meta.version`, `meta.lang`, `meta.approved`, `tech`, `entities`, `flows`, and `views`.
+- Any written spec has `meta.name`, `meta.version`, `entities`, `flows`, and `views`.
 - Any written field type is one of `string`, `number`, `date`, `enum`, `text`, `boolean`.
 - Any written enum has at least one string option.
 - Any written question entry has `id`, `phase`, `question`, `type`, and `resolves`.
 - `pending` does not contain duplicate unresolved questions for the same normalized `resolves` set.
 - The response includes lifecycle stage, changed artifacts, pending count, and the next gate.
 
-## 質問機能プロトコル
-
-全 reforge-engine スキルは `.reforge/questions.json` を共有ストレージとして扱い、1回の実行で提示する質問は1問だけにする。
-
-1. Step 1: 取得
-   - 既存の `pending` があれば最優先の1件だけを取得する。
-   - 新規質問を作る場合は `id`、`phase`、`question`、`type`、`resolves` を必ず持たせる。
-   - `phase` は `meta`、`tech`、`data`、`views`、`flows` のいずれかにする。
-2. Step 2: 提示
-   - AskUserQuestion が利用できる場合はその1問だけを提示する。
-   - AskUserQuestion が利用できない場合はチャットで1問だけ質問し、そこで停止する。
-3. Step 3: 反映
-   - 回答は `resolves` に列挙された JSON パスだけへ反映する。
-   - 回答が不足している場合は `SPEC_PATH` を変更せず、同じ質問を `pending` に残す。
-4. Step 4: 移動
-   - 解決済みの質問を `pending` から削除し、`answer` を付けて `answered` へ追加する。
-   - 次の質問が必要な場合でも同じ実行内では提示せず、次回実行へ回す。
-
 ## Command Flow
 
 1. Require a change request argument. If missing, ask for one change request and stop.
 2. Read `SPEC_PATH`.
-   - If missing, block and report that `/reforge:init "<description>"` is required before update.
+   - If missing, block and report that `/reforge-init "<description>"` is required before update.
    - If invalid JSON, block and report the file that must be fixed.
 3. Read `QUESTIONS_PATH` if present; otherwise start from `{ "pending": [], "answered": [] }`.
-4. Classify the change request:
+4. **update スキル固有**: チェンジタイプが `ambiguous` と分類された場合、不明な点を解決する質問エントリを作成して `pending` に追加し、ステップ 2（質問の提示）へ進む。`SPEC_PATH` は変更しない。Classify the change request:
    - `add`: adds a new entity, field, view, or flow.
    - `modify`: changes an existing explicit spec path.
    - `remove`: removes an existing explicit spec path.
    - `conflict`: contradicts existing spec.
    - `ambiguous`: lacks required details.
 5. If the change can be applied safely:
-   - Save the current parsed spec to `PREVIOUS_SPEC_PATH` before writing changes.
+   - Save the current parsed spec to `spec.previous.json` (`PREVIOUS_SPEC_PATH`) 書き込む前に保存する。
+   - **`meta.approved` 確認フロー**: 提案された変更が `meta.approved` を設定・変更・削除する場合:
+     - ユーザーに警告する: 「この変更は `meta.approved` を変更します。承認状態がリセットされると `/reforge-plan` や `/reforge-impl` が実行できなくなります。」
+     - `AskUserQuestion` を使って続行するか確認を求める。
+     - ユーザーが拒否した場合は `meta.approved` の変更を適用しない（他の変更は適用可能）。
    - Apply only the relevant spec paths.
    - Preserve unrelated entities, fields, flows, and views.
 6. If the change is conflicting, destructive, or ambiguous:
@@ -126,103 +124,115 @@ Before responding, verify:
 - For removal:
   - Treat broad removal as destructive and ask for confirmation unless the target path is exact.
 
-## Minimal Diff Example
-
-変更指示: `日報のstatusにarchivedを追加して`
-
-適用前の `SPEC_PATH` は、更新を書き込む前に必ず `PREVIOUS_SPEC_PATH`（`.reforge/spec.previous.json`）へ保存する。
-
-更新前:
-
-```json
-{
-  "meta": {
-    "name": "日報アプリ",
-    "version": "0.1.0",
-    "lang": "ja",
-    "approved": false
-  },
-  "tech": {
-    "frontend": "Next.js",
-    "backend": "Node.js",
-    "database": "PostgreSQL",
-    "orm": "Prisma",
-    "styling": "Tailwind CSS",
-    "testing": "Vitest"
-  },
-  "entities": {
-    "report": {
-      "fields": {
-        "title": { "type": "string", "required": true },
-        "status": { "type": "enum", "options": ["draft", "submitted"] },
-        "body": { "type": "text" }
-      }
-    }
-  },
-  "views": {
-    "reportList": {
-      "type": "list",
-      "entity": "report",
-      "fields": ["title", "status"]
-    }
-  },
-  "flows": {
-    "submitReport": {
-      "steps": ["日報を作成する", "提出する"]
-    }
-  }
-}
-```
-
-更新後:
-
-```json
-{
-  "meta": {
-    "name": "日報アプリ",
-    "version": "0.1.0",
-    "lang": "ja",
-    "approved": false
-  },
-  "tech": {
-    "frontend": "Next.js",
-    "backend": "Node.js",
-    "database": "PostgreSQL",
-    "orm": "Prisma",
-    "styling": "Tailwind CSS",
-    "testing": "Vitest"
-  },
-  "entities": {
-    "report": {
-      "fields": {
-        "title": { "type": "string", "required": true },
-        "status": { "type": "enum", "options": ["draft", "submitted", "archived"] },
-        "body": { "type": "text" }
-      }
-    }
-  },
-  "views": {
-    "reportList": {
-      "type": "list",
-      "entity": "report",
-      "fields": ["title", "status"]
-    }
-  },
-  "flows": {
-    "submitReport": {
-      "steps": ["日報を作成する", "提出する"]
-    }
-  }
-}
-```
-
-この例で変更してよい JSON パスは `entities.report.fields.status.options` のみ。`meta`、`tech`、`entities.report.fields.title`、`views`、`flows` は更新対象外として同一内容を保持する。
-
 ## Question Rules
 
-- New update questions use the closest core phase: `meta`, `tech`, `data`, `views`, or `flows`.
+- New update questions use `phase: "update"` unless they clearly belong to `data`, `view`, or `flow`.
 - Question `resolves` must point to the spec path blocked by the change.
 - Present only the highest-priority new or existing pending question.
+
+## 質問機能プロトコル
+
+このスキルは以下の4ステップに従って質問を処理します。全 reforge-engine コマンドで同一プロトコルを使用します。
+
+### Step 1: 取得（ステップ 1: 質問の取得）
+
+`.reforge/questions.json` の `pending` 配列を読み込み、最優先の質問（`pending[0]`）を取得します。  
+`pending` が空でこのコマンドが新たな質問を生成する場合は、以下の形式でエントリを作成し `pending` に追加します。
+
+```json
+{
+  "id": "一意のスネークケース識別子",
+  "phase": "meta | tech | data | views | flows のいずれか",
+  "question": "ユーザー向けの質問文（meta.lang に従ってローカライズ）",
+  "type": "text | single_choice | multi_choice | multi_input | confirm のいずれか",
+  "resolves": ["spec.json 上の反映先 JSON パス（例: tech.frontend）"]
+}
+```
+
+> **制約**: `id` は既存の `pending` および `answered` と重複してはならない。  
+> **制約**: `phase` は `meta`・`tech`・`data`・`views`・`flows` の5値のみ有効。
+
+### Step 2: 提示（ステップ 2: 質問の提示）
+
+取得した1問を `AskUserQuestion` を使ってユーザーに提示します。  
+**1回の実行で提示できる質問は必ず1問のみです。** 複数の質問を同時に提示することは禁止されています。
+
+### Step 3: 反映（ステップ 3: 回答の反映）
+
+ユーザーから回答を受け取ったら、質問の `resolves` フィールドに列挙された全 JSON パスに対して、回答内容を即座に `.reforge/spec.json` へ反映します。
+
+> **制約**: `resolves` に記載のないパスは変更しない（最小差分の原則）。  
+> **制約**: 推測による補完は禁止。回答が不十分な場合は spec.json を変更せず、このステップをスキップして質問を `pending` に残します。
+
+### Step 4: 移動（ステップ 4: 質問の移動）
+
+回答の反映が完了したら、`.reforge/questions.json` を以下のように更新します。
+
+1. `pending` 配列から該当の質問エントリを削除する。
+2. `answered` 配列の末尾に同エントリを追加し、`answer` フィールドを付与する（`answeredAt` は任意）。
+3. ファイルを書き込む前にクオリティゲートを実行する。
+
+```json
+// answered に移動後のエントリ例
+{
+  "id": "tech_frontend",
+  "phase": "tech",
+  "question": "フロントエンドフレームワークは何を使用しますか？",
+  "type": "single_choice",
+  "resolves": ["tech.frontend"],
+  "answer": "Next.js"
+}
+```
+
+### 追加制約
+
+- **同一実行内での複数質問禁止**: 追加の質問が必要な場合は、次の実行サイクル（次回コマンド呼び出し）で処理します。同一呼び出し内で `AskUserQuestion` を複数回呼ぶことは禁止されています。
+- **共有ストレージ**: `.reforge/questions.json` は全 reforge-engine コマンドの共有ストレージです。読み書きの前に必ず最新のファイル内容を読み込んでください。
+- **推測での補完禁止**: 不明な spec フィールドは推測で埋めず、必ず `AskUserQuestion` を通じて確認します（`no_guessing` 制約）。
+
+## Minimal Diff Example
+
+以下は `entities.report.fields.status.options` に `archived` を追加する変更の最小例:
+
+変更前 (`spec.previous.json`):
+
+```json
+{
+  "meta": { "name": "daily-report", "version": "0.1.0", "lang": "ja", "approved": false },
+  "tech": { "frontend": "Next.js", "backend": "Node.js / Express", "database": "PostgreSQL", "orm": "Prisma", "styling": "Tailwind CSS", "testing": "Vitest" },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "status": { "type": "enum", "options": ["draft", "submitted"] }
+      }
+    }
+  },
+  "views": { "reportList": { "type": "list", "entity": "report" } },
+  "flows": {}
+}
+```
+
+変更後 (`spec.json`):
+
+```json
+{
+  "meta": { "name": "daily-report", "version": "0.1.0", "lang": "ja", "approved": false },
+  "tech": { "frontend": "Next.js", "backend": "Node.js / Express", "database": "PostgreSQL", "orm": "Prisma", "styling": "Tailwind CSS", "testing": "Vitest" },
+  "entities": {
+    "report": {
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "status": { "type": "enum", "options": ["draft", "submitted", "archived"] }
+      }
+    }
+  },
+  "views": { "reportList": { "type": "list", "entity": "report" } },
+  "flows": {}
+}
+```
+
+変更パス: `entities.report.fields.status.options`
 
 ## Completion Report
 
@@ -233,5 +243,6 @@ Report concisely:
 - Changed spec paths when a patch was applied.
 - Pending question count.
 - Next gate:
-  - If pending count is 0: `/reforge:validate`.
-  - If pending count is greater than 0: answer the presented question or run `/reforge:resume`.
+  - If pending count is 0: `/reforge-validate`.
+  - If pending count is greater than 0: answer the presented question or run `/reforge-resume`.
+
