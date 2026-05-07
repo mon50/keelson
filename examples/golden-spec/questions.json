@@ -1,0 +1,13 @@
+{
+  "pending": [],
+  "answered": [
+    {
+      "id": "app_purpose",
+      "phase": "meta",
+      "question": "What is the primary purpose of this app?",
+      "type": "text",
+      "resolves": ["meta.name", "entities", "views"],
+      "answer": "A daily report application."
+    }
+  ]
+}

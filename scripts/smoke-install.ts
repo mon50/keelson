@@ -1,0 +1,54 @@
+import * as fs from 'fs-extra';
+import * as path from 'node:path';
+import { execSync } from 'node:child_process';
+
+async function main() {
+  const rootDir = process.cwd();
+  console.log('Running install smoke test...');
+
+  // Mock an environment
+  const testDir = path.join(rootDir, '.smoke-test');
+  await fs.ensureDir(testDir);
+  await fs.ensureDir(path.join(testDir, '.claude'));
+  
+  try {
+    // Run install
+    console.log('Installing Reforge in test directory...');
+    execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} install`, { cwd: testDir, stdio: 'inherit' });
+
+    // Check if skills are installed
+    const claudeSkillsDir = path.join(testDir, '.claude', 'skills');
+    if (!await fs.pathExists(claudeSkillsDir)) {
+      throw new Error('Skills were not installed in .claude/skills');
+    }
+
+    const initSkill = path.join(claudeSkillsDir, 'reforge-init', 'SKILL.md');
+    if (!await fs.pathExists(initSkill)) {
+      throw new Error('reforge-init skill was not installed');
+    }
+
+    // Run doctor
+    console.log('Running doctor...');
+    execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} doctor`, { cwd: testDir, stdio: 'inherit' });
+
+    // Run uninstall
+    console.log('Uninstalling Reforge...');
+    execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} uninstall`, { cwd: testDir, stdio: 'inherit' });
+
+    if (await fs.pathExists(claudeSkillsDir)) {
+      const skillsLeft = await fs.readdir(claudeSkillsDir);
+      if (skillsLeft.some(s => s.startsWith('reforge-'))) {
+        throw new Error('Reforge skills were not uninstalled properly');
+      }
+    }
+
+    console.log('✅ Smoke install passed.');
+  } finally {
+    await fs.remove(testDir);
+  }
+}
+
+main().catch((err) => {
+  console.error('❌ Smoke install failed:', err);
+  process.exit(1);
+});
