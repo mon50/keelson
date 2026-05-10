@@ -9,13 +9,6 @@ Reforge turns a natural-language product description into a structured spec, a l
 README: <a href="./README.md">English</a> | <a href="./README_ja.md">日本語</a>
 </sub></div>
 
-## Are you developing Reforge or using it?
-
-- **Using Reforge in your project** — run `npx reforge install` in your project and follow the Quick Start below.
-- **Developing Reforge itself** — you are in the source repository. The `reforge/` directory is the npm package. See `CLAUDE.md` in the parent directory for the development workflow (`kiro-*` commands).
-
----
-
 ## What it is, Why it is useful, Who it is for
 
 Reforge is a **Skill-based Agent Framework**. Instead of acting as a standalone CLI tool, Reforge installs a set of **Agent Skills** into your project. Agent Skills are plain-text instruction files that teach your AI coding agent how to execute each workflow step. Running `npx reforge install` copies them into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex), which makes the `/reforge-*` slash commands available in your agent session.
