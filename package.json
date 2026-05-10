@@ -1,11 +1,11 @@
 {
-  "name": "reforge",
+  "name": "aid-reforge",
   "version": "0.1.0",
   "description": "Installer CLI for Reforge skills",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
-    "reforge": "./dist/bin/cli.js"
+    "aid-reforge": "./dist/bin/cli.js"
   },
   "files": [
     "dist",

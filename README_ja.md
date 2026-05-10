@@ -11,14 +11,15 @@ README: <a href="./README.md">English</a> | 日本語
 
 ## 何をするのか
 
-Reforge はプロジェクトに **Agent Skills** をインストールする。Agent Skills とは、AI コーディングエージェントが各ワークフローステップをどう実行するかを教えるプレーンテキストの指示ファイルである。`npx reforge install` を実行すると、これらのファイルが `.claude/skills/`（Claude Code）または `.agents/skills/`（Codex）にコピーされ、エージェントセッション内で `/reforge-*` スラッシュコマンドが使えるようになる。
+Reforge はプロジェクトに **Agent Skills** をインストールする。Agent Skills とは、AI コーディングエージェントが各ワークフローステップをどう実行するかを教えるプレーンテキストの指示ファイルである。`npx aid-reforge install` を実行すると、これらのファイルが `.claude/skills/`（Claude Code）または `.agents/skills/`（Codex）にコピーされ、エージェントセッション内で `/reforge-*` スラッシュコマンドが使えるようになる。
 
 各スキルはプロダクト開発ライフサイクルの 1 ステップを担う。
 
 | フェーズ | スキル | 役割 |
 |---|---|---|
 | スペック | `/reforge-init` | 説明から `spec.json` と質問キューを生成する |
-| 全フェーズ¹ | `/reforge-resume` | ライフサイクルナビゲーター — どのフェーズでも次に取るべきアクションへ案内する |
+| 全フェーズ¹ | `/reforge-resume` | **ナビゲーターモード** — Q&A + フェーズ自動進行 |
+| スペック³ | `/reforge-answer` | **マニュアルモード** — Q&A 専用（フェーズ案内はしない） |
 | 任意のフェーズ² | `/reforge-update` | 自然言語の変更指示を spec に適用する |
 | 任意のフェーズ² | `/reforge-diff` | 直前のスナップショットとの差分を表示する |
 | スペック | `/reforge-validate` | `spec.json` の完全性と整合性を検証する |
@@ -28,7 +29,8 @@ Reforge はプロジェクトに **Agent Skills** をインストールする。
 | 検証 | `/reforge-verify` | 実装が spec と一致しているか確認する |
 
 ¹ **全フェーズ** — `reforge-resume` は最初の質問から最終検証まで、すべてのフェーズゲートを能動的にナビゲートする。  
-² **任意のフェーズ** — メインのライフサイクルフローに影響なく、いつでも呼び出せるオプションのユーティリティ。
+² **任意のフェーズ** — メインのライフサイクルフローに影響なく、いつでも呼び出せるオプションのユーティリティ。  
+³ **マニュアルモード** — フェーズ進行を自分で制御したいユーザー向け。Q&A のみ対応し、次のコマンドは推奨しない。
 
 全スキルは `.reforge/specs/<name>/` 配下の共通データ契約を共有する。スキルは決定を勝手に埋めない — 不明点はペンディング質問になり、人間が回答する。
 
@@ -36,7 +38,7 @@ Reforge はプロジェクトに **Agent Skills** をインストールする。
 
 ```bash
 cd your-project
-npx reforge install
+npx aid-reforge install
 ```
 
 その後、AI コーディングエージェント上で:
@@ -103,7 +105,8 @@ Reforge のすべての状態はプロジェクト内の `.reforge/specs/<name>/
         ├── spec.json        # プロダクト仕様の Single Source of Truth
         ├── spec.previous.json  # 直前のスナップショット（/reforge-diff で使用）
         ├── questions.json   # 未解決・解決済み質問キュー
-        └── tasks.json       # 実装タスクキュー（/reforge-plan が生成）
+        ├── tasks.json       # 実装タスクキュー（/reforge-plan が生成）
+        └── tasks.previous.json  # /reforge-update が承認リセット時に旧 tasks.json を退避
 ```
 
 ワークスペース状態をローカルに留めたい場合は `.reforge/` を `.gitignore` に追加する。複数マシンで進捗を共有したい場合はコミットする。

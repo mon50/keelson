@@ -7,4 +7,4 @@ description: Reforge {{SKILL_COMMAND}} command forwarding to the project-local S
 
 Read `.reforge/skills/{{SKILL_NAME}}/SKILL.md` from the current project root and follow its instructions exactly.
 
-If the file is missing, tell the user to run `npx reforge install` again.
+If the file is missing, tell the user to run `npx aid-reforge install` again.

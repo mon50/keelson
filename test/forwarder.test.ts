@@ -55,7 +55,7 @@ describe('installable forwarder templates', () => {
       expect(markdown).toContain(`# ${skillName}`);
       expect(markdown).toContain(`.reforge/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
-      expect(markdown).toContain('npx reforge install');
+      expect(markdown).toContain('npx aid-reforge install');
     }
   });
 
@@ -79,7 +79,7 @@ describe('installable forwarder templates', () => {
       expect(markdown).toContain(`# ${skillName}`);
       expect(markdown).toContain(`.reforge/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
-      expect(markdown).toContain('npx reforge install');
+      expect(markdown).toContain('npx aid-reforge install');
     }
   });
 

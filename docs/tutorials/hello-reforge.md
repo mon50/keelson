@@ -6,7 +6,7 @@
 
 ## Step 1: Install Reforge
 ```bash
-npx reforge install
+npx aid-reforge install
 ```
 
 ## Step 2: Initialize

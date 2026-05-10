@@ -6,6 +6,10 @@
 
 ## 全体像
 
+Reforge には 2 つの利用モードがある。**どちらを選んでもライフサイクルは同じ** — 違いは「次に何を実行すべきかの判断を Reforge に任せるか、自分で行うか」だけ。
+
+### ナビゲーターモード（推奨・初心者向け）
+
 `reforge-init` の後は、1 つのコマンドだけでライフサイクル全体を完走できる:
 
 ```
@@ -13,17 +17,30 @@ reforge-init "説明"   # 1 回だけ
 reforge-resume        # 完了まで繰り返す
 ```
 
-`reforge-resume` はライフサイクルナビゲーターである。実行のたびにワークスペースの現在状態を読み取り、適切なアクションへ案内する — 全フェーズにわたって。
+`reforge-resume` はライフサイクルナビゲーター。実行のたびに状態を読み取り、進行マップ・現在フェーズ・NextAction を出力し、質問の処理から次フェーズの案内まで自動で行う。
 
-各フェーズを個別に呼び出したい場合のシーケンスは以下の通り:
+### マニュアルモード（フェーズ進行を自分で制御したいとき）
+
+各フェーズコマンドを順番に直接実行する:
 
 ```
-フェーズ 1 — スペック      reforge-init → reforge-resume で質問に回答 → reforge-validate
+フェーズ 1 — スペック      reforge-init → reforge-answer で質問に回答 → reforge-validate
 フェーズ 2 — プロトタイプ  reforge-render → 人間が承認
 フェーズ 3 — 計画          reforge-plan
 フェーズ 4 — 実装          reforge-impl（1 回に 1 エンティティ）
 フェーズ 5 — 検証          reforge-verify
 ```
+
+`reforge-answer` は **質問1件の提示と回答記録のみ** を行う Q&A 専用スキル。フェーズマップや NextAction は出さない。マニュアルモードでは `reforge-resume` を使わない設計。
+
+### モードの選び方
+
+| | ナビゲーターモード | マニュアルモード |
+|---|---|---|
+| 質問処理 | `reforge-resume` | `reforge-answer` |
+| フェーズ進行 | `reforge-resume`（自動） | 各フェーズコマンドを直接実行 |
+| 出力 | 進行マップ + NextAction | 最小限（残り質問数のみ） |
+| 向いている人 | 初めて使う / 完了まで一気に進めたい | 各フェーズで一旦立ち止まりたい / どのコマンドが何をするか把握済み |
 
 任意のタイミングで使用可能: spec を修正する `reforge-update`、変更をレビューする `reforge-diff`。
 
@@ -37,7 +54,7 @@ reforge-resume        # 完了まで繰り返す
 | **ビュー (View)** | エンティティを表示・編集する UI 画面。例: 一覧ビュー、フォーム、詳細ページ。 |
 | **フロー (Flow)** | 複数のビューをまたぐ多段階のユーザー操作手順。例: 「日報を提出 → 上長がレビュー → 承認」。 |
 | **スペック (Spec)** | `spec.json` ファイル: 1 つの機能・イニシアティブに関するすべてのプロダクト決定の Single Source of Truth。 |
-| **Agent Skill** | `npx reforge install` によってインストールされるプレーンテキストの指示ファイル。AI エージェントが各ライフサイクルコマンドを実行する方法を定義する。 |
+| **Agent Skill** | `npx aid-reforge install` によってインストールされるプレーンテキストの指示ファイル。AI エージェントが各ライフサイクルコマンドを実行する方法を定義する。 |
 
 ---
 
@@ -237,12 +254,14 @@ Created: .reforge/specs/daily-report/questions.json
 
 ### 承認後に spec を修正する
 
-`meta.approved = true` の後に spec を変更する必要が生じた場合:
+`meta.approved = true` の後に spec を変更する必要が生じた場合は、原則として **`/reforge-update` を実行したあとは `/reforge-resume` だけで完結する** — resume が現在地（再承認・再 plan）を判定して以降の手順を順番に案内する。
 
-1. `/reforge-update "変更内容"` を実行 — これにより `meta.approved = false` が自動設定される。
-2. `/reforge-validate` で spec の整合性を確認する。
-3. `/reforge-render` を再実行して更新されたプロトタイプを再承認する。
-4. `/reforge-plan` を実行して `tasks.json` を再生成する。
+1. `/reforge-update "変更内容"` を実行 — `meta.approved` が自動的に `false` にリセットされ、既存の `tasks.json` は `tasks.previous.json` に退避される（再 plan の必要性を resume が検知できるようにするため）。
+2. `/reforge-resume` を実行 — `Approve` フェーズを案内するので、`/reforge-render` で更新後のプロトタイプを再承認する。
+3. 再度 `/reforge-resume` を実行 — `Plan` フェーズを案内するので、`/reforge-plan` を実行して `tasks.json` を再生成する。
+4. 以降の `/reforge-impl` → `/reforge-verify` も同様に `/reforge-resume` が順次案内する。
+
+> **注記:** `/reforge-validate` は `/reforge-resume` が内部で実行するため、ユーザーが手動で叩く必要はない。`/reforge-update` の Next gate も常に `/reforge-resume` を案内する。
 
 ### 1 プロジェクトに複数の spec を持つ
 

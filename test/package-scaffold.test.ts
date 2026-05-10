@@ -29,9 +29,9 @@ describe('root reforge package scaffold', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('defines the npm package boundary for npx reforge install', () => {
-    expect(packageJson.name).toBe('reforge');
-    expect(packageJson.bin).toEqual({ reforge: './dist/bin/cli.js' });
+  it('defines the npm package boundary for npx aid-reforge install', () => {
+    expect(packageJson.name).toBe('aid-reforge');
+    expect(packageJson.bin).toEqual({ 'aid-reforge': './dist/bin/cli.js' });
     expect(packageJson.files).toEqual([
       'dist',
       'skills/core',
@@ -117,6 +117,6 @@ describe('root reforge package scaffold', () => {
       console.error = originalError;
     }
 
-    expect(stderr.join('\n')).toContain('Usage: reforge install');
+    expect(stderr.join('\n')).toContain('Usage: aid-reforge [install');
   });
 });

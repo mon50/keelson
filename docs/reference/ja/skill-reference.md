@@ -9,7 +9,8 @@
 | スキル | フェーズ | 説明 |
 |---|---|---|
 | [`reforge-init`](#reforge-init) | スペック | `spec.json` と質問キューを初期化する |
-| [`reforge-resume`](#reforge-resume) | 全フェーズ¹ | ライフサイクルナビゲーター — どのフェーズでも次のアクションへ案内する |
+| [`reforge-resume`](#reforge-resume) | 全フェーズ¹ | **ナビゲーターモード** — どのフェーズでも次のアクションへ案内する |
+| [`reforge-answer`](#reforge-answer) | スペック³ | **マニュアルモード** — Q&A 専用。ペンディング質問1件に回答するだけでフェーズ案内はしない |
 | [`reforge-update`](#reforge-update) | 任意のフェーズ² | 自然言語の変更指示を spec に適用する |
 | [`reforge-diff`](#reforge-diff) | 任意のフェーズ² | 直前のスナップショットとの JSON パス差分を表示する |
 | [`reforge-validate`](#reforge-validate) | スペック | spec の完全性と整合性を確認する |
@@ -19,7 +20,18 @@
 | [`reforge-verify`](#reforge-verify) | 検証 | 実装が spec と一致しているか確認する |
 
 ¹ **全フェーズ** — `reforge-resume` は最初の質問から最終検証まで、すべてのフェーズゲートを能動的にナビゲートする。  
-² **任意のフェーズ** — メインのライフサイクルフローに影響なく、いつでも呼び出せるオプションのユーティリティ。
+² **任意のフェーズ** — メインのライフサイクルフローに影響なく、いつでも呼び出せるオプションのユーティリティ。  
+³ **マニュアルモード** — フェーズ進行を自分で制御したいときに `reforge-resume` の代わりに使う。Q&A のみで、次のコマンドを推奨しない。
+
+### ナビゲーターモード vs マニュアルモード
+
+| | ナビゲーターモード | マニュアルモード |
+|---|---|---|
+| Q&A | `/reforge-resume`（自動的に質問を処理） | `/reforge-answer` |
+| フェーズ進行 | `/reforge-resume`（次フェーズへ自動案内） | 各フェーズコマンドを直接実行: `/reforge-validate`, `/reforge-render`, `/reforge-plan`, `/reforge-impl`, `/reforge-verify` |
+| 出力 | 進行マップ + 現在フェーズ + NextAction | 最小限: ライフサイクルステージ + 残り質問数 |
+
+どちらか1つのモードを選んで使うのが推奨。混在も動作はするが、それぞれの設計意図を活かせない。
 
 ---
 
@@ -86,6 +98,34 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 
 ---
 
+### `reforge-answer`
+
+マニュアルモード用の Q&A 専用スキル。ペンディング質問を 1 件提示して回答を記録する。**フェーズ進行の案内も次コマンド推奨もしない。**
+
+**引数:** `[<spec-name>]`（任意 — spec が 1 つだけの場合は省略可）
+
+**読み取り:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json`
+
+**書き込み:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json` — 回答を記録するときのみ
+
+**動作:**
+- `pending[0]` がある場合は提示し、回答を `resolves` のパスのみに反映して `answered` へ移動する。
+- `pending` が空なら `complete` を返して停止する。次に何のフェーズコマンドを実行するかはユーザーが判断する。
+- 出力は最小限（ライフサイクルステージと残り質問数のみ）。進行マップ・NextAction・推奨コマンドは出さない。
+
+**終了コード:** `answered`, `complete`, `blocked`
+
+**使用タイミング:** **マニュアルモード**を使いたいとき — 各フェーズを `/reforge-validate`, `/reforge-render`, `/reforge-plan`, `/reforge-impl`, `/reforge-verify` を直接実行して制御したいとき。`/reforge-resume` の Q&A 機能のマニュアルモード版に相当する。
+
+**使わないほうがよい場合:** 自動でフェーズを進めたいとき。その場合は `/reforge-resume`（ナビゲーターモード）を使う。
+
+**例:**
+```
+/reforge-answer
+```
+
+---
+
 ### `reforge-update`
 
 `spec.json` に自然言語の変更指示を適用する。
@@ -98,12 +138,15 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 - `.reforge/specs/<name>/spec.json` — 対象パスのみを更新
 - `.reforge/specs/<name>/spec.previous.json` — 変更前の spec のスナップショット
 - `.reforge/specs/<name>/questions.json` — 変更が新たな曖昧性を導入した場合、新しい質問を追加することがある
+- `.reforge/specs/<name>/tasks.previous.json` — `meta.approved` が `true` → `false` に遷移する場合（または `entities` が変更される場合）、既存の `tasks.json` をここへ退避し、`/reforge-resume` が再 plan の必要性を検知できるようにする
 
 **動作:**
 - 変更指示に影響されるパスのみを修正する
 - 影響を受けないフィールドとセクションをすべて保持する
 - spec が承認済みだった場合、`meta.approved = false` を設定する
+- 承認がリセットされる場合、`tasks.json` を `tasks.previous.json` に退避し、再承認後の再 plan を強制する
 - 指示の曖昧な側面は推測せずにペンディング質問に変換する
+- Next gate は常に `/reforge-resume`。resume が内部でバリデーション、再承認 (`/reforge-render`)、再 plan (`/reforge-plan`) へ順次案内する
 
 **例:**
 ```
@@ -363,6 +406,12 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 直近の `reforge-update` 実行前の `spec.json` スナップショット。`reforge-diff` で使用する。`reforge-update` と `reforge-init` 以外のスキルは書き込まない。
 
 > **初回実行時:** 新しいワークスペースではこのファイルは存在しない。最初の `reforge-update`（または `reforge-init` の上書き）が作成するまで、`/reforge-diff` は「前のスナップショットがありません」と報告する。
+
+### `.reforge/specs/<name>/tasks.previous.json`
+
+`reforge-update` が `meta.approved` を `false` にリセットしたとき（または `entities` を変更したとき）に、旧 `tasks.json` を退避したファイル。`tasks.json` をリネームすることで `/reforge-resume` が「タスクキューがない」と検知し、再承認後に `/reforge-plan` が案内される仕組みを成立させる。新しい `tasks.json` が生成された後は削除して構わない。
+
+> **注記:** このファイルを書き込むのは `reforge-update` のみ。`reforge-plan` はこれを参照しない。
 
 ---
 

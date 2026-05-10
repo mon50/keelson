@@ -6,24 +6,41 @@ This guide walks through the full Reforge lifecycle: from an initial product ide
 
 ## Overview
 
-After `reforge-init`, you can drive the entire lifecycle with a single command:
+Reforge supports two usage modes. **The lifecycle is identical** — the only difference is whether Reforge decides the next action for you or you decide yourself.
+
+### Navigator mode (recommended; best for first-time users)
+
+After `reforge-init`, drive the entire lifecycle with a single command:
 
 ```
 reforge-init "description"   # once
 reforge-resume               # repeat until complete
 ```
 
-`reforge-resume` is the lifecycle navigator. On each run it reads the current workspace state, routes to the right action, and tells you what to do next — across all phases.
+`reforge-resume` is the lifecycle navigator. Each run reads the workspace state, prints a phase map + current phase + NextAction, and handles both question Q&A and phase routing automatically.
 
-If you prefer to invoke each phase directly, the full sequence is:
+### Manual mode (when you want to control phase progression yourself)
+
+Run each phase command in sequence:
 
 ```
-Phase 1 — Spec      reforge-init → answer questions via reforge-resume → reforge-validate
+Phase 1 — Spec      reforge-init → answer questions via reforge-answer → reforge-validate
 Phase 2 — Prototype reforge-render → human approval
 Phase 3 — Plan      reforge-plan
 Phase 4 — Implement reforge-impl (one entity per run)
 Phase 5 — Verify    reforge-verify
 ```
+
+`reforge-answer` is the **Q&A-only skill** for manual mode. It presents one pending question and records one answer — no phase map, no NextAction, no command recommendation. By design, manual mode does not use `reforge-resume`.
+
+### Picking a mode
+
+| | Navigator mode | Manual mode |
+|---|---|---|
+| Q&A | `reforge-resume` | `reforge-answer` |
+| Phase progression | `reforge-resume` (automatic) | Run each phase command directly |
+| Output | Phase map + NextAction | Minimal (remaining question count) |
+| Best for | First-time users / running straight through | Stopping at each phase / users who already know each command's role |
 
 Optional at any time: `reforge-update` to revise the spec, `reforge-diff` to review changes.
 
@@ -37,7 +54,7 @@ Optional at any time: `reforge-update` to revise the spec, `reforge-diff` to rev
 | **View** | A UI screen that displays or edits an entity — e.g., a list view, a form, a detail page. |
 | **Flow** | A multi-step user journey that crosses one or more views — e.g., "Submit report → Supervisor review → Approve". |
 | **Spec** | The `spec.json` file: the single source of truth for all product decisions about one feature or initiative. |
-| **Agent Skill** | A plain-text instruction file installed by `npx reforge install` that teaches the AI agent how to execute one lifecycle command. |
+| **Agent Skill** | A plain-text instruction file installed by `npx aid-reforge install` that teaches the AI agent how to execute one lifecycle command. |
 
 ---
 
@@ -237,12 +254,14 @@ Because all state lives in `.reforge/`, you can always pick up where you left of
 
 ### Revise the spec after approval
 
-If you need to change the spec after `meta.approved = true`:
+If you need to change the spec after `meta.approved = true`, run `/reforge-update` once and then drive the rest of the recovery with `/reforge-resume` — the navigator routes you through re-approval and re-plan automatically.
 
-1. Run `/reforge-update "your change"` — this sets `meta.approved = false` automatically.
-2. Run `/reforge-validate` to confirm the spec is still consistent.
-3. Run `/reforge-render` again to re-approve the updated prototype.
-4. Run `/reforge-plan` to regenerate `tasks.json`.
+1. Run `/reforge-update "your change"` — `meta.approved` is reset to `false` automatically, and any existing `tasks.json` is moved to `tasks.previous.json` so the navigator knows a re-plan is required.
+2. Run `/reforge-resume` — it will land on the `Approve` phase. Run `/reforge-render` and re-approve the updated prototype.
+3. Run `/reforge-resume` again — it will land on the `Plan` phase. Run `/reforge-plan` to regenerate `tasks.json`.
+4. Continue with `/reforge-impl` and `/reforge-verify` as guided by subsequent `/reforge-resume` runs.
+
+> **Note:** `/reforge-validate` runs inline inside `/reforge-resume`, so you do not need to invoke it manually. The next-gate of `/reforge-update` always points to `/reforge-resume`.
 
 ### Multiple specs in one project
 

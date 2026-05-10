@@ -9,7 +9,8 @@ Complete reference for all Reforge skills and the `.reforge/` workspace schema.
 | Skill | Phase | Description |
 |---|---|---|
 | [`reforge-init`](#reforge-init) | Spec | Initialize `spec.json` and the question queue |
-| [`reforge-resume`](#reforge-resume) | All phases¹ | Lifecycle navigator — routes to the right next action at any phase |
+| [`reforge-resume`](#reforge-resume) | All phases¹ | **Navigator mode** — routes to the right next action at any phase |
+| [`reforge-answer`](#reforge-answer) | Spec³ | **Manual mode** — Q&A only; answer one pending question without phase routing |
 | [`reforge-update`](#reforge-update) | Any phase² | Apply a natural-language change to the spec |
 | [`reforge-diff`](#reforge-diff) | Any phase² | Show JSON-path changes since last snapshot |
 | [`reforge-validate`](#reforge-validate) | Spec | Check spec completeness and consistency |
@@ -19,7 +20,18 @@ Complete reference for all Reforge skills and the `.reforge/` workspace schema.
 | [`reforge-verify`](#reforge-verify) | Verify | Check implementation against the spec |
 
 ¹ **All phases** — `reforge-resume` actively navigates every phase gate, from first question to final verify.  
-² **Any phase** — optional utilities you can invoke at any point without affecting the main lifecycle flow.
+² **Any phase** — optional utilities you can invoke at any point without affecting the main lifecycle flow.  
+³ **Manual mode** — Use `reforge-answer` instead of `reforge-resume` when you want to control phase transitions yourself. It only handles Q&A and never recommends the next command.
+
+### Navigator vs Manual Mode
+
+| | Navigator mode | Manual mode |
+|---|---|---|
+| Q&A | `/reforge-resume` (handles questions automatically) | `/reforge-answer` |
+| Phase progression | `/reforge-resume` (routes to next phase) | Run each phase command directly: `/reforge-validate`, `/reforge-render`, `/reforge-plan`, `/reforge-impl`, `/reforge-verify` |
+| Output | Phase map + current phase + NextAction | Minimal: lifecycle stage + remaining pending count |
+
+Pick one mode and stay in it. Mixing them works but defeats the design intent of each.
 
 ---
 
@@ -86,6 +98,34 @@ Lifecycle navigator. Evaluates the full workspace state and routes to the correc
 
 ---
 
+### `reforge-answer`
+
+Manual-mode Q&A. Present one pending question and record one answer. Does NOT route phases or recommend the next command.
+
+**Argument:** `[<spec-name>]` (optional — omit when only one spec exists)
+
+**Reads:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json`
+
+**Writes:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json` — only when recording an answer
+
+**Behavior:**
+- If `pending[0]` exists, present it; on reply, write the answer to the `resolves` paths and move the question to `answered`.
+- If no `pending` questions remain, return `complete` and stop. The user decides which phase command to run next.
+- Output is minimal: lifecycle stage and remaining pending count. No phase map, no NextAction, no command recommendation.
+
+**Outcome codes:** `answered`, `complete`, `blocked`
+
+**When to use:** When you prefer **manual mode** — you want to drive each phase yourself by invoking `/reforge-validate`, `/reforge-render`, `/reforge-plan`, `/reforge-impl`, `/reforge-verify` directly. `/reforge-answer` is the manual-mode replacement for `/reforge-resume`'s Q&A capability.
+
+**Don't use this if:** You want automatic phase progression. Use `/reforge-resume` (navigator mode) instead.
+
+**Example:**
+```
+/reforge-answer
+```
+
+---
+
 ### `reforge-update`
 
 Apply a natural-language change request to `spec.json`.
@@ -98,12 +138,15 @@ Apply a natural-language change request to `spec.json`.
 - `.reforge/specs/<name>/spec.json` — targeted update
 - `.reforge/specs/<name>/spec.previous.json` — snapshot of the spec before the change
 - `.reforge/specs/<name>/questions.json` — may add new pending questions if the change introduces ambiguity
+- `.reforge/specs/<name>/tasks.previous.json` — when `meta.approved` flips from `true` to `false` (or entities change), the existing `tasks.json` is moved here so `/reforge-resume` can detect that a re-plan is required
 
 **Behavior:**
 - Modifies only the paths affected by the change request
 - Preserves all unaffected fields and sections
 - Sets `meta.approved = false` if the spec was previously approved
+- Retires `tasks.json` to `tasks.previous.json` when approval is reset, forcing a re-plan after the next approval
 - Converts ambiguous aspects of the request into pending questions rather than guessing
+- Next gate is always `/reforge-resume`, which routes through inline validation, re-approval (`/reforge-render`), and re-plan (`/reforge-plan`) automatically
 
 **Example:**
 ```
@@ -363,6 +406,12 @@ The implementation task queue written by `reforge-plan` and consumed by `reforge
 A snapshot of `spec.json` taken before the most recent `reforge-update`. Used by `reforge-diff`. Never written by any skill other than `reforge-update` and `reforge-init`.
 
 > **First run:** This file does not exist on a fresh workspace. `/reforge-diff` reports "no previous snapshot found" until the first `reforge-update` (or `reforge-init` overwrite) creates it.
+
+### `.reforge/specs/<name>/tasks.previous.json`
+
+The previous `tasks.json`, retired when `reforge-update` resets `meta.approved` to `false` (or modifies `entities`). Created by renaming `tasks.json` so that `/reforge-resume` detects the missing task queue and routes to `/reforge-plan` after re-approval. Safe to delete once a fresh `tasks.json` has been generated.
+
+> **Note:** Only `reforge-update` writes this file. `reforge-plan` does not consult it.
 
 ---
 

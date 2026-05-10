@@ -7,7 +7,8 @@ Natural-language product spec converger for Claude Code.
 | Command | Description |
 |---------|-------------|
 | `/reforge-init "<description>"` | Initialize `.reforge/specs/<name>/spec.json` and `questions.json` |
-| `/reforge-resume` | Lifecycle navigator — routes to the right next action at any phase |
+| `/reforge-resume` | **Navigator mode** — Q&A + phase routing |
+| `/reforge-answer` | **Manual mode** — Q&A only (no phase routing) |
 | `/reforge-update "<change>"` | Apply a natural-language change to the existing spec |
 | `/reforge-diff` | Show JSON-path differences between the previous and current spec |
 | `/reforge-validate` | Validate `spec.json` for completeness and consistency |
@@ -39,6 +40,7 @@ Reforge reads and writes to `.reforge/specs/<name>/` in your project directory:
 | `.reforge/specs/<name>/questions.json` | Pending and answered question queue |
 | `.reforge/specs/<name>/spec.previous.json` | Previous spec snapshot (used by `/reforge-diff`) |
 | `.reforge/specs/<name>/tasks.json` | Implementation task queue (created by `/reforge-plan`) |
+| `.reforge/specs/<name>/tasks.previous.json` | Retired task queue when `/reforge-update` resets approval; signals `/reforge-resume` to route to `/reforge-plan` after re-approval |
 
 Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to share session progress across machines.
 

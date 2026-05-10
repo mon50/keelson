@@ -25,7 +25,7 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
 
   const hasReforge = await fs.pathExists(path.join(cwd, '.reforge'));
   if (!hasReforge) {
-    warnings.push('Reforge is not installed in this repository. Run `npx reforge install` first.');
+    warnings.push('Reforge is not installed in this repository. Run `npx aid-reforge install` first.');
   } else {
     // Check spec versions
     const specsDir = path.join(cwd, '.reforge', 'specs');

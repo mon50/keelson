@@ -11,7 +11,7 @@ README: <a href="./README.md">English</a> | <a href="./README_ja.md">日本語</
 
 ## What it is, Why it is useful, Who it is for
 
-Reforge is a **Skill-based Agent Framework**. Instead of acting as a standalone CLI tool, Reforge installs a set of **Agent Skills** into your project. Agent Skills are plain-text instruction files that teach your AI coding agent how to execute each workflow step. Running `npx reforge install` copies them into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex), which makes the `/reforge-*` slash commands available in your agent session.
+Reforge is a **Skill-based Agent Framework**. Instead of acting as a standalone CLI tool, Reforge installs a set of **Agent Skills** into your project. Agent Skills are plain-text instruction files that teach your AI coding agent how to execute each workflow step. Running `npx aid-reforge install` copies them into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex), which makes the `/reforge-*` slash commands available in your agent session.
 
 **Why it is useful:** It transforms natural language into structured artifacts (spec.json) without guessing, keeping human decision-making central.
 **Who it is for:** Developers using Claude Code or Codex who want structured, deterministic workflows.
@@ -28,7 +28,8 @@ Each skill owns one step of the product development lifecycle:
 | Phase | Skill | What it does |
 |---|---|---|
 | Spec | `/reforge-init` | Scaffold `spec.json` and a question queue from your description |
-| All phases¹ | `/reforge-resume` | Lifecycle navigator — routes to the right next action at any phase |
+| All phases¹ | `/reforge-resume` | **Navigator mode** — Q&A + phase routing |
+| Spec³ | `/reforge-answer` | **Manual mode** — Q&A only (no phase routing) |
 | Any phase² | `/reforge-update` | Apply a natural-language change to the spec |
 | Any phase² | `/reforge-diff` | Show what changed since the last spec snapshot |
 | Spec | `/reforge-validate` | Check `spec.json` for completeness and consistency |
@@ -38,7 +39,8 @@ Each skill owns one step of the product development lifecycle:
 | Verify | `/reforge-verify` | Confirm that the implementation matches the spec |
 
 ¹ **All phases** — `reforge-resume` actively navigates every phase gate, from first question to final verify.  
-² **Any phase** — optional utilities you can invoke at any point without affecting the main lifecycle flow.
+² **Any phase** — optional utilities you can invoke at any point without affecting the main lifecycle flow.  
+³ **Manual mode** — `reforge-answer` is for users who prefer to drive each phase themselves; it handles only Q&A and never recommends the next command.
 
 All skills share a single data contract under `.reforge/specs/<name>/`. No skill invents decisions — unknowns become pending questions that a human must answer.
 
@@ -46,7 +48,7 @@ All skills share a single data contract under `.reforge/specs/<name>/`. No skill
 
 ```bash
 cd your-project
-npx reforge install
+npx aid-reforge install
 ```
 
 Then, in your AI coding agent:
@@ -111,6 +113,7 @@ All Reforge state lives under `.reforge/specs/<name>/` in your project. `.reforg
 | `.reforge/spec.previous.json` | 直前のspecスナップショット（diff用） |
 | `.reforge/questions.json` | 質問キュー（pending / answered） |
 | `.reforge/tasks.json` | 実装タスクキュー（entity単位のタスク） |
+| `.reforge/tasks.previous.json` | `/reforge-update` が承認をリセットした際に旧 tasks.json を退避 — 再承認後に `/reforge-resume` が `/reforge-plan` を案内するためのトリガー |
 
 ```
 .reforge/
@@ -120,7 +123,8 @@ All Reforge state lives under `.reforge/specs/<name>/` in your project. `.reforg
         ├── spec.json        # Single Source of Truth for the product spec
         ├── spec.previous.json  # previous snapshot, used by /reforge-diff
         ├── questions.json   # pending and answered question queue
-        └── tasks.json       # implementation task queue (created by /reforge-plan)
+        ├── tasks.json       # implementation task queue (created by /reforge-plan)
+        └── tasks.previous.json  # retired by /reforge-update when approval resets
 ```
 
 Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to share progress across machines.

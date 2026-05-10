@@ -45,7 +45,7 @@ export async function main(
     return uninstall(cwd, args.includes('--purge-workspace'));
   }
 
-  console.error('Usage: reforge [install|doctor|uninstall]');
+  console.error('Usage: aid-reforge [install|doctor|uninstall]');
   return 1;
 }
 
