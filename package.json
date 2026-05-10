@@ -11,10 +11,11 @@
     "dist",
     "skills/core",
     "skills/templates",
-    "skills/runtime"
+    "skills/runtime",
+    "reforge-renderer/dist"
   ],
   "scripts": {
-    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/bin/cli.js', 0o755)\"",
+    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && npm run build --prefix reforge-renderer && tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/bin/cli.js', 0o755)\"",
     "test": "vitest run"
   },
   "engines": {
