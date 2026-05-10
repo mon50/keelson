@@ -78,7 +78,7 @@ describe('install()', () => {
     expect(fs.existsSync(path.join(tmpDir, '.agents/skills'))).toBe(false);
   });
 
-  it('.claude/ のみ存在する場合は Claude Code のみに9スキルを配置する', async () => {
+  it('.claude/ のみ存在する場合は Claude Code のみに10スキルを配置する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
     const assets = makeAssets({ rendererServerDir: fakeRendererDir });
@@ -91,7 +91,7 @@ describe('install()', () => {
     expectNoSkillsDir(tmpDir, '.agents');
   });
 
-  it('.agents/ のみ存在する場合は Codex のみに9スキルを配置する', async () => {
+  it('.agents/ のみ存在する場合は Codex のみに10スキルを配置する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.agents'));
 
     const assets = makeAssets({ rendererServerDir: fakeRendererDir });
@@ -104,7 +104,7 @@ describe('install()', () => {
     expectAllSkillsInstalled(tmpDir, '.agents');
   });
 
-  it('.claude/ と .agents/ の両方が存在する場合は両方に9スキルを配置する', async () => {
+  it('.claude/ と .agents/ の両方が存在する場合は両方に10スキルを配置する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
     await fse.ensureDir(path.join(tmpDir, '.agents'));
 
@@ -118,7 +118,7 @@ describe('install()', () => {
     expectAllSkillsInstalled(tmpDir, '.agents');
   });
 
-  it('どちらの環境ディレクトリも存在しない場合は Claude Code のみに9スキルを配置する', async () => {
+  it('どちらの環境ディレクトリも存在しない場合は Claude Code のみに10スキルを配置する', async () => {
     const assets = makeAssets({ rendererServerDir: fakeRendererDir });
     const result = await install(tmpDir, { assets });
 
@@ -152,17 +152,18 @@ describe('install()', () => {
     expect(result.error).toBeDefined();
   });
 
-  it('result.skillsInstalled に9スキルすべてが含まれる', async () => {
+  it('result.skillsInstalled に10スキルすべてが含まれる', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
     const assets = makeAssets({ rendererServerDir: fakeRendererDir });
     const result = await install(tmpDir, { assets });
 
     expect(result.success).toBe(true);
-    expect(result.skillsInstalled).toHaveLength(9);
+    expect(result.skillsInstalled).toHaveLength(10);
     const expected = [
       'reforge-init',
       'reforge-resume',
+      'reforge-answer',
       'reforge-update',
       'reforge-diff',
       'reforge-plan',
@@ -191,7 +192,7 @@ describe('install()', () => {
     expect(fs.existsSync(path.join(tmpDir, '.reforge/server'))).toBe(true);
   });
 
-  it('install() 後 .reforge/server/index.js が存在し、Claude Code に9スキルを登録する', async () => {
+  it('install() 後 .reforge/server/index.js が存在し、Claude Code に10スキルを登録する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
     const assets = makeAssets({ rendererServerDir: fakeRendererDir });
@@ -199,7 +200,7 @@ describe('install()', () => {
 
     expect(result.success).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, '.reforge/server/index.js'))).toBe(true);
-    expect(result.forwardingInstalled['claude-code']).toHaveLength(9);
+    expect(result.forwardingInstalled['claude-code']).toHaveLength(10);
   });
 
   it('main(["install"], cwd) が exit code 0 を返し、インストールを完了する', async () => {

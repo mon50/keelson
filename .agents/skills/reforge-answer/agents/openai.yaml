@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reforge Answer"
+  short_description: "Manual-mode Q&A: answer one pending Reforge question"
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools: []

@@ -143,6 +143,7 @@ describe('installer shared contracts', () => {
     expect(ALL_SKILLS).toEqual([
       'reforge-init',
       'reforge-resume',
+      'reforge-answer',
       'reforge-update',
       'reforge-diff',
       'reforge-plan',
@@ -157,6 +158,7 @@ describe('installer shared contracts', () => {
     expect(SKILL_COMMAND).toEqual({
       'reforge-init': 'init',
       'reforge-resume': 'resume',
+      'reforge-answer': 'answer',
       'reforge-update': 'update',
       'reforge-diff': 'diff',
       'reforge-plan': 'plan',

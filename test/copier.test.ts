@@ -36,14 +36,14 @@ describe('copyLocalSkills()', () => {
     expect(fs.existsSync(skillMd)).toBe(true);
   });
 
-  it('9スキルすべてが .reforge/skills/ 配下にコピーされる', async () => {
+  it('10スキルすべてが .reforge/skills/ 配下にコピーされる', async () => {
     const assets = makeAssets();
     await copyLocalSkills(tmpDir, assets);
     const skillsDir = path.join(tmpDir, '.reforge/skills');
     const dirs = fs.readdirSync(skillsDir).filter((entry) => {
       return fs.statSync(path.join(skillsDir, entry)).isDirectory();
     });
-    expect(dirs.length).toBe(9);
+    expect(dirs.length).toBe(10);
   });
 
   it('正常完了時は result.overwritten が配列で result.error が undefined', async () => {
@@ -135,7 +135,7 @@ describe('copyForwarders() - Claude Code', () => {
     expect(fs.existsSync(skillMd)).toBe(true);
   });
 
-  it('9スキルすべてが .claude/skills/ に生成される', async () => {
+  it('10スキルすべてが .claude/skills/ に生成される', async () => {
     await copyForwarders(tmpDir, 'claude-code', assets);
     const skillsDir = path.join(tmpDir, '.claude/skills');
     const skillFiles: string[] = [];
@@ -145,7 +145,7 @@ describe('copyForwarders() - Claude Code', () => {
         skillFiles.push(candidate);
       }
     }
-    expect(skillFiles.length).toBe(9);
+    expect(skillFiles.length).toBe(10);
   });
 
   it('生成された SKILL.md がフォワーダー形式（.reforge/skills/reforge-init/SKILL.md を含む）', async () => {

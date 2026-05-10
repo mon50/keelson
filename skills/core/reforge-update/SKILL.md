@@ -22,6 +22,8 @@ argument-hint: "\"<change request>\""
 - `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
 - `QUESTIONS_PATH = ".reforge/specs/<name>/questions.json"`
 - `PREVIOUS_SPEC_PATH = ".reforge/specs/<name>/spec.previous.json"`
+- `TASKS_PATH = ".reforge/specs/<name>/tasks.json"`
+- `TASKS_PREVIOUS_PATH = ".reforge/specs/<name>/tasks.previous.json"`
 
 ## Spec Resolution (reforge-update [<spec-name>] "<change request>")
 
@@ -98,6 +100,10 @@ Before responding, verify:
      - ユーザーに警告する: 「この変更は `meta.approved` を変更します。承認状態がリセットされると `/reforge-plan` や `/reforge-impl` が実行できなくなります。」
      - `AskUserQuestion` を使って続行するか確認を求める。
      - ユーザーが拒否した場合は `meta.approved` の変更を適用しない（他の変更は適用可能）。
+   - **tasks.json の退避**: 変更を適用した結果、`meta.approved` が `true` → `false` に遷移する場合（または既存の `entities` セクションが `add`/`modify`/`remove` のいずれかで変更される場合）:
+     - `TASKS_PATH` (`.reforge/specs/<name>/tasks.json`) が存在すれば、`TASKS_PREVIOUS_PATH` (`.reforge/specs/<name>/tasks.previous.json`) にリネーム（既存の previous は上書き）して退避する。
+     - これにより `reforge-resume` の Step 5（tasks.json 不在チェック）が再 match し、再承認後に `/reforge-plan` が案内される。
+     - 退避を行った場合は Completion Report の Changed artifacts に `TASKS_PREVIOUS_PATH` を含める。
    - Apply only the relevant spec paths.
    - Preserve unrelated entities, fields, flows, and views.
 6. If the change is conflicting, destructive, or ambiguous:
@@ -239,10 +245,9 @@ Before responding, verify:
 Report concisely:
 
 - Lifecycle stage: `updated`, `question_needed`, or `blocked`.
-- Changed artifacts: `SPEC_PATH`, `QUESTIONS_PATH`, `PREVIOUS_SPEC_PATH`, or `none`.
+- Changed artifacts: `SPEC_PATH`, `QUESTIONS_PATH`, `PREVIOUS_SPEC_PATH`, `TASKS_PREVIOUS_PATH`, or `none`.
 - Changed spec paths when a patch was applied.
 - Pending question count.
-- Next gate:
-  - If pending count is 0: `/reforge-validate`.
-  - If pending count is greater than 0: answer the presented question or run `/reforge-resume`.
+- `meta.approved` の遷移（`true` → `false` に変わった場合は明示する）と `tasks.json` の退避有無。
+- Next gate: 常に `/reforge-resume` を案内する。resume が現在地（質問・再承認・再 plan のいずれか）を判定して以降の手順をナビゲートする。`/reforge-validate` は resume が内部で実行するため、ユーザーが手動で叩く必要はない。
 

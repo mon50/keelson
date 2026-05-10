@@ -5,6 +5,7 @@ export type TargetEnvironment = (typeof TARGET_ENVIRONMENTS)[number];
 export const ALL_SKILLS = [
   'reforge-init',
   'reforge-resume',
+  'reforge-answer',
   'reforge-update',
   'reforge-diff',
   'reforge-plan',
@@ -19,6 +20,7 @@ export type SkillName = (typeof ALL_SKILLS)[number];
 export const SKILL_COMMAND = {
   'reforge-init': 'init',
   'reforge-resume': 'resume',
+  'reforge-answer': 'answer',
   'reforge-update': 'update',
   'reforge-diff': 'diff',
   'reforge-plan': 'plan',

@@ -30,8 +30,8 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
     lines.push('');
   }
 
-  lines.push('Next step:');
-  lines.push('  /reforge:init "<description>"');
+  lines.push('Available commands:');
+  lines.push('  /reforge:init "<プロダクトの説明>"');
   lines.push('');
 
   if (result.overwritten.length > 0) {

@@ -93,13 +93,7 @@ Before responding, verify:
 
 ```json
 {
-  "meta": { 
-    "name": "daily-report", 
-    "version": "0.1.0", 
-    "lang": "ja", 
-    "approved": false,
-    "reforgeVersion": "1.0.0"
-  },
+  "meta": { "name": "daily-report", "version": "0.1.0", "lang": "ja", "approved": false },
   "tech": { "frontend": "", "backend": "", "database": "", "orm": "", "styling": "", "testing": "" },
   "entities": {},
   "views": {},

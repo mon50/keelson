@@ -6,6 +6,9 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 
 # reforge-resume
 
+このスキルは **ナビゲーターモード** のエントリポイント。質問処理 + フェーズルーティングを兼ねる。  
+**マニュアルモード**（フェーズ進行を自分で制御するユーザー向け）の Q&A 専用スキルは `/reforge-answer`。両者を混在させると進行マップの一貫性が崩れるため、どちらか一方を選んで運用するのが推奨。
+
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
@@ -333,18 +336,68 @@ If this resume run includes a user answer to a previously presented question:
 
 ## Completion Report
 
-Report concisely:
+毎回必ず以下の3要素を **この順番で** 簡潔に出力する。冗長な説明は付けない。
 
-- Lifecycle stage: `resumed`, `answered`, `question`, `blocked`, or `complete`.
-- Changed artifacts: `SPEC_PATH` and/or `QUESTIONS_PATH`, or `none`.
-- Pending question count.
-- Next gate (based on which step matched):
-  - ステップ 0 一致: `/reforge-init "<説明>"` を実行する（0 specs）または spec を選択する（複数 specs）
-  - ステップ 1 一致: `/reforge-init "<説明>"` を実行する
-  - ステップ 2 一致: 提示した質問に回答し、再度 `/reforge-resume` を実行する
-  - ステップ 3 一致: `spec.json` のエラーを修正してから再実行する
-  - ステップ 4 一致: `/reforge-render` を実行して承認を得る
-  - ステップ 5 一致: `/reforge-plan` を実行してタスクキューを生成する
-  - ステップ 6 一致: `/reforge-impl [entity]` を実行して実装を進める
-  - ステップ 7 一致: `/reforge-verify` を実行して動作検証を行う
-  - ステップ 8 一致: プロジェクト完了（次のアクションなし）
+### 1. 進行マップ（必須・1行）
+
+8 フェーズを横一列で表示する。記号の意味:
+
+- `[✓]` 通過済み（ステップが pass した）
+- `[▶]` 現在地（ステップが match して停止した）
+- `[ ]` 未着手
+
+固定フォーマット:
+
+```
+進行: [?]Init → [?]Questions → [?]Validate → [?]Approve → [?]Plan → [?]Impl → [?]Verify → [?]Done  (現在番号/8)
+```
+
+ステップと記号の対応:
+
+| match したステップ | 現在地 | 完了済み |
+|---|---|---|
+| ステップ 0 / 1 | Init | （なし） |
+| ステップ 2 | Questions | Init |
+| ステップ 3 | Validate | Init, Questions |
+| ステップ 4 | Approve | Init, Questions, Validate |
+| ステップ 5 | Plan | Init, Questions, Validate, Approve |
+| ステップ 6 | Impl | Init, Questions, Validate, Approve, Plan |
+| ステップ 7 | Verify | Init, Questions, Validate, Approve, Plan, Impl |
+| ステップ 8 | Done | すべて完了（`[✓]` のみ、`[▶]` なし） |
+
+### 2. 現在フェーズの状況（1行）
+
+`現在: <フェーズ名> — <短い状況>` 形式。例:
+
+- `現在: Questions フェーズ — 未解決質問 3 件`
+- `現在: Approve フェーズ — meta.approved=false`
+- `現在: Impl フェーズ — pending/in_progress タスク 4 件 (次: User)`
+
+### 3. NextAction（1行）
+
+`NextAction: <ユーザーの次の動作> → <実行コマンド>` 形式。ステップ別:
+
+- ステップ 0 一致: `NextAction: プロダクト概要を渡して spec を作成 → /reforge-init "<説明>"`
+- ステップ 1 一致: `NextAction: spec.json が無いため初期化 → /reforge-init "<説明>"`
+- ステップ 2 一致: `NextAction: 提示した質問に回答 → /reforge-resume を再実行`
+- ステップ 3 一致: `NextAction: spec.json のエラーを修正 → /reforge-resume を再実行`
+- ステップ 4 一致: `NextAction: UI プロトタイプを確認して承認 → /reforge-render`
+- ステップ 5 一致: `NextAction: タスクキューを生成 → /reforge-plan`
+- ステップ 6 一致: `NextAction: 次タスクを実装 → /reforge-impl <entity>`
+- ステップ 7 一致: `NextAction: 動作検証を実行 → /reforge-verify`
+- ステップ 8 一致: `NextAction: なし（全フェーズ完了）`
+
+### 4. 補助情報（必要時のみ）
+
+以下は **状態変化があった場合のみ** 1行追加する。常時表示しない。
+
+- `Lifecycle: <resumed | answered | question | blocked | complete>`
+- `Changed: SPEC_PATH` または `QUESTIONS_PATH`（書き込みがあった場合のみ）
+
+### 出力例
+
+```
+進行: [✓]Init → [▶]Questions → [ ]Validate → [ ]Approve → [ ]Plan → [ ]Impl → [ ]Verify → [ ]Done  (2/8)
+現在: Questions フェーズ — 未解決質問 3 件
+NextAction: 提示した質問に回答 → /reforge-resume を再実行
+```
