@@ -36,7 +36,8 @@ describe('root reforge package scaffold', () => {
       'dist',
       'skills/core',
       'skills/templates',
-      'skills/runtime'
+      'skills/runtime',
+      'reforge-renderer/dist'
     ]);
   });
 
