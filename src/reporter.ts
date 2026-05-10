@@ -1,4 +1,5 @@
 import type { InstallResult, ReporterOptions, TargetEnvironment } from './types';
+import { SKILL_COMMAND } from './types';
 
 export function report(result: InstallResult, options?: ReporterOptions): void {
   const stdout = options?.stdout ?? process.stdout;
@@ -19,30 +20,18 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   lines.push('✅ Reforge installed successfully!');
   lines.push('');
 
-  lines.push('Installed:');
-  if (environments.includes('claude')) {
-    lines.push('  .claude/skills/');
-  }
-  if (environments.includes('codex')) {
-    lines.push('  .agents/skills/');
-  }
-  lines.push('');
-
-  if (environments.includes('claude')) {
-    lines.push('Claude Code:');
-    lines.push('  use /reforge-init, /reforge-status, /reforge-resume, ...');
+  for (const env of environments) {
+    const skills = result.forwardingInstalled[env] ?? [];
+    lines.push(`${env} (${skills.length} skills):`);
+    for (const skill of skills) {
+      const cmd = SKILL_COMMAND[skill];
+      lines.push(`  /reforge:${cmd}`);
+    }
     lines.push('');
   }
 
-  if (environments.includes('codex')) {
-    lines.push('Codex:');
-    lines.push('  use /skills or $ to select reforge-init, reforge-status, reforge-resume, ...');
-    lines.push('');
-  }
-
-  lines.push('Note:');
-  lines.push('  Reforge keeps the same workflow concepts across agents,');
-  lines.push('  but invocation UI differs by environment.');
+  lines.push('Next step:');
+  lines.push('  /reforge:init "<description>"');
   lines.push('');
 
   if (result.overwritten.length > 0) {
