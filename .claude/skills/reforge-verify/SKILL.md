@@ -1,5 +1,6 @@
 ---
 name: reforge-verify
+description: Verify that the implementation matches the approved Reforge specification. Read-only check against spec.entities, tech-driven file path patterns, and tasks.json completion status. Does not require meta.approved (informational command).
 allowed-tools: Read, Bash
 ---
 

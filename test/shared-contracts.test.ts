@@ -270,7 +270,7 @@ describe('reforge-validate skill documentation contracts', () => {
         'allowed-tools': 'Read, Glob'
       });
       expect(frontmatter.description, `${skillPath} must describe the validate command`).toMatch(
-        /\/reforge:validate|spec\.json/
+        /\/reforge-validate|spec\.json/
       );
 
       let previousStepPosition = -1;
@@ -365,7 +365,7 @@ describe('reforge-validate skill documentation contracts', () => {
       expect(step4, `${skillPath} Step 4 must not classify NOT_APPROVED as an error`).toMatch(
         /`NOT_APPROVED` は `error` ではなく `info`/
       );
-      expect(step4, `${skillPath} Step 4 must tell the user to approve with render`).toContain('/reforge:render');
+      expect(step4, `${skillPath} Step 4 must tell the user to approve with render`).toContain('/reforge-render');
       expect(step4, `${skillPath} Step 4 must define the plan/impl precondition error gate`).toMatch(
         /plan\/impl 実行要求時.*`meta\.approved` が `false` の場合.*エラー/s
       );
@@ -376,7 +376,7 @@ describe('reforge-validate skill documentation contracts', () => {
         '`NOT_APPROVED`'
       );
       expect(markdown, `${skillPath} must include the approval message text`).toContain(
-        '`meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください`'
+        '`meta.approved が false です。/reforge-render でUIプロトタイプを確認・承認してください`'
       );
     }
   });
@@ -515,8 +515,8 @@ describe('reforge-validate skill documentation contracts', () => {
       }
 
       expect(markdown).toContain('`meta.approved` のデフォルト値は `false`');
-      expect(markdown).toContain('`meta.approved: false` の間は `/reforge:plan` と `/reforge:impl` を実行してはならない');
-      expect(markdown).toContain('`meta.approved: true` の場合に限り `/reforge:plan` と `/reforge:impl` を実行できる');
+      expect(markdown).toContain('`meta.approved: false` の間は `/reforge-plan` と `/reforge-impl` を実行してはならない');
+      expect(markdown).toContain('`meta.approved: true` の場合に限り `/reforge-plan` と `/reforge-impl` を実行できる');
     }
   });
 

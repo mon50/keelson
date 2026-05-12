@@ -31,9 +31,23 @@ const planSkillPaths = [
   '.agents/skills/reforge-plan/SKILL.md'
 ];
 
+const answerSkillPaths = [
+  '.claude/skills/reforge-answer/SKILL.md',
+  '.agents/skills/reforge-answer/SKILL.md'
+];
+
 const questionProtocolSkillPaths = [...initSkillPaths, ...resumeSkillPaths, ...updateSkillPaths];
 
+const audienceStyleSkillPaths = [
+  ...initSkillPaths,
+  ...resumeSkillPaths,
+  ...answerSkillPaths,
+  ...updateSkillPaths
+];
+
 const requiredTechFields = ['frontend', 'backend', 'database', 'orm', 'styling', 'testing'] as const;
+const requiredInceptionQuestionIds = ['define_audience', 'define_intent', 'define_requirements'] as const;
+const requiredInceptionPhases = ['audience', 'intent', 'requirements'] as const;
 
 function readMarkdown(skillPath: string): string {
   return readFileSync(resolve(process.cwd(), skillPath), 'utf8');
@@ -96,13 +110,13 @@ function isQuestionsJson(value: unknown): value is QuestionsJson {
   return Array.isArray(candidate.pending) && Array.isArray(candidate.answered);
 }
 
-function isTechQuestionsSample(value: unknown): value is QuestionsJson {
+function isInceptionQuestionsSample(value: unknown): value is QuestionsJson {
   if (!isQuestionsJson(value)) {
     return false;
   }
 
   const questionIds = value.pending.map((question) => question.id);
-  return requiredTechFields.every((field) => questionIds.includes(`define_tech_${field}`));
+  return requiredInceptionQuestionIds.every((id) => questionIds.includes(id));
 }
 
 function isTasksJson(value: unknown): value is TasksJson {
@@ -139,32 +153,39 @@ describe('reforge-init engine skill contracts', () => {
     }
   });
 
-  it('documents pending questions for every uninferable tech field', () => {
+  it('documents pending Inception questions (audience / intent / requirements) and defers tech questions', () => {
     for (const skillPath of initSkillPaths) {
       const markdown = readMarkdown(skillPath);
       const samples = parseJsonCodeBlocks(markdown);
-      const questionsSample = samples.find(isTechQuestionsSample);
+      const questionsSample = samples.find(isInceptionQuestionsSample);
 
-      expect(questionsSample, `${skillPath} must include a parseable questions.json sample`).toBeTruthy();
+      expect(questionsSample, `${skillPath} must include an Inception questions.json sample`).toBeTruthy();
       expect(questionsSample?.answered).toEqual([]);
 
-      for (const field of requiredTechFields) {
-        expect(markdown, `${skillPath} must document define_tech_${field}`).toContain(
-          `define_tech_${field}`
-        );
-        expect(markdown, `${skillPath} must resolve tech.${field}`).toContain(`tech.${field}`);
+      for (const id of requiredInceptionQuestionIds) {
+        expect(markdown, `${skillPath} must document ${id}`).toContain(id);
       }
 
       const pendingQuestionIds = questionsSample?.pending.map((question) => question.id) ?? [];
-      expect(pendingQuestionIds).toEqual(requiredTechFields.map((field) => `define_tech_${field}`));
+      expect(pendingQuestionIds).toEqual([...requiredInceptionQuestionIds]);
 
       for (const question of questionsSample?.pending ?? []) {
-        expect(question).toMatchObject({
-          phase: 'tech',
-          type: 'text'
-        });
-        expect(question.resolves).toEqual([question.id.replace('define_tech_', 'tech.')]);
+        expect(requiredInceptionPhases as readonly string[]).toContain(question.phase);
+        expect(question.resolves.length).toBeGreaterThan(0);
       }
+
+      expect(markdown, `${skillPath} must still describe the 6 tech subfields for later question generation`).toContain(
+        'tech.{field}'
+      );
+      for (const field of requiredTechFields) {
+        expect(markdown, `${skillPath} must reference define_tech_${field} in deferred generation rules`).toContain(
+          `define_tech_${field}`
+        );
+      }
+
+      expect(markdown, `${skillPath} must defer tech questions until requirements are non-empty`).toMatch(
+        /初期化時に tech 質問を即 pending 化することは禁止|requirements.*non-empty|requirements 確定後/
+      );
     }
   });
 });
@@ -211,16 +232,22 @@ describe('reforge-resume engine skill contracts', () => {
       const markdown = readMarkdown(skillPath);
 
       expect(markdown, `${skillPath} must guide init when spec.json is missing`).toMatch(
-        /`SPEC_PATH` missing[\s\S]*\/reforge:init/
+        /`SPEC_PATH` missing[\s\S]*\/reforge-init/
       );
-      expect(markdown, `${skillPath} must present exactly one pending question`).toMatch(
-        /`QUESTIONS_PATH` pending[\s\S]*AskUserQuestion[\s\S]*exactly one|`QUESTIONS_PATH` pending[\s\S]*AskUserQuestion[\s\S]*1問/
+      expect(markdown, `${skillPath} must present a batch of up to 4 pending questions`).toMatch(
+        /`QUESTIONS_PATH` pending[\s\S]*AskUserQuestion[\s\S]*(?:最大\s*4\s*[問件]|up to 4)|`QUESTIONS_PATH` pending[\s\S]*(?:バッチ|batch)/
       );
       expect(markdown, `${skillPath} must guide render when meta.approved is false`).toMatch(
-        /`meta\.approved` is `false`[\s\S]*\/reforge:render/
+        /`meta\.approved` is `false`[\s\S]*\/reforge-render/
       );
       expect(markdown, `${skillPath} must guide plan when tasks.json is missing`).toMatch(
-        /`TASKS_PATH` missing[\s\S]*\/reforge:plan/
+        /`TASKS_PATH` missing[\s\S]*\/reforge-plan/
+      );
+      expect(markdown, `${skillPath} must not contain the deprecated /reforge:xxx command format`).not.toMatch(
+        /\/reforge:(init|resume|answer|update|render|plan|impl|verify|validate|diff)/
+      );
+      expect(markdown, `${skillPath} must use the canonical lifecycle vocab (no bare 'Lifecycle: question')`).not.toMatch(
+        /Lifecycle:\s*question\b(?!s_)/
       );
     }
   });
@@ -309,7 +336,7 @@ describe('reforge-plan engine skill contracts', () => {
       expect(markdown, `${skillPath} must refuse planning before approval`).toMatch(
         /meta\.approved[\s\S]*(?:false|`false`)[\s\S]*(?:refuse|拒否|実行しない)/
       );
-      expect(markdown, `${skillPath} must guide render for approval`).toContain('/reforge:render');
+      expect(markdown, `${skillPath} must guide render for approval`).toContain('/reforge-render');
       expect(tasksSample?.tasks, `${skillPath} must include a parseable tasks.json sample`).toEqual([
         {
           id: 'report',
@@ -346,12 +373,41 @@ describe('reforge question protocol consistency', () => {
 
     expect(canonical.section).toContain('Step 1: 取得');
     expect(canonical.section).toContain('Step 2: 提示');
-    expect(canonical.section).toContain('Step 3: 反映');
-    expect(canonical.section).toContain('Step 4: 移動');
-    expect(canonical.section).toMatch(/1問|one question/i);
+    expect(canonical.section).toContain('Step 5: 反映');
+    expect(canonical.section).toContain('Step 6: 移動');
+    expect(canonical.section).toMatch(/最大\s*4\s*[問件]|up to 4|バッチ/i);
+    expect(canonical.section).toMatch(/questions\.md|`QUESTIONS_MD_PATH`/);
     expect(canonical.section).toContain('`resolves`');
     expect(canonical.section).toContain('`pending`');
     expect(canonical.section).toContain('`answered`');
-    expect(canonical.section).toContain('`.reforge/questions.json`');
+    expect(canonical.section).toContain('`.reforge/specs/<name>/questions.json`');
+  });
+});
+
+describe('reforge Audience and Style consistency', () => {
+  it('uses one identical Audience and Style section in init, resume, answer, and update', () => {
+    const sections = audienceStyleSkillPaths.map((skillPath) => {
+      const markdown = readMarkdown(skillPath);
+      const section = extractSecondLevelSection(markdown, '## Audience and Style');
+
+      expect(section, `${skillPath} must include the Audience and Style section`).not.toBe('');
+      return { skillPath, section };
+    });
+
+    const [canonical] = sections;
+
+    for (const { skillPath, section } of sections) {
+      expect(section, `${skillPath} must match the canonical Audience and Style text`).toBe(canonical.section);
+    }
+
+    expect(canonical.section).toContain('IT職企画担当');
+    expect(canonical.section).toContain('分からない・AI におまかせ');
+    expect(canonical.section).toContain('### 質問選択肢の供給源');
+    expect(canonical.section).toContain('### コマンド表記の統一');
+    expect(canonical.section).toContain('AI-DLC');
+    expect(canonical.section).toContain('files_written');
+    expect(canonical.section).toContain('questions_batch');
+    expect(canonical.section).toContain('questions_md');
+    expect(canonical.section).toMatch(/`options`/);
   });
 });

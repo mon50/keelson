@@ -158,7 +158,7 @@ describe('impl → verify integration: artifact symmetry and gate behavior', () 
     const verifyMarkdown = readVerifySkill();
 
     expect(implMarkdown).toContain(
-      '仕様が承認されていません。`/reforge:render` を実行して承認してください'
+      '仕様が承認されていません。`/reforge-render` を実行して承認してください'
     );
     expect(verifyMarkdown).toMatch(
       /meta\.approved[\s\S]*状態に関わらず実行|実行をブロックしない/
@@ -172,13 +172,13 @@ describe('impl → verify integration: artifact symmetry and gate behavior', () 
     const implMarkdown = readImplSkill();
 
     expect(implMarkdown).toContain(
-      'spec.jsonが見つかりません。`/reforge:init` を実行してください'
+      'spec.jsonが見つかりません。`/reforge-init` を実行してください'
     );
     expect(implMarkdown).toContain(
-      'tasks.jsonが見つかりません。`/reforge:plan` を実行してください'
+      'tasks.jsonが見つかりません。`/reforge-plan` を実行してください'
     );
     expect(implMarkdown).toMatch(
-      /`\/reforge:resume` を実行して仕様を完成させてください/
+      /`\/reforge-resume` を実行して仕様を完成させてください/
     );
   });
 

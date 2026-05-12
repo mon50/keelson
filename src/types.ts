@@ -61,6 +61,14 @@ export interface SpecMeta {
   lang: string;
   /** Defaults to false until the UI prototype is approved. */
   approved: boolean;
+  /** Target audience tags (non-engineer friendly). Filled in Inception phase. */
+  audience?: string[];
+  /** One-line product intent: the problem being solved. Filled in Inception phase. */
+  intent?: string;
+  /** ISO timestamp recorded when meta.approved is set to true. */
+  approvedAt?: string;
+  /** Hash or marker captured at approval time. */
+  approvedDigest?: string;
 }
 
 export interface SpecTech {
@@ -72,15 +80,40 @@ export interface SpecTech {
   testing: string;
 }
 
+/**
+ * User-story style requirement entry. AI-DLC Inception artifact that sits between
+ * intent and Construction-phase artifacts (entities/views/flows/tech).
+ */
+export interface RequirementEntry {
+  id: string;
+  /** "As a <role>" */
+  as: string;
+  /** "I want <feature>" */
+  want: string;
+  /** "so that <benefit>" */
+  so_that: string;
+}
+
 export interface SpecJson {
   meta: SpecMeta;
+  /** AI-DLC Inception artifact. Optional for backward compatibility. */
+  requirements?: RequirementEntry[];
   tech: SpecTech;
   entities: Record<string, EntityDefinition>;
   views: Record<string, ViewDefinition>;
   flows: Record<string, FlowDefinition>;
 }
 
-export type QuestionPhase = 'meta' | 'tech' | 'data' | 'views' | 'flows';
+export type QuestionPhase =
+  | 'meta'
+  | 'audience'
+  | 'intent'
+  | 'requirements'
+  | 'tech'
+  | 'data'
+  | 'views'
+  | 'flows'
+  | 'update';
 
 export interface PendingQuestion {
   id: string;
@@ -89,6 +122,8 @@ export interface PendingQuestion {
   type: string;
   /** JSON paths resolved by the answer. */
   resolves: string[];
+  /** Optional selection options for single_choice / multi_choice / confirm questions. */
+  options?: string[];
 }
 
 export interface AnsweredQuestion extends PendingQuestion {
