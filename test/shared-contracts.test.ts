@@ -29,19 +29,19 @@ const reforgeDirectoryDocumentationPaths = [...validateSkillPaths, 'README.md'];
 
 const reforgeStandardFiles = [
   {
-    path: '.reforge/spec.json',
+    path: '.reforge/specs/<name>/spec.json',
     role: /プロダクト仕様|Single Source of Truth/
   },
   {
-    path: '.reforge/spec.previous.json',
+    path: '.reforge/specs/<name>/spec.previous.json',
     role: /直前のspecスナップショット|diff|差分/
   },
   {
-    path: '.reforge/questions.json',
+    path: '.reforge/specs/<name>/questions.json',
     role: /質問キュー|pending|answered/
   },
   {
-    path: '.reforge/tasks.json',
+    path: '.reforge/specs/<name>/tasks.json',
     role: /実装タスクキュー|タスク|entity/
   }
 ];
@@ -169,6 +169,23 @@ describe('installer shared contracts', () => {
     });
     expect(Object.keys(SKILL_COMMAND).sort()).toEqual([...ALL_SKILLS].sort());
   });
+
+  it('keeps packaged core skills in sync with checked-in agent skill copies', () => {
+    for (const skill of ALL_SKILLS) {
+      const core = readFileSync(resolve(process.cwd(), `skills/core/${skill}/SKILL.md`), 'utf8');
+      const claude = readFileSync(
+        resolve(process.cwd(), `.claude/skills/${skill}/SKILL.md`),
+        'utf8'
+      );
+      const codex = readFileSync(
+        resolve(process.cwd(), `.agents/skills/${skill}/SKILL.md`),
+        'utf8'
+      );
+
+      expect(claude, `${skill} Claude skill must match package core`).toBe(core);
+      expect(codex, `${skill} Codex skill must match package core`).toBe(core);
+    }
+  });
 });
 
 describe('spec.json shared contracts', () => {
@@ -178,6 +195,7 @@ describe('spec.json shared contracts', () => {
       'SpecJson',
       'SpecMeta',
       'SpecTech',
+      'SpecContext',
       'EntityDefinition',
       'FieldDefinition',
       'ViewDefinition',
@@ -306,8 +324,8 @@ describe('reforge-validate skill documentation contracts', () => {
       expect(step2, `${skillPath} Step 2 must define the Japanese missing-section message format`).toContain(
         "トップレベルセクション '<SectionName>' は必須です"
       );
-      expect(step2, `${skillPath} Step 2 must mention the complete-section .reforge/spec.json check`).toContain(
-        '`.reforge/spec.json`'
+      expect(step2, `${skillPath} Step 2 must mention the complete-section spec path check`).toContain(
+        '`.reforge/specs/<name>/spec.json`'
       );
       expect(step2, `${skillPath} Step 2 must describe the passing complete-section sample/check`).toMatch(
         /すべて.*存在.*(?:通過|追加しない|エラーなし)/s
@@ -421,7 +439,9 @@ describe('reforge-validate skill documentation contracts', () => {
       const step7 = extractValidationStep(markdown, 7);
 
       expect(step6, `${skillPath} must document Step 6`).not.toBe('');
-      expect(step6, `${skillPath} Step 6 must read questions.json`).toContain('`.reforge/questions.json`');
+      expect(step6, `${skillPath} Step 6 must read questions.json`).toContain(
+        '`.reforge/specs/<name>/questions.json`'
+      );
       expect(step6, `${skillPath} Step 6 must count pending questions`).toMatch(/`pending`.*(?:件数|count)/s);
       expect(step6, `${skillPath} Step 6 must add pending questions to warnings`).toMatch(
         /`pending`.*1 件以上.*`warnings`/s
@@ -470,7 +490,9 @@ describe('reforge-validate skill documentation contracts', () => {
       }
 
       expect(relevantSection).toContain('`.reforge/`');
-      expect(relevantSection).toContain('`.reforge/` 配下のパスは変更してはならない');
+      expect(relevantSection).toMatch(
+        /`\.reforge\/` 配下のパスは変更してはならない|Do not rename or move the `\.reforge\/` paths/
+      );
 
       for (const standardFile of reforgeStandardFiles) {
         expect(relevantSection, `${documentationPath} must document ${standardFile.path}`).toContain(
@@ -564,8 +586,8 @@ describe('reforge-validate skill documentation contracts', () => {
         expect(markdown).toMatch(new RegExp(`\\|\\s*\`${subtask}\`\\s*\\|`));
       }
 
-      expect(markdown).toContain('`.reforge/questions.json`');
-      expect(markdown).toContain('`.reforge/tasks.json`');
+      expect(markdown).toContain('`.reforge/specs/<name>/questions.json`');
+      expect(markdown).toContain('`.reforge/specs/<name>/tasks.json`');
       expect(markdown).toContain('タスク粒度は entity 単位');
     }
   });

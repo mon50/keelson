@@ -1,6 +1,6 @@
 ---
 name: reforge-validate
-description: Validate a Reforge spec from .reforge/spec.json and the optional .reforge/questions.json queue.
+description: Validate a Reforge spec from .reforge/specs/<name>/spec.json and the optional .reforge/specs/<name>/questions.json queue.
 allowed-tools: Read, Glob
 ---
 
@@ -10,8 +10,8 @@ allowed-tools: Read, Glob
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
 - Do not invent missing spec data and do not silently repair invalid input.
-- Read `.reforge/spec.json` as the required validation target.
-- Read `.reforge/questions.json` only when the file exists.
+- Read `.reforge/specs/<name>/spec.json` as the required validation target.
+- Read `.reforge/specs/<name>/questions.json` only when the file exists.
 
 ## Canonical Paths
 
@@ -35,10 +35,10 @@ allowed-tools: Read, Glob
 
 | ファイル | 役割 |
 |---|---|
-| `.reforge/spec.json` | プロダクト仕様（Single Source of Truth） |
-| `.reforge/spec.previous.json` | 直前のspecスナップショット（diff用） |
-| `.reforge/questions.json` | 質問キュー（pending / answered） |
-| `.reforge/tasks.json` | 実装タスクキュー（entity単位のタスク） |
+| `.reforge/specs/<name>/spec.json` | プロダクト仕様（Single Source of Truth） |
+| `.reforge/specs/<name>/spec.previous.json` | 直前のspecスナップショット（diff用） |
+| `.reforge/specs/<name>/questions.json` | 質問キュー（pending / answered） |
+| `.reforge/specs/<name>/tasks.json` | 実装タスクキュー（entity単位のタスク） |
 
 ## Output Contract
 
@@ -61,7 +61,7 @@ allowed-tools: Read, Glob
 
 2. Step 2: スキーマ準拠検証 — 必須セクション存在チェック
 
-   `.reforge/spec.json` に `meta`、`tech`、`entities`、`views`、`flows` の5セクションが存在するか確認する。
+   `.reforge/specs/<name>/spec.json` に `meta`、`tech`、`entities`、`views`、`flows` の5セクションが存在するか確認する。
    欠如しているセクションがあれば `errors` リストに追加し、継続する（停止しない）。
 
    エラーコード: `SCHEMA_MISSING_SECTION`
@@ -95,11 +95,11 @@ allowed-tools: Read, Glob
 
    `meta.approved` の値を読み取り、状態に応じて `info` リストへ追加する。
 
-   - `meta.approved` が `false` の場合: `NOT_APPROVED` を `info` リストに追加する。`NOT_APPROVED` は `error` ではなく `info`。ユーザーへのガイダンスとして「`/reforge:render` でUIプロトタイプを確認・承認してください」を表示する。
+   - `meta.approved` が `false` の場合: `NOT_APPROVED` を `info` リストに追加する。`NOT_APPROVED` は `error` ではなく `info`。ユーザーへのガイダンスとして「`/reforge-render` でUIプロトタイプを確認・承認してください」を表示する。
    - plan/impl 実行要求時: `meta.approved` が `false` の場合はエラーとして扱う（validate コマンド自体では info のみ）。
 
    メッセージカタログへの追加:
-   - `NOT_APPROVED`: `` `meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください` ``
+   - `NOT_APPROVED`: `` `meta.approved が false です。/reforge-render でUIプロトタイプを確認・承認してください` ``
 
    `meta.approved: false` のスペックは `NOT_APPROVED` として報告するが、validate の合否判定には影響しない。
 
@@ -116,7 +116,7 @@ allowed-tools: Read, Glob
 
 6. Step 6: questions.json検証 — 未解決質問の警告
 
-   `.reforge/questions.json` が存在する場合に読み取り、`pending` の件数を確認する。
+   `.reforge/specs/<name>/questions.json` が存在する場合に読み取り、`pending` の件数を確認する。
 
    - `pending` が 1 件以上の場合: `PENDING_QUESTIONS` を `warnings` リストに追加する。
    - `pending` が 0 件の場合: 警告なし、`✔ valid` の判定に貢献する。
@@ -177,9 +177,17 @@ allowed-tools: Read, Glob
 - Each view definition must contain `type`.
 - `type` must be a string.
 
+### context (optional)
+
+- `context` is optional for backward compatibility.
+- When present, `context` must be an object.
+- `context.mode`, when present, must be one of `greenfield`, `brownfield`, or `unknown`.
+- `context.repository.detectedStack`, `context.repository.conventions`, `context.changeScope.affectedAreas`, `context.changeScope.allowedWriteAreas`, `context.changeScope.protectedAreas`, `context.acceptanceCriteria`, and `context.risks`, when present, must be arrays of strings.
+- Treat context validation issues as warnings unless the value prevents safe implementation. A missing `context` section must never make an otherwise valid legacy spec invalid.
+
 ## questions.json Rules
 
-- If `.reforge/questions.json` does not exist, skip questions validation.
+- If `.reforge/specs/<name>/questions.json` does not exist, skip questions validation.
 - If the file exists, it must parse as a JSON object.
 - The root object must contain `pending` and `answered`.
 - `pending` and `answered` must both be arrays.
@@ -308,7 +316,7 @@ Use these as anchors when validating.
 
 ### spec.json 完全サンプル
 
-`meta.approved` のデフォルト値は `false`。`meta.approved: false` の間は `/reforge:plan` と `/reforge:impl` を実行してはならない。`meta.approved: true` の場合に限り `/reforge:plan` と `/reforge:impl` を実行できる。
+`meta.approved` のデフォルト値は `false`。`meta.approved: false` の間は `/reforge-plan` と `/reforge-impl` を実行してはならない。`meta.approved: true` の場合に限り `/reforge-plan` と `/reforge-impl` を実行できる。
 
 フィールド型一覧:
 
@@ -407,4 +415,4 @@ Use these as anchors when validating.
 }
 ```
 
-`.reforge/tasks.json` には全エンティティのタスクが格納される。`.reforge/` 配下のパスは変更してはならない。
+`.reforge/specs/<name>/tasks.json` には全エンティティのタスクが格納される。`.reforge/` 配下のパスは変更してはならない。

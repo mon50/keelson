@@ -296,7 +296,7 @@ describe('reforge-update and reforge-diff engine skill contracts', () => {
       const markdown = readMarkdown(skillPath);
 
       expect(markdown, `${skillPath} must read the previous snapshot`).toContain(
-        '`.reforge/spec.previous.json`'
+        '`.reforge/specs/<name>/spec.previous.json`'
       );
       expect(markdown, `${skillPath} must show a modified JSON path`).toContain(
         '~ entities.report.fields.status.options[2]: undefined -> archived'

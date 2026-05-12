@@ -10,7 +10,7 @@ argument-hint: "\"<product description>\""
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - Do not invent missing product decisions. Convert unknowns into pending questions.
 - 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に応じてバッチ提示または `questions.md` 出力に切り替える（後述「質問機能プロトコル」参照）。
 - Keep the skill self-contained. Do not require external prompt files.
@@ -65,7 +65,7 @@ argument-hint: "\"<product description>\""
 ### コマンド表記の統一
 
 - スラッシュコマンドは **必ずハイフン形式** で表記する: `/reforge-init`、`/reforge-resume`、`/reforge-answer`、`/reforge-update`、`/reforge-render`、`/reforge-plan`、`/reforge-impl`、`/reforge-verify`、`/reforge-validate`、`/reforge-diff`。
-- 旧表記の `/reforge:xxx`（コロン形式）は使わない（reforge/CLAUDE.md と整合）。
+- 旧コロン形式のスラッシュコマンド表記は使わない（reforge/CLAUDE.md と整合）。
 
 ## Canonical Paths
 
@@ -151,6 +151,7 @@ Before responding, verify:
 {
   "meta": { "name": "daily-report", "version": "0.1.0", "lang": "ja", "approved": false, "audience": [], "intent": "" },
   "requirements": [],
+  "context": { "mode": "greenfield" },
   "tech": { "frontend": "", "backend": "", "database": "", "orm": "", "styling": "", "testing": "" },
   "entities": {},
   "views": {},
@@ -160,7 +161,41 @@ Before responding, verify:
 
 - `meta.approved` の初期値は常に `false`
 - `meta.audience` / `meta.intent` / `requirements` / `tech` の各フィールドは質問で確定するまで空（空配列または空文字）で初期化する
+- `context` は任意の導入文脈。新規MVPなら `mode: "greenfield"`、既存リポジトリへの新機能なら `mode: "brownfield"` を使う。判断不能なら `mode: "unknown"` とし、質問で確定する。
 - `tech` のサブフィールドは AI-DLC Construction 段階の質問で確定する。**初期化時に tech 質問を即 pending 化することは禁止**。要件（`requirements`）が空でない状態になってから tech 質問を生成する。
+
+### Brownfield Context（既存リポジトリへの新機能）
+
+プロダクト説明が既存リポジトリへの機能追加を示す場合（例: "existing repo", "既存", "このSaaSに招待機能を追加"）、`context.mode` を `"brownfield"` として扱う。
+
+- 軽量なリポジトリ観察のみ行う: `package.json`、framework config、ORM/schema/migration、route/component/test ディレクトリなど、技術スタックと責務境界を示すファイルを `Glob` / `Read` で確認する。
+- 既存アプリ全体を完全に reverse engineer したと表現してはならない。Reforge が扱う単位は「新機能・イニシアティブの spec」であり、既存コードは制約と文脈として読む。
+- 明確な証拠がある場合のみ `context.repository.detectedStack`、`context.repository.conventions`、`context.changeScope.affectedAreas`、`context.changeScope.allowedWriteAreas`、`context.changeScope.protectedAreas`、`context.acceptanceCriteria`、`context.risks` に記録する。
+- 変更範囲、触ってはいけない領域、受け入れ条件、既存権限/監査/通知などが不明なら、`requirements` または `data` / `flows` / `views` phase の pending question として残す。
+- Brownfield では `tech.*` をファイルから確実に読める場合だけ埋める。推測で Next.js / Prisma / Vitest などを選ばない。
+
+最小例:
+
+```json
+{
+  "context": {
+    "mode": "brownfield",
+    "repository": {
+      "existing": true,
+      "detectedStack": ["Next.js", "Prisma"],
+      "conventions": ["API routes live under src/app/api", "UI components live under src/components"]
+    },
+    "changeScope": {
+      "feature": "team invitations",
+      "affectedAreas": ["auth", "teams", "email"],
+      "allowedWriteAreas": ["src/app/api/teams", "src/components/teams", "prisma/migrations"],
+      "protectedAreas": ["billing", "legacy imports"]
+    },
+    "acceptanceCriteria": ["Admins can invite a teammate by email", "Existing RBAC rules still gate team settings"],
+    "risks": ["Email delivery provider is not identified yet"]
+  }
+}
+```
 
 ### 初期 questions.json サンプル
 
@@ -207,8 +242,13 @@ Question priority order (AI-DLC Inception → Construction):
 6. Set `meta.approved` to `false`. This field is always `false` on init; it is only set to `true` by an explicit human approval action.
 7. Derive the spec slug from `meta.name` using the Spec Name Derivation rules.
 8. Set `SPEC_DIR = ".reforge/specs/<slug>/"`, `SPEC_PATH`, `QUESTIONS_PATH`, `QUESTIONS_MD_PATH`, `PREVIOUS_SPEC_PATH` accordingly.
-9. Read existing `SPEC_PATH` and `QUESTIONS_PATH` when present.
-10. If `SPEC_PATH` already exists, do not overwrite it silently.
+9. Determine `context.mode` from the description and repository signals:
+   - `greenfield`: new app / MVP / prototype with no explicit existing repository constraints.
+   - `brownfield`: feature work inside an existing application or repository.
+   - `unknown`: mode is unclear; create one pending question rather than assuming.
+10. In brownfield mode, inspect only lightweight repository signals and record explicit constraints in optional `context` fields. Do not claim complete repository understanding.
+11. Read existing `SPEC_PATH` and `QUESTIONS_PATH` when present.
+12. If `SPEC_PATH` already exists, do not overwrite it silently.
     - **上書き確認 confirm 質問を、その後の Inception 質問群と同じ AskUserQuestion バッチに統合する**（システムからは 1 回の質問呼び出しだが、ユーザーから見ると「上書き確認 → Inception 質問」の 2 段階を一緒に提示する形）。Q1 を `confirm_overwrite`（type: `confirm` = はい・いいえ確認、選択肢: 「上書き」「キャンセル」）として先頭に置き、Q2 以降に Inception 質問（`define_audience` / `define_intent` / `define_requirements`）を続ける。これで 1 回の AskUserQuestion で confirm + Inception の最大 4 問を一括提示できる。
     - `confirm_overwrite` は `resolves: []`（spec の特定フィールドに紐づかない確認質問）。回答後は `questions.json` の `answered` に `phase: "meta"` で記録する（`pending` には積まない）。
     - **キャンセル時挙動**: ユーザーが Q1 で「キャンセル」を選んだ場合、Q2〜Q4 の回答内容は **無視し `SPEC_PATH` には書き込まない**。`questions.json` の `answered` には `confirm_overwrite` のみを `answer: "キャンセル"` で記録し、Q2〜Q4 の Inception 質問は処理しない（pending に積み直しもしない）。Lifecycle を `blocked` で報告し、「ユーザーがキャンセルを選択しました。`SPEC_PATH` は変更されていません」と案内して終了する。
@@ -230,20 +270,20 @@ Question priority order (AI-DLC Inception → Construction):
 | `entities` / `views` / `flows` | 退避して `{}` で再初期化 | Construction をやり直す |
 
 これにより、新しいプロダクト概要に対する Inception → Construction を最初からやり直せる。
-11. Extract only explicit Inception data:
+13. Extract only explicit Inception data:
     - If audience tags are explicit, populate `meta.audience`.
     - If a product intent is explicit, populate `meta.intent`.
     - If user stories are explicit, populate `requirements`.
-12. Extract only explicit Construction data:
+14. Extract only explicit Construction data:
     - If an entity is explicitly named, add it under `entities`.
     - If a field is explicitly named and its type is clear, add it.
     - If a field exists but type is unclear, create a question instead of guessing.
     - If a view or flow is not explicit, leave it absent and create the next needed question.
-13. Generate Inception pending questions for missing decisions (audience / intent / requirements) **before** any Construction questions.
-14. Do **not** generate `tech` pending questions during init. Tech は要件確定後の後続 reforge-resume / reforge-answer 呼び出しで補完する。
-15. De-duplicate pending questions by normalized `resolves`.
-16. Write `SPEC_PATH` and `QUESTIONS_PATH` only after the Quality Gate passes.
-17. Apply the question presentation protocol (see 「質問機能プロトコル」) once and stop.
+15. Generate Inception pending questions for missing decisions (audience / intent / requirements) **before** any Construction questions.
+16. Do **not** generate `tech` pending questions during init unless brownfield repository files provide unambiguous values. Tech は要件確定後の後続 reforge-resume / reforge-answer 呼び出しで補完する。
+17. De-duplicate pending questions by normalized `resolves`.
+18. Write `SPEC_PATH` and `QUESTIONS_PATH` only after the Quality Gate passes.
+19. Apply the question presentation protocol (see 「質問機能プロトコル」) once and stop.
 
 ## Unknown Handling Rules
 
@@ -252,6 +292,8 @@ Create questions rather than guessing for:
 - Target audience (`meta.audience`).
 - Product intent (`meta.intent`).
 - User-story style requirements (`requirements`).
+- Usage context (`context.mode`) when greenfield vs brownfield is unclear.
+- Brownfield change scope, allowed write areas, protected areas, existing conventions, acceptance criteria, and risks.
 - Primary entity name.
 - Entity fields.
 - Field types.
@@ -448,7 +490,7 @@ Representative questions:
 - [ ] <option2>
 - [ ] その他: ___________
 
-**Answer:** 
+**Answer:**
 
 ---
 

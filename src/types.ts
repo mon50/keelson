@@ -94,10 +94,33 @@ export interface RequirementEntry {
   so_that: string;
 }
 
+export type SpecMode = 'greenfield' | 'brownfield' | 'unknown';
+
+export interface SpecContext {
+  /** Greenfield MVP, brownfield feature work, or unknown when the intent is not explicit. */
+  mode?: SpecMode;
+  repository?: {
+    existing?: boolean;
+    summary?: string;
+    detectedStack?: string[];
+    conventions?: string[];
+  };
+  changeScope?: {
+    feature?: string;
+    affectedAreas?: string[];
+    allowedWriteAreas?: string[];
+    protectedAreas?: string[];
+  };
+  acceptanceCriteria?: string[];
+  risks?: string[];
+}
+
 export interface SpecJson {
   meta: SpecMeta;
   /** AI-DLC Inception artifact. Optional for backward compatibility. */
   requirements?: RequirementEntry[];
+  /** Optional context for new MVPs and existing-repository feature work. */
+  context?: SpecContext;
   tech: SpecTech;
   entities: Record<string, EntityDefinition>;
   views: Record<string, ViewDefinition>;

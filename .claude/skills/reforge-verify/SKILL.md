@@ -40,8 +40,9 @@ Verify that the implementation matches the approved Reforge specification. Read-
 3. `SPEC_PATH` の `meta` と `entities` を読み取る（`meta.approved` の値は情報として記録するのみ）。
 4. `spec.tech` を読み取り、ファイルパスパターンを動的に決定する。
 5. 全 entity に対して照合チェックを実行する（詳細はEntityマッチングロジックセクション参照）。
-6. `TASKS_PATH` を読み取り、全タスクの `status` を確認する。
-7. 全照合完了後に一括レポートを出力する。
+6. `spec.context` が存在する場合は Brownfield / Greenfield context を情報として読み取り、`allowedWriteAreas`、`protectedAreas`、`acceptanceCriteria`、`risks` をレポート対象に追加する。
+7. `TASKS_PATH` を読み取り、全タスクの `status` を確認する。
+8. 全照合完了後に一括レポートを出力する。
 
 ## Entity Matching Logic
 
@@ -119,6 +120,15 @@ UIコンポーネントパスの決定 (spec.tech.frontend + spec.tech.styling):
 全entityの照合チェック後に `TASKS_PATH` を読み取る。
 - tasks.json が存在しない場合は `TASK_INCOMPLETE: tasks.json が見つかりません` として警告リストに追加する（重篤度: warning）。
 - tasks.json が存在する場合は全タスクの `status` を確認し、`"done"` でないタスクがあれば `TASK_INCOMPLETE: {entity}（status: {status}）` として警告リストに追加する（重篤度: warning）。
+
+### Brownfield / Acceptance Context
+
+`spec.context` が存在する場合は、verify レポートに以下の情報セクションを追加する。これは構造照合の補助であり、error/pass 判定を誇張してはならない。
+
+- `context.mode` が `"brownfield"` の場合、`allowedWriteAreas` と `protectedAreas` を表示する。
+- 実装ファイルのパスが `protectedAreas` に一致することを読み取りだけで確認できた場合は `PROTECTED_AREA_TOUCHED` を warning として追加する。
+- `acceptanceCriteria` は手動確認チェックリストとして表示する。ファイル存在や文字列検索だけで満たしたと断定できない項目は `manual check required` として残す。
+- `risks` は残リスクとして表示する。verify が自動的にリスクを解消したとは報告しない。
 
 ### レポート形式
 

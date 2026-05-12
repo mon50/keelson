@@ -27,9 +27,9 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     );
 
     const orderedSteps = [
-      '1. `.reforge/spec.json` の存在を確認する。',
+      '1. `.reforge/specs/<name>/spec.json` の存在を確認する。',
       '2. `meta.approved` が `true` であることを確認する。',
-      '3. `.reforge/tasks.json` の存在を確認する。',
+      '3. `.reforge/specs/<name>/tasks.json` の存在を確認する。',
       '4. `spec.tech` の完全性を確認する。',
       '5. `spec.entities[entity]` の定義を確認する。'
     ];
@@ -67,9 +67,9 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       'tasks.jsonが見つかりません。`/reforge-plan` を実行してください'
     );
     expect(markdown).toMatch(
-      /`\.reforge\/tasks\.json` の存在を確認する。[\s\S]*tasks\.jsonが見つかりません。`\/reforge-plan` を実行してください[\s\S]*停止/
+      /`\.reforge\/specs\/<name>\/tasks\.json` の存在を確認する。[\s\S]*tasks\.jsonが見つかりません。`\/reforge-plan` を実行してください[\s\S]*停止/
     );
-    expect(markdown.indexOf('`.reforge/tasks.json` の存在を確認する。')).toBeGreaterThan(
+    expect(markdown.indexOf('`.reforge/specs/<name>/tasks.json` の存在を確認する。')).toBeGreaterThan(
       markdown.indexOf('`meta.approved` が `true` であることを確認する。')
     );
   });
@@ -78,10 +78,10 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toContain(
-      'entity引数が省略された場合は、`.reforge/tasks.json` の `tasks` 配列を先頭から走査し、最初の `status: "pending"` タスクの `entity` を対象entityとして確定する。'
+      'entity引数が省略された場合は、`.reforge/specs/<name>/tasks.json` の `tasks` 配列を先頭から走査し、最初の `status: "pending"` タスクの `entity` を対象entityとして確定する。'
     );
     expect(markdown.indexOf('entity引数が省略された場合')).toBeGreaterThan(
-      markdown.indexOf('`.reforge/tasks.json` の存在を確認する。')
+      markdown.indexOf('`.reforge/specs/<name>/tasks.json` の存在を確認する。')
     );
     expect(markdown.indexOf('entity引数が省略された場合')).toBeLessThan(
       markdown.indexOf('`spec.tech` の完全性を確認する。')
@@ -456,10 +456,10 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toMatch(
-      /開始前確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "in_progress"`/
+      /開始前確認[\s\S]*`\.reforge\/specs\/<name>\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "in_progress"`/
     );
     expect(markdown).toMatch(
-      /完了後確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "done"`/
+      /完了後確認[\s\S]*`\.reforge\/specs\/<name>\/tasks\.json`[\s\S]*対象entityタスク[\s\S]*`status: "done"`/
     );
     expect(markdown).toMatch(
       /status更新[\s\S]*確認できない場合[\s\S]*実装を進めない|完了報告しない/
@@ -496,7 +496,7 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toMatch(
-      /ロールバック後確認[\s\S]*`\.reforge\/tasks\.json`[\s\S]*再読み取り[\s\S]*対象entityタスク[\s\S]*`status: "pending"`/
+      /ロールバック後確認[\s\S]*`\.reforge\/specs\/<name>\/tasks\.json`[\s\S]*再読み取り[\s\S]*対象entityタスク[\s\S]*`status: "pending"`/
     );
     expect(markdown).toMatch(
       /`status: "pending"` を確認できない場合[\s\S]*完了報告しない/

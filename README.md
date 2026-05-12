@@ -1,35 +1,80 @@
 # Reforge
 
-Reforge turns a natural-language product description into a structured spec, a local UI prototype, and an entity-by-entity implementation plan — one question at a time.
+Keep AI coding agents from guessing.
 
-[![npm version](https://img.shields.io/npm/v/reforge?logo=npm)](https://www.npmjs.com/package/reforge)
+Reforge is a spec-first workflow for Claude Code and Codex. It turns vague product intent into an approved spec, local prototype, implementation queue, and verification loop before your AI coding agent starts changing code.
+
+Use it for new MVPs or for feature work inside existing repositories. When something is unclear, Reforge does not invent a decision. It turns the unknown into a question and keeps the answer in the spec.
+
+[![npm version](https://img.shields.io/npm/v/aid-reforge?logo=npm)](https://www.npmjs.com/package/aid-reforge)
 [![license: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 <div align="center"><sub>
 README: <a href="./README.md">English</a> | <a href="./README_ja.md">日本語</a>
 </sub></div>
 
-## What it is, Why it is useful, Who it is for
+## Why
 
-Reforge is a **Skill-based Agent Framework**. Instead of acting as a standalone CLI tool, Reforge installs a set of **Agent Skills** into your project. Agent Skills are plain-text instruction files that teach your AI coding agent how to execute each workflow step. Running `npx aid-reforge install` copies them into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex), which makes the `/reforge-*` slash commands available in your agent session.
+AI coding is fast at the start. The hard part is keeping the product, data model, API, UI, tasks, and tests from drifting apart after the first few prompts.
 
-**Why it is useful:** It transforms natural language into structured artifacts (spec.json) without guessing, keeping human decision-making central.
-**Who it is for:** Developers using Claude Code or Codex who want structured, deterministic workflows.
-**Who it is not for:** Non-technical users looking for a fully autonomous "build an app for me" button.
+Reforge puts a human approval gate in front of implementation:
 
-### Before / After Example
-- **Description:** "A daily report app"
-- **Spec:** structured `spec.json` with entities and views
-- **Prototype:** running HTML wireframe at `localhost:4317`
-- **Tasks:** deterministic `tasks.json` queue for implementation
+- Unknown product decisions become pending questions.
+- Answers are stored in `.reforge/specs/<name>/spec.json`.
+- The local prototype must be approved before planning.
+- Implementation runs entity by entity from `tasks.json`.
+- Verification checks the implementation back against the spec.
 
-Each skill owns one step of the product development lifecycle:
+The point is not to make AI more autonomous. The point is to keep AI from silently choosing requirements, roles, states, fields, or repository boundaries for you.
+
+## Use Cases
+
+| Use case | Pain Reforge targets |
+|---|---|
+| **Greenfield MVP** | You ask Claude Code or Codex to build an app, but auth, permissions, states, views, and data rules are vague. |
+| **Brownfield feature** | You add a feature to an existing repository, but the agent may ignore existing stack, naming, ownership boundaries, tests, or protected areas. |
+
+Brownfield support is feature-scoped. Reforge does not claim to fully reverse engineer a large repository. It records lightweight repository context, change scope, allowed write areas, protected areas, acceptance criteria, and risks when they are explicit or safely detectable. Missing context becomes questions.
+
+## Before / After
+
+**Before**
+
+```
+"Build a daily report app"
+```
+
+The agent may decide draft behavior, submission rules, supervisor approval, admin screens, notifications, database fields, and API shape on its own.
+
+**After**
+
+Reforge asks for the missing decisions first:
+
+- Who can read submitted reports?
+- Are drafts required?
+- Can a report be edited after submission?
+- Which fields belong to the report entity?
+- Which views are required for the MVP?
+
+Those answers become the source of truth before implementation begins.
+
+For an existing repository, the same workflow narrows the change:
+
+- Which feature is being added?
+- Which existing areas can be touched?
+- Which areas are protected?
+- What acceptance criteria must pass?
+- Which repo conventions should the implementation follow?
+
+## How It Works
+
+Reforge is a **Skill-based Agent Framework**. `npx aid-reforge install` copies the canonical skills into `.reforge/skills/` and installs lightweight forwarders into `.claude/skills/` for Claude Code or `.agents/skills/` for Codex. The visible `/reforge-*` slash commands read the project-local skill files and follow the same workflow contract.
 
 | Phase | Skill | What it does |
 |---|---|---|
 | Spec | `/reforge-init` | Scaffold `spec.json` and a question queue from your description |
-| All phases¹ | `/reforge-resume` | **Navigator mode** — Q&A + phase routing |
-| Spec³ | `/reforge-answer` | **Manual mode** — Q&A only (no phase routing) |
+| All phases¹ | `/reforge-resume` | **Navigator mode** - Q&A + phase routing |
+| Spec³ | `/reforge-answer` | **Manual mode** - Q&A only, without phase routing |
 | Any phase² | `/reforge-update` | Apply a natural-language change to the spec |
 | Any phase² | `/reforge-diff` | Show what changed since the last spec snapshot |
 | Spec | `/reforge-validate` | Check `spec.json` for completeness and consistency |
@@ -38,11 +83,11 @@ Each skill owns one step of the product development lifecycle:
 | Implement | `/reforge-impl` | Implement one entity (DB + API + UI + tests) |
 | Verify | `/reforge-verify` | Confirm that the implementation matches the spec |
 
-¹ **All phases** — `reforge-resume` actively navigates every phase gate, from first question to final verify.  
-² **Any phase** — optional utilities you can invoke at any point without affecting the main lifecycle flow.  
-³ **Manual mode** — `reforge-answer` is for users who prefer to drive each phase themselves; it handles only Q&A and never recommends the next command.
+¹ **All phases** - `reforge-resume` actively navigates every phase gate, from first question to final verify.
+² **Any phase** - optional utilities you can invoke at any point without affecting the main lifecycle flow.
+³ **Manual mode** - use `reforge-answer` when you want to answer questions without phase routing.
 
-All skills share a single data contract under `.reforge/specs/<name>/`. No skill invents decisions — unknowns become pending questions that a human must answer.
+Questions are batched when useful: up to 4 questions can be presented at once, and larger batches are written to `.reforge/specs/<name>/questions.md` for offline answering.
 
 ## Quick Start
 
@@ -55,76 +100,89 @@ Then, in your AI coding agent:
 
 ```
 /reforge-init "A daily-report app for field teams"
+/reforge-resume
 ```
 
-Reforge scaffolds `spec.json` and asks its first question. Answer it, then run `/reforge-resume` to continue. At any point — questions, validation, prototype, planning, implementation — `/reforge-resume` tells you exactly what to do next.
+For an existing repository feature:
 
-### Full workflow at a glance
+```
+/reforge-init "Add team invitations to this existing SaaS repo. Follow existing auth, email, and team settings conventions."
+/reforge-resume
+```
 
-**Navigator mode** — let `reforge-resume` drive every phase:
+`/reforge-resume` tells you exactly what to do next at every point: answer questions, validate, render, approve, plan, implement, or verify.
+
+### Full Workflow
+
+**Navigator mode** - let `reforge-resume` drive every phase:
 
 ```
 /reforge-init "description"   # scaffold spec + question queue
-/reforge-resume               # repeat until complete — navigates questions → validate → render → plan → impl → verify
+/reforge-resume               # repeat until complete
 ```
 
-**Manual mode** — invoke each phase directly (use `reforge-resume` only for answering questions):
+**Manual mode** - invoke each phase directly:
 
 ```
-/reforge-init "description"   # scaffold spec + question queue
-/reforge-resume               # answer one pending question per run (repeat until no questions remain)
-/reforge-validate             # confirm spec is complete
-/reforge-render               # review prototype → approve
-/reforge-plan                 # generate implementation tasks
-/reforge-impl                 # implement entity by entity
-/reforge-verify               # verify against spec
+/reforge-init "description"
+/reforge-answer               # repeat until no pending questions remain
+/reforge-validate
+/reforge-render               # review prototype -> approve
+/reforge-plan
+/reforge-impl
+/reforge-verify
 ```
 
-### Multiple specs
+### Multiple Specs
 
-One project can hold multiple specs — one per feature or initiative:
+One project can hold multiple specs, one per feature or initiative:
 
 ```
 /reforge-init "Daily report app"    # creates .reforge/specs/daily-report/
 /reforge-init "Photo albums"        # creates .reforge/specs/photo-albums/
 
 /reforge-resume photo-albums        # navigate a specific spec
-/reforge-impl photo-albums User     # implement User entity in photo-albums
+/reforge-impl photo-albums User     # implement User in photo-albums
 ```
 
-Spec names are auto-derived from your description (kebab-case slug). When only one spec exists, the name argument can be omitted.
+When only one spec exists, the name argument can be omitted.
 
 ## Supported Environments
 
-| Environment | Skills directory |
+| Environment | Forwarder directory |
 |---|---|
 | **Claude Code** | `.claude/skills/` |
 | **Codex** | `.agents/skills/` |
 
-`reforge install` auto-detects which environment is active and installs to the correct location. If both are present, both are installed.
+The canonical project-local skills live in `.reforge/skills/`.
 
 ## Workspace Files
 
-All Reforge state lives under `.reforge/specs/<name>/` in your project. `.reforge/` 配下のパスは変更してはならない — every component depends on the standard paths.
+All Reforge state lives under `.reforge/specs/<name>/` in your project.
 
-| ファイル | 役割 |
+Do not rename or move the `.reforge/` paths listed here. Reforge skills and the renderer rely on these standard locations.
+
+| File | Purpose |
 |---|---|
-| `.reforge/spec.json` | プロダクト仕様（Single Source of Truth） |
-| `.reforge/spec.previous.json` | 直前のspecスナップショット（diff用） |
-| `.reforge/questions.json` | 質問キュー（pending / answered） |
-| `.reforge/tasks.json` | 実装タスクキュー（entity単位のタスク） |
-| `.reforge/tasks.previous.json` | `/reforge-update` が承認をリセットした際に旧 tasks.json を退避 — 再承認後に `/reforge-resume` が `/reforge-plan` を案内するためのトリガー |
+| `.reforge/specs/<name>/spec.json` | Product spec and Single Source of Truth |
+| `.reforge/specs/<name>/questions.json` | Pending and answered question queue |
+| `.reforge/specs/<name>/questions.md` | Optional large question batch for offline answering |
+| `.reforge/specs/<name>/spec.previous.json` | Previous spec snapshot used by `/reforge-diff` |
+| `.reforge/specs/<name>/tasks.json` | Implementation task queue created by `/reforge-plan` |
+| `.reforge/specs/<name>/tasks.previous.json` | Retired task queue when `/reforge-update` resets approval |
 
 ```
 .reforge/
-├── server/                  # local prototype renderer (created by /reforge-render)
+├── server/                  # local prototype renderer
+├── skills/                  # canonical project-local Reforge skills
 └── specs/
-    └── <name>/              # one directory per spec (auto-named from description)
-        ├── spec.json        # Single Source of Truth for the product spec
-        ├── spec.previous.json  # previous snapshot, used by /reforge-diff
-        ├── questions.json   # pending and answered question queue
-        ├── tasks.json       # implementation task queue (created by /reforge-plan)
-        └── tasks.previous.json  # retired by /reforge-update when approval resets
+    └── <name>/
+        ├── spec.json
+        ├── questions.json
+        ├── questions.md
+        ├── spec.previous.json
+        ├── tasks.json
+        └── tasks.previous.json
 ```
 
 Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to share progress across machines.
@@ -140,8 +198,8 @@ Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to s
   - [Why Reforge?](docs/explanation/why-reforge.md)
 - **Guides**
   - [Workflow Guide](docs/guides/workflow-guide.md)
-  - [Status vs Resume](docs/guides/status-vs-resume.md)
   - [Adopting an Existing Repo](docs/guides/adopt-existing-repo.md)
+  - [Status vs Resume](docs/guides/status-vs-resume.md)
   - [Recovery and Rollback](docs/guides/recovery-and-rollback.md)
   - [Reviewing Prototypes](docs/guides/reviewing-prototypes.md)
 - **Reference**
@@ -161,4 +219,3 @@ Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to s
 
 **Maturity:** Beta. API and workflow structure may evolve.
 **Support Policy:** See [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md).
-

@@ -1,6 +1,6 @@
 ---
 name: reforge-update
-description: Apply a natural-language change request to .reforge/spec.json as a safe diff, preserving unrelated spec paths. Supports new Inception fields (meta.audience / meta.intent / requirements). Ambiguous changes generate pending questions (batch via AskUserQuestion, or questions.md when 5+). Approval changes and entity changes auto-archive tasks.json for re-planning.
+description: Apply a natural-language change request to .reforge/specs/<name>/spec.json as a safe diff, preserving unrelated spec paths. Supports new Inception fields (meta.audience / meta.intent / requirements). Ambiguous changes generate pending questions (batch via AskUserQuestion, or questions.md when 5+). Approval changes and entity changes auto-archive tasks.json for re-planning.
 allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 argument-hint: "\"<change request>\""
 ---
@@ -10,7 +10,7 @@ argument-hint: "\"<change request>\""
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - Do not invent missing product decisions. Convert unknowns into pending questions.
 - 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に応じてバッチ提示または `questions.md` 出力に切り替える（後述「質問機能プロトコル」参照）。
 - Keep the skill self-contained. Do not require external prompt files.
@@ -65,7 +65,7 @@ argument-hint: "\"<change request>\""
 ### コマンド表記の統一
 
 - スラッシュコマンドは **必ずハイフン形式** で表記する: `/reforge-init`、`/reforge-resume`、`/reforge-answer`、`/reforge-update`、`/reforge-render`、`/reforge-plan`、`/reforge-impl`、`/reforge-verify`、`/reforge-validate`、`/reforge-diff`。
-- 旧表記の `/reforge:xxx`（コロン形式）は使わない（reforge/CLAUDE.md と整合）。
+- 旧コロン形式のスラッシュコマンド表記は使わない（reforge/CLAUDE.md と整合）。
 
 ## Canonical Paths
 
@@ -161,7 +161,7 @@ Before responding, verify:
      - これにより `reforge-resume` の Step 5（tasks.json 不在チェック）が再 match し、再承認後に `/reforge-plan` が案内される。
      - 退避を行った場合は Completion Report の Changed artifacts に `TASKS_PREVIOUS_PATH` を含める。
    - Apply only the relevant spec paths.
-   - Preserve unrelated entities, fields, flows, and views.
+   - Preserve unrelated entities, fields, flows, views, requirements, and context.
 6. If the change is conflicting, destructive, or ambiguous:
    - Do not mutate `SPEC_PATH`.
    - Add or present pending questions that resolve the missing decisions. 4 件以下なら AskUserQuestion バッチ、5 件以上なら `QUESTIONS_MD_PATH` 出力。
@@ -190,6 +190,11 @@ Before responding, verify:
 - For audience / intent edits:
   - `meta.audience` is `string[]`; preserve existing tags unless the user explicitly removes them.
   - `meta.intent` is a single string; replacing it should be an explicit user instruction.
+- For context edits (`context.*`):
+  - Preserve existing context unless the user explicitly changes it.
+  - `context.mode` may be `greenfield`, `brownfield`, or `unknown`.
+  - Brownfield scope fields (`affectedAreas`, `allowedWriteAreas`, `protectedAreas`, `acceptanceCriteria`, `risks`) are append-only unless the user explicitly removes or replaces entries.
+  - If a change request would require editing outside `context.changeScope.allowedWriteAreas`, create a pending question instead of silently widening the scope.
 - For removal:
   - Treat broad removal as destructive and ask for confirmation unless the target path is exact.
 
@@ -260,7 +265,7 @@ Before responding, verify:
 - [ ] <option2>
 - [ ] その他: ___________
 
-**Answer:** 
+**Answer:**
 
 ---
 

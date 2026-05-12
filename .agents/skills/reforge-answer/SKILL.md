@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - このスキルは **質問の提示と回答記録のみ** を行う。フェーズマップ、NextAction、次フェーズの案内は出力しない。
 - ライフサイクルナビゲーションが必要な場合は `/reforge-resume` を使用する（ナビゲーターモード）。
 - `/reforge-answer` はマニュアルモードでの Q&A 専用エンドポイント。
@@ -66,7 +66,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ### コマンド表記の統一
 
 - スラッシュコマンドは **必ずハイフン形式** で表記する: `/reforge-init`、`/reforge-resume`、`/reforge-answer`、`/reforge-update`、`/reforge-render`、`/reforge-plan`、`/reforge-impl`、`/reforge-verify`、`/reforge-validate`、`/reforge-diff`。
-- 旧表記の `/reforge:xxx`（コロン形式）は使わない（reforge/CLAUDE.md と整合）。
+- 旧コロン形式のスラッシュコマンド表記は使わない（reforge/CLAUDE.md と整合）。
 
 ## Canonical Paths
 
@@ -101,7 +101,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - `**Answer:**` 行に非空のテキストが入っている、または選択肢に `[x]` チェックが入っている質問を「回答済み」と判定する。
 - 回答済みの質問について、対応する `pending` エントリの `resolves` に従って `SPEC_PATH` を更新し、`pending` から `answered` へ移動する。
 - 全件処理後、残った pending で `QUESTIONS_MD_PATH` を再生成する。pending が空になった場合は `QUESTIONS_MD_PATH` を削除する。
-- このステップで反映があった場合は `Lifecycle: answered_md` を報告する。
+- このステップで反映があった場合は `Lifecycle: answered` を報告する。
 
 ### ステップ 3: questions.json の pending チェック
 
@@ -181,7 +181,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - [ ] <option2>
 - [ ] その他: ___________
 
-**Answer:** 
+**Answer:**
 
 ---
 
@@ -237,7 +237,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 
 マニュアルモード Q&A の出力は最小限に保つ。出力する要素は以下のみ:
 
-- ライフサイクルステージ: `answered`、`answered_md`、`questions_md`、`complete`、または `blocked` のいずれか。
+- ライフサイクルステージ: `answered`、`questions_md`、`complete`、または `blocked` のいずれか。
 - 反映先（書き込みがあった場合のみ）: `SPEC_PATH`、`QUESTIONS_PATH`、必要なら `QUESTIONS_MD_PATH`。
 - 残り pending 質問数。
 - バッチ提示モード（1〜4 問）か Markdown 出力モード（5 問以上）かを 1 行で示す。

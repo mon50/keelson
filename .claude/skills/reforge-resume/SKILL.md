@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - Do not invent missing product decisions. Convert unknowns into pending questions.
 - 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に応じてバッチ提示または `questions.md` 出力に切り替える（後述「質問機能プロトコル」参照）。
 - Keep the skill self-contained. Do not require external prompt files.
@@ -68,7 +68,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ### コマンド表記の統一
 
 - スラッシュコマンドは **必ずハイフン形式** で表記する: `/reforge-init`、`/reforge-resume`、`/reforge-answer`、`/reforge-update`、`/reforge-render`、`/reforge-plan`、`/reforge-impl`、`/reforge-verify`、`/reforge-validate`、`/reforge-diff`。
-- 旧表記の `/reforge:xxx`（コロン形式）は使わない（reforge/CLAUDE.md と整合）。
+- 旧コロン形式のスラッシュコマンド表記は使わない（reforge/CLAUDE.md と整合）。
 
 ## Canonical Paths
 
@@ -143,7 +143,7 @@ Before responding, verify:
 
 このスキルが読み取るファイルのデータ構造を以下に定義する。
 
-### `.reforge/spec.json`
+### `.reforge/specs/<name>/spec.json`
 
 ```json
 {
@@ -169,7 +169,7 @@ Before responding, verify:
 - `meta`, `tech`, `entities`, `views`, `flows` がすべて存在することがスキーマ合格の最低条件
 - `meta.audience`, `meta.intent`, `requirements` は AI-DLC Inception 段階の必須化が望ましいが、スキーマ的には optional（後方互換）
 
-### `.reforge/questions.json`
+### `.reforge/specs/<name>/questions.json`
 
 ```json
 {
@@ -188,7 +188,7 @@ Before responding, verify:
 
 - `pending` 配列に1件以上ある場合、バリデーション・approved 確認より優先して質問を処理する
 
-### `.reforge/tasks.json`
+### `.reforge/specs/<name>/tasks.json`
 
 ```json
 [
@@ -268,7 +268,7 @@ spec が確定したらステップ 1 へ進む。
 
 - **1件以上の検証エラーがある場合**:
   - バリデーションエラーの一覧を表示する（エラーごとに該当フィールドと修正方法を明記する）。
-  - 「`.reforge/spec.json` のエラーを修正してから再実行してください。」と案内して終了する。
+  - 「`.reforge/specs/<name>/spec.json` のエラーを修正してから再実行してください。」と案内して終了する。
 
 すべての検証に合格した場合はステップ 4 へ進む。
 
@@ -386,7 +386,7 @@ verify が完了している場合はステップ 8 へ進む。
 - [ ] <option2>
 - [ ] その他: ___________
 
-**Answer:** 
+**Answer:**
 
 ---
 

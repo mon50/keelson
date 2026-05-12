@@ -10,7 +10,7 @@
 |---|---|---|
 | [`reforge-init`](#reforge-init) | スペック | `spec.json` と質問キューを初期化する |
 | [`reforge-resume`](#reforge-resume) | 全フェーズ¹ | **ナビゲーターモード** — どのフェーズでも次のアクションへ案内する |
-| [`reforge-answer`](#reforge-answer) | スペック³ | **マニュアルモード** — Q&A 専用。ペンディング質問1件に回答するだけでフェーズ案内はしない |
+| [`reforge-answer`](#reforge-answer) | スペック³ | **マニュアルモード** — Q&A 専用。ペンディング質問に回答するだけでフェーズ案内はしない |
 | [`reforge-update`](#reforge-update) | 任意のフェーズ² | 自然言語の変更指示を spec に適用する |
 | [`reforge-diff`](#reforge-diff) | 任意のフェーズ² | 直前のスナップショットとの JSON パス差分を表示する |
 | [`reforge-validate`](#reforge-validate) | スペック | spec の完全性と整合性を確認する |
@@ -52,12 +52,14 @@
 spec 名は説明から kebab-case スラッグとして自動導出される（例: `"フォトアルバム"` → `photo-albums`）。
 
 **動作:**
-- 説明から推測できる内容で `meta`, `tech`, `entities`, `views`, `flows` を埋める
+- 説明から推測できる内容で `meta`, 任意の `requirements`, 任意の `context`, `tech`, `entities`, `views`, `flows` を埋める
+- Inception-first 順序（`audience`, `intent`, `requirements` → construction details）を使う
+- 既存リポジトリへの新機能追加では、明示または安全に検出できる brownfield context を記録する
 - 回答できないプロダクトの意思決定はすべてペンディング質問に変換する
-- 最後に 1 つだけ質問を提示して停止する
+- 最後に質問バッチを提示するか `questions.md` に書き出して停止する
 - enum オプション、フィールド名、ロール、承認ルールを証拠なく勝手に埋めない
 
-**終了コード:** `files_written`, `question`, `blocked`, `complete`
+**終了コード:** `files_written`, `questions_batch`, `questions_md`, `blocked`, `complete`
 
 **例:**
 ```
@@ -81,7 +83,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 | 条件 | 出力 |
 |---|---|
 | `spec.json` が存在しないまたは無効 | ブロック; `/reforge-init` を案内 |
-| 未解決の質問がある | 最優先の質問を 1 つ提示し、返答で回答を記録する |
+| 未解決の質問がある | 最大 4 問を提示、または `questions.md` に書き出し、返答で回答を記録する |
 | 検証エラーあり | ブロック; `/reforge-validate` を案内 |
 | `meta.approved` が false | ブロック; `/reforge-render` を案内 |
 | `tasks.json` が存在しない | ブロック; `/reforge-plan` を案内 |
@@ -92,7 +94,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 **質問に回答するとき:**
 - 回答を質問エントリの `resolves` に列挙されたパスのみに反映する
 - 質問を `pending` から `answered` に移動する
-- 同一実行内で次の質問は提示しない — 次の質問は再度 `/reforge-resume` を実行して取得する
+- 現在の Q&A アクション後に停止する。続行するには再度 `/reforge-resume` を実行する
 
 **使用タイミング:** 次に何をすべきか分からないときや、中断後に再開するとき。どのフェーズでも安全に実行できる — 質問への回答記録以外では状態を変更しない。
 
@@ -100,7 +102,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 
 ### `reforge-answer`
 
-マニュアルモード用の Q&A 専用スキル。ペンディング質問を 1 件提示して回答を記録する。**フェーズ進行の案内も次コマンド推奨もしない。**
+マニュアルモード用の Q&A 専用スキル。ペンディング質問を提示して回答を記録する。**フェーズ進行の案内も次コマンド推奨もしない。**
 
 **引数:** `[<spec-name>]`（任意 — spec が 1 つだけの場合は省略可）
 
@@ -109,7 +111,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 **書き込み:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json` — 回答を記録するときのみ
 
 **動作:**
-- `pending[0]` がある場合は提示し、回答を `resolves` のパスのみに反映して `answered` へ移動する。
+- pending 質問がある場合は最大 4 問を提示、または `questions.md` に書き出す。回答を `resolves` のパスのみに反映して `answered` へ移動する。
 - `pending` が空なら `complete` を返して停止する。次に何のフェーズコマンドを実行するかはユーザーが判断する。
 - 出力は最小限（ライフサイクルステージと残り質問数のみ）。進行マップ・NextAction・推奨コマンドは出さない。
 
@@ -143,6 +145,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 **動作:**
 - 変更指示に影響されるパスのみを修正する
 - 影響を受けないフィールドとセクションをすべて保持する
+- 任意の `requirements` と `context` は明示的に変更されない限り保持する
 - spec が承認済みだった場合、`meta.approved = false` を設定する
 - 承認がリセットされる場合、`tasks.json` を `tasks.previous.json` に退避し、再承認後の再 plan を強制する
 - 指示の曖昧な側面は推測せずにペンディング質問に変換する
@@ -301,6 +304,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 - `spec.json` のすべてのエンティティに対応する実装ファイルが存在する
 - `entities` で宣言されたすべてのフィールドが生成コードに含まれている
 - `tasks.json` のすべてのタスクが `status: "done"` になっている
+- brownfield context がある場合は表示する。構造的に証明できない受け入れ条件は manual check として残す
 
 **出力:** エンティティごとの合否レポート。`meta.approved` の状態に関わらず実行できる — 情報確認目的でいつでも使用可能。
 
@@ -320,7 +324,26 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
     "name": "string",       // プロダクト名
     "version": "string",    // spec バージョン
     "lang": "string",       // 応答言語（例: "ja", "en"）
-    "approved": false       // reforge-render で人間が承認したとき true に設定される
+    "approved": false,      // reforge-render で人間が承認したとき true に設定される
+    "audience": [],         // 任意: Inception のターゲットユーザー
+    "intent": ""            // 任意: Inception のプロダクト目的
+  },
+  "requirements": [],
+  "context": {
+    "mode": "greenfield | brownfield | unknown",
+    "repository": {
+      "existing": true,
+      "detectedStack": ["string"],
+      "conventions": ["string"]
+    },
+    "changeScope": {
+      "feature": "string",
+      "affectedAreas": ["string"],
+      "allowedWriteAreas": ["string"],
+      "protectedAreas": ["string"]
+    },
+    "acceptanceCriteria": ["string"],
+    "risks": ["string"]
   },
   "tech": {
     "frontend": "string",   // 例: "Next.js"
@@ -365,7 +388,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
   "pending": [
     {
       "id": "q-1",
-      "phase": "meta | tech | data | views | flows",
+      "phase": "meta | audience | intent | requirements | tech | data | views | flows | update",
       "question": "アプリの認証方式は何にしますか？",
       "type": "string",
       "resolves": ["tech.auth"]  // 回答が埋める JSON パス
@@ -383,6 +406,10 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
   ]
 }
 ```
+
+### `.reforge/specs/<name>/questions.md`
+
+pending が 5 件以上ある場合に書き出される任意の Markdown 質問バッチ。ユーザーは `Answer:` 行を埋めてから `/reforge-resume` または `/reforge-answer` を再実行できる。
 
 ### `.reforge/specs/<name>/tasks.json`
 
@@ -418,7 +445,7 @@ spec 名は説明から kebab-case スラッグとして自動導出される（
 ## 全スキル共通の制約
 
 - **推測しない。** スキルは説明や事前の回答に証拠がなければ、フィールド名・enum 値・ロール・承認ルール・技術選定を勝手に埋めない。
-- **1 回に 1 質問。** スキルは 1 回の実行でユーザー向けの質問を最大 1 つだけ提示する。
-- **スキーマ準拠。** すべての書き込みは `spec.json` の `meta`, `tech`, `entities`, `views`, `flows` 構造と `questions.json` の `pending`, `answered` 構造を保持する。
+- **1 回に 1 質問ツール呼び出し。** スキルは最大 4 問を 1 バッチで提示できる。5 問以上は `questions.md` に書き出す。
+- **スキーマ準拠。** すべての書き込みは `spec.json` の `meta`, 任意の `requirements`, 任意の `context`, `tech`, `entities`, `views`, `flows` 構造と `questions.json` の `pending`, `answered` 構造を保持する。
 - **言語の一貫性。** 説明と質問は `meta.lang` に従う。ファイルパス・JSON キー・ステータスマーカー・スキル名は常にリテラルのまま。
 - **標準パス。** 上記の `.reforge/` パスを変更・移動してはならない。

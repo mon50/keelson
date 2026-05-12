@@ -10,8 +10,11 @@ const servers: Array<{ stop(): Promise<void> }> = [];
 
 async function makeWorkspace(): Promise<string> {
   const cwd = await mkdtemp(join(tmpdir(), 'reforge-server-'));
-  await mkdir(join(cwd, '.reforge'));
-  await writeFile(join(cwd, '.reforge/spec.json'), JSON.stringify(dailyReportSpec()));
+  await mkdir(join(cwd, '.reforge/specs/daily-report'), { recursive: true });
+  await writeFile(
+    join(cwd, '.reforge/specs/daily-report/spec.json'),
+    JSON.stringify(dailyReportSpec())
+  );
   return cwd;
 }
 
@@ -70,7 +73,7 @@ describe('HttpServer', () => {
 describe('FileWatcher', () => {
   it('notifies once for a saved file and stops cleanly', async () => {
     const cwd = await makeWorkspace();
-    const specPath = join(cwd, '.reforge/spec.json');
+    const specPath = join(cwd, '.reforge/specs/daily-report/spec.json');
     const watcher = createWatcher();
     let changes = 0;
     watcher.onChange(() => {
@@ -88,7 +91,7 @@ describe('FileWatcher', () => {
 
   it('triggers onChange with default debounce (150ms) when no debounceMs is specified', async () => {
     const cwd = await makeWorkspace();
-    const specPath = join(cwd, '.reforge/spec.json');
+    const specPath = join(cwd, '.reforge/specs/daily-report/spec.json');
     const watcher = createWatcher();
     let changes = 0;
     watcher.onChange(() => {

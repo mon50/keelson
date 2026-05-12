@@ -36,14 +36,16 @@ export interface ReforgeSpec {
   [key: string]: unknown;
 }
 
-export type LoadErrorCode = 'NOT_FOUND' | 'PARSE_ERROR' | 'READ_ERROR';
+export type LoadErrorCode = 'NOT_FOUND' | 'AMBIGUOUS_SPEC' | 'PARSE_ERROR' | 'READ_ERROR';
 
 export interface LoadError {
   code: LoadErrorCode;
   message: string;
 }
 
-export type LoadResult = { ok: true; spec: ReforgeSpec } | { ok: false; error: LoadError };
+export type LoadResult =
+  | { ok: true; spec: ReforgeSpec; specPath: string }
+  | { ok: false; error: LoadError };
 
 export type ConfirmationKind = 'ui' | 'non-ui';
 export type LayoutKind = 'pc' | 'smp';

@@ -9,7 +9,7 @@ allowed-tools: Read, Write
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - `meta.approved` が `false` の場合、このスキルは一切のファイルを変更してはならない。
 - `tasks.json` の上書きには必ず確認を行うこと。
 - Keep the skill self-contained. Do not require external prompt files.
@@ -161,7 +161,7 @@ spec が確定したらステップ 1 へ進む。
 
 - **ファイルが存在しない場合**:
   - ライフサイクルステージ `blocked` を報告する。
-  - 「`.reforge/spec.json` が見つかりません。`/reforge-init "<プロダクトの説明>"` を実行してください。」と案内して終了する。
+  - 「`.reforge/specs/<name>/spec.json` が見つかりません。`/reforge-init "<プロダクトの説明>"` を実行してください。」と案内して終了する。
 
 - **`meta.approved` が `false`（または存在しない）場合**:
   - ライフサイクルステージ `blocked` を報告する。
@@ -174,7 +174,7 @@ spec が確定したらステップ 1 へ進む。
 
 **2a: questions.json の pending チェック（要件 6.5）**
 
-`QUESTIONS_PATH`（`.reforge/questions.json`）を読み取る。
+`QUESTIONS_PATH`（`.reforge/specs/<name>/questions.json`）を読み取る。
 
 - **`pending` 配列に1件以上ある場合**:
   - 警告を表示する: 「未解決の質問が N 件残っています。`/reforge-resume` で質問を解決してから計画を立てることを推奨しますが、このまま続行することもできます。」
@@ -194,10 +194,10 @@ spec が確定したらステップ 1 へ進む。
 
 **3a: 既存 tasks.json の上書き確認（要件 6.4）**
 
-`TASKS_PATH`（`.reforge/tasks.json`）を読み取る。
+`TASKS_PATH`（`.reforge/specs/<name>/tasks.json`）を読み取る。
 
 - **ファイルが既存の場合**:
-  - 警告を表示する: 「`.reforge/tasks.json` が既に存在します。上書きすると既存のタスク進捗が失われます。上書きしますか？（yes/no）」
+  - 警告を表示する: 「`.reforge/specs/<name>/tasks.json` が既に存在します。上書きすると既存のタスク進捗が失われます。上書きしますか？（yes/no）」
   - ユーザーが `no` または確認しない場合:
     - ライフサイクルステージ `cancelled` を報告する。
     - 「上書きをキャンセルしました。既存の `tasks.json` は変更されていません。」と報告して終了する。

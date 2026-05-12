@@ -5,7 +5,7 @@
 **Expected Outcome:** Know which command to use when.
 
 ## CLI
-- `npx aid-reforge install`: Installs skills to `.claude/skills` or `.agents/skills`.
+- `npx aid-reforge install`: Copies canonical skills to `.reforge/skills` and installs forwarders to `.claude/skills` or `.agents/skills`.
 - `npx aid-reforge doctor`: Validates workspace.
 - `npx aid-reforge uninstall`: Removes Reforge.
 
