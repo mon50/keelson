@@ -95,11 +95,11 @@ allowed-tools: Read, Glob
 
    `meta.approved` の値を読み取り、状態に応じて `info` リストへ追加する。
 
-   - `meta.approved` が `false` の場合: `NOT_APPROVED` を `info` リストに追加する。`NOT_APPROVED` は `error` ではなく `info`。ユーザーへのガイダンスとして「`/reforge:render` でUIプロトタイプを確認・承認してください」を表示する。
+   - `meta.approved` が `false` の場合: `NOT_APPROVED` を `info` リストに追加する。`NOT_APPROVED` は `error` ではなく `info`。ユーザーへのガイダンスとして「`/reforge-render` でUIプロトタイプを確認・承認してください」を表示する。
    - plan/impl 実行要求時: `meta.approved` が `false` の場合はエラーとして扱う（validate コマンド自体では info のみ）。
 
    メッセージカタログへの追加:
-   - `NOT_APPROVED`: `` `meta.approved が false です。/reforge:render でUIプロトタイプを確認・承認してください` ``
+   - `NOT_APPROVED`: `` `meta.approved が false です。/reforge-render でUIプロトタイプを確認・承認してください` ``
 
    `meta.approved: false` のスペックは `NOT_APPROVED` として報告するが、validate の合否判定には影響しない。
 
@@ -308,7 +308,7 @@ Use these as anchors when validating.
 
 ### spec.json 完全サンプル
 
-`meta.approved` のデフォルト値は `false`。`meta.approved: false` の間は `/reforge:plan` と `/reforge:impl` を実行してはならない。`meta.approved: true` の場合に限り `/reforge:plan` と `/reforge:impl` を実行できる。
+`meta.approved` のデフォルト値は `false`。`meta.approved: false` の間は `/reforge-plan` と `/reforge-impl` を実行してはならない。`meta.approved: true` の場合に限り `/reforge-plan` と `/reforge-impl` を実行できる。
 
 フィールド型一覧:
 

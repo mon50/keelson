@@ -50,13 +50,13 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toContain(
-      'spec.jsonが見つかりません。`/reforge:init` を実行してください'
+      'spec.jsonが見つかりません。`/reforge-init` を実行してください'
     );
     expect(markdown).toContain(
-      '仕様が承認されていません。`/reforge:render` を実行して承認してください'
+      '仕様が承認されていません。`/reforge-render` を実行して承認してください'
     );
     expect(markdown).toMatch(
-      /`meta\.approved` が `true` でない場合[\s\S]*仕様が承認されていません。`\/reforge:render` を実行して承認してください[\s\S]*停止/
+      /`meta\.approved` が `true` でない場合[\s\S]*仕様が承認されていません。`\/reforge-render` を実行して承認してください[\s\S]*停止/
     );
   });
 
@@ -64,10 +64,10 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toContain(
-      'tasks.jsonが見つかりません。`/reforge:plan` を実行してください'
+      'tasks.jsonが見つかりません。`/reforge-plan` を実行してください'
     );
     expect(markdown).toMatch(
-      /`\.reforge\/tasks\.json` の存在を確認する。[\s\S]*tasks\.jsonが見つかりません。`\/reforge:plan` を実行してください[\s\S]*停止/
+      /`\.reforge\/tasks\.json` の存在を確認する。[\s\S]*tasks\.jsonが見つかりません。`\/reforge-plan` を実行してください[\s\S]*停止/
     );
     expect(markdown.indexOf('`.reforge/tasks.json` の存在を確認する。')).toBeGreaterThan(
       markdown.indexOf('`meta.approved` が `true` であることを確認する。')
@@ -92,10 +92,10 @@ describe('reforge-impl Claude Code skill scaffold', () => {
     const markdown = readImplSkill();
 
     expect(markdown).toContain(
-      'エンティティ `[entity]` のタスクが見つかりません。`/reforge:plan` を再実行してください'
+      'エンティティ `[entity]` のタスクが見つかりません。`/reforge-plan` を再実行してください'
     );
     expect(markdown).toMatch(
-      /対象entityを確定したら[\s\S]*tasks\.json[\s\S]*対応するタスク[\s\S]*エンティティ `\[entity\]` のタスクが見つかりません。`\/reforge:plan` を再実行してください[\s\S]*停止/
+      /対象entityを確定したら[\s\S]*tasks\.json[\s\S]*対応するタスク[\s\S]*エンティティ `\[entity\]` のタスクが見つかりません。`\/reforge-plan` を再実行してください[\s\S]*停止/
     );
   });
 
@@ -114,7 +114,7 @@ describe('reforge-impl Claude Code skill scaffold', () => {
       /`spec\.entities\[entity\]` からDBテーブル定義、フィールド型、必須制約を読み取る/
     );
     expect(markdown).toMatch(
-      /`spec\.entities\[entity\]` が存在しない、または `fields` が空の場合[\s\S]*`\/reforge:resume` を実行してエンティティ定義を完成させてください[\s\S]*停止/
+      /`spec\.entities\[entity\]` が存在しない、または `fields` が空の場合[\s\S]*`\/reforge-resume` を実行してエンティティ定義を完成させてください[\s\S]*停止/
     );
     expect(markdown).toMatch(
       /`spec\.views` を読み取り、`entity` が対象entityと一致するviewだけを抽出する/

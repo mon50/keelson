@@ -165,7 +165,7 @@ spec が確定したらステップ 1 へ進む。
 
 - **`meta.approved` が `false`（または存在しない）場合**:
   - ライフサイクルステージ `blocked` を報告する。
-  - 「仕様がまだ承認されていません。`/reforge:render` を実行して UI プロトタイプを確認し、承認を得てから再実行してください。」と案内して終了する。
+  - 「仕様がまだ承認されていません。`/reforge-render` を実行して UI プロトタイプを確認し、承認を得てから再実行してください。」と案内して終了する。
   - **このステップで終了した場合、以降のステップは一切実行しない。**
 
 `meta.approved` が `true` の場合はステップ 2 へ進む。
@@ -265,7 +265,7 @@ tasks.json を生成しました（3 タスク）。
 | 状態 | 動作 |
 |------|------|
 | `spec.json` が存在しない | `blocked`: `/reforge-init` を案内して終了 |
-| `meta.approved` が `false` | `blocked`: `/reforge:render` を案内して終了 |
+| `meta.approved` が `false` | `blocked`: `/reforge-render` を案内して終了 |
 | `entities` が空または未定義 | `blocked`: エンティティ定義を促して終了 |
 | `questions.json` に pending あり | 警告表示（ブロックしない）、処理継続 |
 | `tasks.json` が既存 | 上書き確認（yes/no）、no なら `cancelled` |
@@ -280,6 +280,6 @@ Report concisely（`meta.lang` に従って応答すること）:
 - 生成されたタスク数（`files_written` の場合のみ）。
 - 次のゲート:
   - `files_written`: `/reforge-impl <エンティティ名>` を実行する
-  - `blocked`（approved 未承認）: `/reforge:render` を実行して承認を得る
+  - `blocked`（approved 未承認）: `/reforge-render` を実行して承認を得る
   - `blocked`（entities 未定義）: `/reforge-update` または `/reforge-resume` でエンティティを定義する
   - `cancelled`: 既存の `tasks.json` が保持されている（変更なし）
