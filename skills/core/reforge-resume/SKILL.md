@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - Think in English, respond to the user in the language specified by `meta.lang`.
 - Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - Do not invent missing product decisions. Convert unknowns into pending questions.
-- 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に応じてバッチ提示または `questions.md` 出力に切り替える（後述「質問機能プロトコル」参照）。
+- 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に関係なく常に先頭 4 件までをバッチ提示し、残りは次の実行で処理する（後述「質問機能プロトコル」参照）。
 - Keep the skill self-contained. Do not require external prompt files.
 - 判定ロジックの順序を変更してはならない（不変条件）。
 
@@ -47,7 +47,6 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
   - **Lifecycle ステージ語彙**: Output Contract が定義する 6 種類のみ使う:
     - `files_written`（書き込み完了）
     - `questions_batch`（質問をバッチ提示中・AskUserQuestion 経由）
-    - `questions_md`（質問を Markdown 出力中・5問以上）
     - `answered`（回答を反映完了）
     - `blocked`（前提が満たされず中断）
     - `complete`（処理完了・変更なし）
@@ -76,7 +75,6 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - `SPECS_DIR = ".reforge/specs"`
 - `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
 - `QUESTIONS_PATH = ".reforge/specs/<name>/questions.json"`
-- `QUESTIONS_MD_PATH = ".reforge/specs/<name>/questions.md"`
 - `TASKS_PATH = ".reforge/specs/<name>/tasks.json"`
 - `PREVIOUS_SPEC_PATH = ".reforge/specs/<name>/spec.previous.json"`
 
@@ -111,8 +109,8 @@ Use this shared kernel for every reforge-engine command.
 ### Constraints
 
 - `no_guessing`: Do not fill fields, flows, views, enum options, required flags, names, roles, or approval rules without evidence.
-- `batch_questions`: Present pending questions in batches (up to 4 via `AskUserQuestion`, 5+ via `questions.md`). 1 質問しか出せないという旧制約は撤廃。
-- `inception_first`: 質問の生成・提示順序は AI-DLC に従い `meta → audience → intent → requirements → data → flows → views → tech` を厳守する。Inception 未完了の状態で Construction 質問を先頭に積んではならない。
+- `batch_questions`: Present pending questions in batches of up to 4 via `AskUserQuestion`. pending が 5 件以上の場合も先頭 4 件のみを提示し、残りは次の `/reforge-resume` 実行で処理する。`questions.md` は使用しない。
+- `inception_first`: 質問の生成・提示順序は AI-DLC に従い `meta → audience → intent → requirements → views → flows → data → tech` を厳守する。Inception 未完了の状態で Construction 質問を先頭に積んではならない。
 - `core_schema_compliant`: Writes must preserve `meta`, `entities`, `flows`, and `views` in `spec.json`, and `pending`, `answered` in `questions.json`. Optional sections `meta.audience`, `meta.intent`, `requirements` も保持する。
 - `preserve_human_decision`: If a branch requires user judgment, use AskUserQuestion when available. If unavailable, write to `questions.md` and stop.
 - `language_consistent`: Localize explanations and questions using `meta.lang`; keep file paths, JSON keys, status markers, and command names literal.
@@ -123,7 +121,6 @@ Every run ends with exactly one of these outcomes:
 
 - `files_written`: files changed, summary reported, pending count reported.
 - `questions_batch`: up to 4 questions presented via AskUserQuestion.
-- `questions_md`: 5+ pending questions written to `questions.md` for offline answering.
 - `blocked`: no unsafe write performed, reason reported, next action provided.
 - `complete`: no mutation needed, current state and next gate reported.
 
@@ -241,10 +238,9 @@ spec が確定したらステップ 1 へ進む。
 - **`pending` 配列に1件以上ある場合**:
   - AI-DLC phase 優先度（`meta → audience → intent → requirements → data → flows → views → tech → update`）で pending を並べる。
   - 「質問機能プロトコル」Step 2 の提示モード判定に従う:
-    - 1〜4 件 → `AskUserQuestion` を **1 回だけ** 呼び出して最大 4 問のバッチを提示する。
-    - 5 件以上 → `QUESTIONS_MD_PATH` に書き出し、ユーザーにエディタ記入を案内する。
-  - ユーザーから回答を受け取ったら（バッチ提示時のみ）「質問機能プロトコル」Step 5 / 6 に従い `SPEC_PATH` と `QUESTIONS_PATH` を一括更新する。
-  - ライフサイクルステージは `questions_batch`または `questions_md`（Markdown）として報告し、終了する。
+    - 件数に関係なく `AskUserQuestion` を **1 回だけ** 呼び出して先頭 4 問のバッチを提示する（5件以上の場合は残りを次回に持ち越す）。
+  - ユーザーから回答を受け取ったら「質問機能プロトコル」Step 5 / 6 / 7 に従い `SPEC_PATH` と `QUESTIONS_PATH` を一括更新する。
+  - ライフサイクルステージは `questions_batch` として報告し、終了する。
 
 `pending` が空の場合はステップ 3 へ進む。
 
@@ -331,7 +327,7 @@ verify が完了している場合はステップ 8 へ進む。
 
 ### Step 1: 取得（pending の取得・新規生成）
 
-`.reforge/specs/<name>/questions.json` の `pending` 配列を読み込み、AI-DLC phase 優先度（`meta → audience → intent → requirements → data → flows → views → tech → update`）に従って並べます。新規質問を生成する場合は以下の形式でエントリを追加します。
+`.reforge/specs/<name>/questions.json` の `pending` 配列を読み込み、AI-DLC phase 優先度（`meta → audience → intent → requirements → views → flows → data → tech → update`）に従って並べます。新規質問を生成する場合は以下の形式でエントリを追加します。
 
 ```json
 {
@@ -354,50 +350,17 @@ verify が完了している場合はステップ 8 へ進む。
 |---|---|
 | 0 件 | 提示しない（`complete` を報告して終了） |
 | 1〜4 件 | バッチ提示モード（`AskUserQuestion` で一括提示） |
-| 5 件以上 | Markdown 出力モード（`QUESTIONS_MD_PATH` に書き出して案内） |
+| 5 件以上 | バッチ提示モード（先頭 4 件のみ `AskUserQuestion` で提示し、残りは次の `/reforge-resume` 実行で処理） |
 
-### Step 3: 提示（バッチ・1〜4 問）
+### Step 3: 提示（バッチ・最大 4 問）
 
-`AskUserQuestion` を **1 回だけ** 呼び出し、`questions` 配列に pending 先頭から最大 4 件を入れて一括提示する。1 問のみ強制してはならない。pending 件数に応じて Step 2 の判定を厳守する。
+`AskUserQuestion` を **1 回だけ** 呼び出し、`questions` 配列に pending 先頭から最大 4 件を入れて一括提示する。pending が 5 件以上の場合も先頭 4 件のみを提示する。
 
 選択型 (`single_choice` / `multi_choice` / `confirm`) は AskUserQuestion の選択肢として渡す。自由記述型 (`text` / `multi_input`) は AskUserQuestion の Other 経由で受け取る。
 
-### Step 4: 提示（Markdown・5 問以上）
-
-`QUESTIONS_MD_PATH`（`.reforge/specs/<name>/questions.md`）を以下のフォーマットで生成する。
-
-````markdown
-# Pending Questions
-
-> 各質問の **Answer:** 行に回答を記入し、`/reforge-answer` または `/reforge-resume` を再実行してください。
-> spec.json と questions.json に一括反映されます。
-> 未記入の質問は pending に残ります。
-
-### Q1: <質問文>
-
-- id: `<id>`
-- phase: `<phase>`
-- type: `<type>`
-- resolves: `<spec.json path>`
-
-### 選択肢（type が single_choice / multi_choice の場合のみ）
-
-- [ ] <option1>
-- [ ] <option2>
-- [ ] その他: ___________
-
-**Answer:**
-
----
-
-### Q2: ...
-````
-
-生成後、ユーザーには「`.reforge/specs/<slug>/questions.md` を開いて全質問の **Answer:** 行に回答を記入し、`/reforge-resume` を再実行してください。」と案内する。
-
 ### Step 5: 反映（バッチ一括）
 
-ユーザー回答（AskUserQuestion 結果または `questions.md` の Answer 行）を解析し、各質問の `resolves` に列挙された JSON パスへ一括で反映する。
+ユーザー回答（AskUserQuestion 結果）を解析し、各質問の `resolves` に列挙された JSON パスへ一括で反映する。
 
 > **制約**: `resolves` に記載のないパスは変更しない（最小差分の原則）。
 > **制約**: 推測による補完は禁止。回答が不十分な質問は反映をスキップし、その質問のみ pending に残す。
@@ -409,7 +372,6 @@ verify が完了している場合はステップ 8 へ進む。
 1. `pending` 配列から該当質問エントリを削除する。
 2. `answered` 配列の末尾に同エントリを追加し `answer` フィールドを付与する（`answeredAt` は任意）。
 3. すべての書き込みを 1 回のクオリティゲート実行のもとで一括実施する。
-4. Markdown モードを使った場合は、残った pending のみで `QUESTIONS_MD_PATH` を再生成する（pending が空になった場合は `QUESTIONS_MD_PATH` を削除する）。
 
 ```json
 // answered に移動後のエントリ例
@@ -423,12 +385,25 @@ verify が完了している場合はステップ 8 へ進む。
 }
 ```
 
+### Step 7: 整合性チェック（Consistency Check）
+
+回答反映（Step 5/6）後、最新の spec.json を検査し、現フェーズで必要な派生質問を `pending` に追加する。
+
+**対象パターン（AI-DLC ordering に従い自動検出）:**
+
+1. `requirements` が確定し `views` が空 → `define_views_list` 質問を生成（未生成の場合のみ）
+2. `views` にキーが追加されたが各画面の詳細が文字列だけ（`type` / `description` / `actions` 未定義）→ 各画面の `view_detail_{view_id}` 質問を生成
+3. `views` が確定し `flows` が空 → `define_flows_list` 質問を生成（未生成の場合のみ）
+4. `flows` にキーが追加されたが各フローの詳細が文字列だけ（`trigger` / `steps` 未定義）→ 各フローの `flow_detail_{flow_id}` 質問を生成
+5. `views` と `flows` が確定し `entities` が空 → `define_data_entities` 質問を生成（未生成の場合のみ）
+
+**制約:** 同一実行内での `AskUserQuestion` の2回呼び出しは禁止。整合性チェックで生成した質問は `pending` に追加するだけで、提示は次の `/reforge-resume` 実行に委ねる。
+
 ### 追加制約
 
-- **AskUserQuestion 1 呼び出しの原則**: 1 スキル実行内で `AskUserQuestion` を呼ぶのは 1 回のみ。複数呼び出しは禁止。
-- **Markdown フォールバック**: pending が 5 件以上の場合は AskUserQuestion を呼ばず、必ず `QUESTIONS_MD_PATH` に書き出す。
+- **AskUserQuestion 1 呼び出しの原則**: 1 スキル実行内で `AskUserQuestion` を呼ぶのは 1 回のみ（Step 3）。複数呼び出しは禁止。
 - **共有ストレージ**: `.reforge/specs/<name>/questions.json` は全 reforge-engine コマンドの共有ストレージ。読み書きの前に必ず最新を読み込む。
-- **推測での補完禁止**: 不明な spec フィールドは推測で埋めず、必ず質問を生成して `AskUserQuestion` または `questions.md` を通じて確認する。
+- **推測での補完禁止**: 不明な spec フィールドは推測で埋めず、必ず質問を生成して `AskUserQuestion` を通じて確認する。
 
 ## Answer Application
 
@@ -487,8 +462,8 @@ If this resume run includes user answers to previously presented questions (eith
 
 `現在: <フェーズ名> — <短い状況>` 形式。例:
 
-- `現在: Questions フェーズ — 未解決質問 3 件 (バッチ提示モード)`
-- `現在: Questions フェーズ — 未解決質問 7 件 (Markdown 出力モード)`
+- `現在: Questions フェーズ — 未解決質問 3 件 (バッチ提示・今回 3 問)`
+- `現在: Questions フェーズ — 未解決質問 7 件 (バッチ提示・今回 4 問、残り 3 問は次回)`
 - `現在: Approve フェーズ — meta.approved=false`
 - `現在: Impl フェーズ — pending/in_progress タスク 4 件 (次: User)`
 
@@ -498,8 +473,7 @@ If this resume run includes user answers to previously presented questions (eith
 
 - ステップ 0 一致: `NextAction: プロダクト概要を渡して spec を作成 → /reforge-init "<説明>"`
 - ステップ 1 一致: `NextAction: spec.json が無いため初期化 → /reforge-init "<説明>"`
-- ステップ 2 一致 (バッチ): `NextAction: 提示したバッチ質問に回答 → /reforge-resume を再実行`
-- ステップ 2 一致 (Markdown): `NextAction: questions.md に回答を記入 → /reforge-resume を再実行`
+- ステップ 2 一致: `NextAction: 提示したバッチ質問に回答 → /reforge-resume を再実行`
 - ステップ 3 一致: `NextAction: spec.json のエラーを修正 → /reforge-resume を再実行`
 - ステップ 4 一致: `NextAction: UI プロトタイプを確認して承認 → /reforge-render`
 - ステップ 5 一致: `NextAction: タスクキューを生成 → /reforge-plan`
@@ -511,8 +485,8 @@ If this resume run includes user answers to previously presented questions (eith
 
 以下は **状態変化があった場合のみ** 1行追加する。常時表示しない。
 
-- `Lifecycle: <files_written | questions_batch | questions_md | answered | blocked | complete>`
-- `Changed: SPEC_PATH` / `QUESTIONS_PATH` / `QUESTIONS_MD_PATH`（書き込みがあった場合のみ）
+- `Lifecycle: <files_written | questions_batch | answered | blocked | complete>`
+- `Changed: SPEC_PATH` / `QUESTIONS_PATH`（書き込みがあった場合のみ）
 - `Inception: audience=<count> intent=<set|unset> requirements=<count>`（Inception 段階の進捗が分かる場合）
 
 ### 出力例（バッチモード）
@@ -523,10 +497,10 @@ If this resume run includes user answers to previously presented questions (eith
 NextAction: 提示したバッチ質問に回答 → /reforge-resume を再実行
 ```
 
-### 出力例（Markdown モード）
+### 出力例（5件以上のバッチ）
 
 ```
 進行: [✓]Init → [▶]Questions → [ ]Validate → [ ]Approve → [ ]Plan → [ ]Impl → [ ]Verify → [ ]Done  (2/8)
-現在: Questions フェーズ — 未解決質問 8 件 (Markdown 出力モード)
-NextAction: questions.md に回答を記入 → /reforge-resume を再実行
+現在: Questions フェーズ — 未解決質問 8 件 (バッチ提示・今回 4 問、残り 4 問は次回)
+NextAction: 提示したバッチ質問に回答 → /reforge-resume を再実行
 ```
