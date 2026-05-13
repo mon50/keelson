@@ -1,35 +1,43 @@
 import { join } from 'node:path';
-import { SPEC_RELATIVE_PATH, loadSpec } from './loader';
+import { loadSpec, resolveSpecPath } from './loader';
 import { createReforgeServer } from './server';
 import { createWatcher } from './watcher';
 
 export async function main(argv = process.argv.slice(2), cwd = process.cwd()): Promise<void> {
   if (argv.includes('--help') || argv.includes('-h')) {
-    console.log('Usage: reforge-render [--port <port>]');
-    console.log('Starts a local specification confirmation UI from .reforge/spec.json.');
+    console.log('Usage: reforge-render [--port <port>] [--spec <name-or-path>]');
+    console.log('Starts a local specification confirmation UI from .reforge/specs/<name>/spec.json.');
     return;
   }
 
   const port = readPort(argv);
-  const initial = await loadSpec(cwd);
+  const specArg = readValueArg(argv, '--spec');
+  const initial = await loadSpec(cwd, specArg);
   if (!initial.ok) {
     console.error(initial.error.message);
     process.exitCode = 1;
     return;
   }
 
+  const resolved = await resolveSpecPath(cwd, specArg);
+  if (!resolved.ok) {
+    console.error(resolved.error.message);
+    process.exitCode = 1;
+    return;
+  }
+
   const server = createReforgeServer();
-  const address = await server.start({ cwd, port });
+  const address = await server.start({ cwd, port, spec: specArg });
   const watcher = createWatcher();
   watcher.onChange(async () => {
-    const result = await loadSpec(cwd);
+    const result = await loadSpec(cwd, specArg);
     if (result.ok) {
       server.notifyReload();
     } else {
       server.notifyError(result.error.message);
     }
   });
-  watcher.start(join(cwd, SPEC_RELATIVE_PATH), { debounceMs: 150 });
+  watcher.start(join(cwd, resolved.value.relativePath), { debounceMs: 150 });
 
   console.log(`Reforge renderer running at ${address.url}`);
 
@@ -46,11 +54,16 @@ export async function main(argv = process.argv.slice(2), cwd = process.cwd()): P
 }
 
 function readPort(argv: string[]): number {
-  const portIndex = argv.indexOf('--port');
-  if (portIndex >= 0 && argv[portIndex + 1]) {
-    return Number(argv[portIndex + 1]);
+  const port = readValueArg(argv, '--port');
+  if (port) {
+    return Number(port);
   }
   return Number(process.env.REFORGE_RENDER_PORT || process.env.PORT || 4317);
+}
+
+function readValueArg(argv: string[], name: string): string | undefined {
+  const index = argv.indexOf(name);
+  return index >= 0 ? argv[index + 1] : undefined;
 }
 
 if (require.main === module) {

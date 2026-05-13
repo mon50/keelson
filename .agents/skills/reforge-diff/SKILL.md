@@ -1,6 +1,6 @@
 ---
 name: reforge-diff
-description: Show JSON-path differences between .reforge/spec.previous.json and .reforge/spec.json, plus unresolved question count.
+description: Show JSON-path differences between .reforge/specs/<name>/spec.previous.json and .reforge/specs/<name>/spec.json, plus unresolved question count.
 allowed-tools: Read, Glob
 ---
 
@@ -9,7 +9,7 @@ allowed-tools: Read, Glob
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - Do not invent missing product decisions. Convert unknowns into pending questions.
 - Ask at most one user-facing question per run.
 - Keep the skill self-contained. Do not require external prompt files.
@@ -61,7 +61,6 @@ Use this shared kernel for every reforge-engine command.
 Every run ends with exactly one of these outcomes:
 
 - `files_written`: files changed, summary reported, pending count reported.
-- `question`: one question presented, partial state saved when safe.
 - `blocked`: no unsafe write performed, reason reported, next action provided.
 - `complete`: no mutation needed, current state and next gate reported.
 
@@ -82,7 +81,7 @@ Before responding, verify:
    - If missing, block and report that no current spec exists.
    - If invalid JSON, block and report the file that must be fixed.
 2. Determine response language from current spec `meta.lang`.
-3. Read `.reforge/spec.previous.json` (`PREVIOUS_SPEC_PATH`).
+3. Read `.reforge/specs/<name>/spec.previous.json` (`PREVIOUS_SPEC_PATH`).
    - If missing, block and report that no previous snapshot exists. Suggest running `/reforge-update "<change>"` after a spec exists.
    - If invalid JSON, block and report the file that must be fixed.
 4. Read `QUESTIONS_PATH` if present.

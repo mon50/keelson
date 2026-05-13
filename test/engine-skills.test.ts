@@ -296,7 +296,7 @@ describe('reforge-update and reforge-diff engine skill contracts', () => {
       const markdown = readMarkdown(skillPath);
 
       expect(markdown, `${skillPath} must read the previous snapshot`).toContain(
-        '`.reforge/spec.previous.json`'
+        '`.reforge/specs/<name>/spec.previous.json`'
       );
       expect(markdown, `${skillPath} must show a modified JSON path`).toContain(
         '~ entities.report.fields.status.options[2]: undefined -> archived'
@@ -376,7 +376,7 @@ describe('reforge question protocol consistency', () => {
     expect(canonical.section).toContain('Step 5: 反映');
     expect(canonical.section).toContain('Step 6: 移動');
     expect(canonical.section).toMatch(/最大\s*4\s*[問件]|up to 4|バッチ/i);
-    expect(canonical.section).toMatch(/questions\.md|`QUESTIONS_MD_PATH`/);
+    expect(canonical.section).toContain('先頭 4 件のみ');
     expect(canonical.section).toContain('`resolves`');
     expect(canonical.section).toContain('`pending`');
     expect(canonical.section).toContain('`answered`');
@@ -407,7 +407,7 @@ describe('reforge Audience and Style consistency', () => {
     expect(canonical.section).toContain('AI-DLC');
     expect(canonical.section).toContain('files_written');
     expect(canonical.section).toContain('questions_batch');
-    expect(canonical.section).toContain('questions_md');
+    expect(canonical.section).toContain('answered');
     expect(canonical.section).toMatch(/`options`/);
   });
 });

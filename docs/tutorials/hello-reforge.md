@@ -2,7 +2,7 @@
 
 **Audience:** Developers new to Reforge.
 **Prerequisites:** Node.js 18+, Claude Code or Codex installed.
-**Expected Outcome:** You will build a daily report prototype.
+**Expected Outcome:** You will create a daily report spec and prototype.
 
 ## Step 1: Install Reforge
 ```bash
@@ -16,7 +16,7 @@ In your AI agent:
 ```
 
 ## Step 3: Resume
-Answer questions to build the spec.
+Answer the pending question batch to build the spec.
 ```
 /reforge-resume
 ```

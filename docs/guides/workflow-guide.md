@@ -2,7 +2,7 @@
 
 > 📖 **日本語ガイドはこちら:** [ワークフローガイド (日本語)](ja/workflow-guide.md)
 
-This guide walks through the full Reforge lifecycle: from an initial product idea to a verified implementation. Each phase is gated by human review — Reforge never makes product decisions on your behalf.
+This guide walks through the full Reforge lifecycle: from an initial product idea or existing-repo feature request to a verified implementation. Each phase is gated by human review - Reforge never makes product decisions on your behalf.
 
 ## Overview
 
@@ -31,7 +31,7 @@ Phase 4 — Implement reforge-impl (one entity per run)
 Phase 5 — Verify    reforge-verify
 ```
 
-`reforge-answer` is the **Q&A-only skill** for manual mode. It presents one pending question and records one answer — no phase map, no NextAction, no command recommendation. By design, manual mode does not use `reforge-resume`.
+`reforge-answer` is the **Q&A-only skill** for manual mode. It presents pending questions and records answers - no phase map, no NextAction, no command recommendation. By design, manual mode does not use `reforge-resume`.
 
 ### Picking a mode
 
@@ -73,7 +73,7 @@ Optional at any time: `reforge-update` to revise the spec, `reforge-diff` to rev
 
 The spec name (`daily-report`) is auto-derived from your description as a kebab-case slug. It then presents the single highest-priority pending question and stops.
 
-**Expect 8–15 questions for a typical spec.** The first 6 are always tech-stack questions (`frontend`, `backend`, `database`, `orm`, `styling`, `testing`) unless you mention them in the description. After that come entity, view, and flow questions.
+**Expect several questions for a typical spec.** Reforge asks Inception questions first (`audience`, `intent`, `requirements`), then moves into Construction questions (`entities`, `flows`, `views`, `tech`). Tech-stack questions are deferred until requirements are known unless brownfield repository files provide unambiguous values.
 
 **Example output:**
 
@@ -81,9 +81,10 @@ The spec name (`daily-report`) is auto-derived from your description as a kebab-
 Created: .reforge/specs/daily-report/spec.json
 Created: .reforge/specs/daily-report/questions.json
 
-Pending question (1 of 11):
-  What frontend framework should the app use?
-  (e.g., Next.js, Vite + React, Nuxt)
+Pending questions:
+  1. Who are the primary users?
+  2. What problem does this product solve?
+  3. What user stories must the MVP satisfy?
 ```
 
 ### Step 2: Answer questions (and navigate the full lifecycle)
@@ -99,7 +100,7 @@ The decision tree it evaluates in order:
 | State | Action |
 |---|---|
 | `spec.json` missing | Guide to `/reforge-init` |
-| Pending questions exist | Present the top-priority question, record your answer |
+| Pending questions exist | Present a question batch or write `questions.md`, then record answers |
 | Validation errors found | Guide to `/reforge-validate` |
 | `meta.approved` is false | Guide to `/reforge-render` |
 | `tasks.json` missing | Guide to `/reforge-plan` |
@@ -107,7 +108,7 @@ The decision tree it evaluates in order:
 | All tasks done, verify pending | Guide to `/reforge-verify` |
 | All done | Report project complete |
 
-**One action per run.** Each invocation presents or records exactly one thing (one question, one next-step instruction) and then stops. After you answer a question, run `/reforge-resume` again to get the next one — this is manual re-invocation by design, so you stay in control of the pace.
+**One lifecycle action per run.** Each invocation handles one phase action and then stops. During Q&A, Reforge may present up to 4 pending questions in one batch; if there are 5 or more, it writes `questions.md` for offline answering. After answering, run `/reforge-resume` again to continue.
 
 **Pausing at the prototype step.** When the navigator reaches the `reforge-render` phase, it instructs you to run `/reforge-render` and open the browser URL. The lifecycle is paused there until you click **Approve** in the browser. Once approved, run `/reforge-resume` again and the navigator will proceed to the next phase.
 
@@ -280,6 +281,18 @@ Specify the spec name when running other commands:
 ```
 
 When only one spec exists, the name argument can be omitted.
+
+### Existing repository feature work
+
+For brownfield work, initialize a feature-scoped spec rather than asking Reforge to understand the whole app:
+
+```
+/reforge-init "Add team invitations to this existing SaaS repo. Follow existing auth, email, and team settings conventions."
+```
+
+Reforge can record optional `context` such as `mode: "brownfield"`, detected stack, conventions, affected areas, allowed write areas, protected areas, acceptance criteria, and risks. Anything unclear remains a pending question.
+
+See [Adopting an Existing Repo](adopt-existing-repo.md).
 
 ### Version control
 

@@ -7,6 +7,7 @@ import { escapeHtml } from './utils';
 export interface ServerConfig {
   port: number;
   cwd: string;
+  spec?: string;
 }
 
 export interface ServerAddress {
@@ -24,10 +25,11 @@ export interface ReforgeServer {
 export function createReforgeServer(): ReforgeServer {
   let server: Server | undefined;
   let cwd = process.cwd();
+  let spec: string | undefined;
   const clients = new Set<ServerResponse>();
 
   async function handleRoot(res: ServerResponse): Promise<void> {
-    const result = await loadSpec(cwd);
+    const result = await loadSpec(cwd, spec);
     if (!result.ok) {
       res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(renderErrorPage(result.error.message));
@@ -66,6 +68,7 @@ export function createReforgeServer(): ReforgeServer {
   return {
     start(config) {
       cwd = config.cwd;
+      spec = config.spec;
       server = createServer((req, res) => {
         const url = new URL(req.url ?? '/', 'http://127.0.0.1');
         if (req.method === 'GET' && url.pathname === '/') {

@@ -1,6 +1,10 @@
 import type { InstallResult, ReporterOptions, TargetEnvironment } from './types';
 import { SKILL_COMMAND } from './types';
 
+function slashCommand(command: string): string {
+  return `/reforge-${command}`;
+}
+
 export function report(result: InstallResult, options?: ReporterOptions): void {
   const stdout = options?.stdout ?? process.stdout;
   const stderr = options?.stderr ?? process.stderr;
@@ -25,13 +29,14 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
     lines.push(`${env} (${skills.length} skills):`);
     for (const skill of skills) {
       const cmd = SKILL_COMMAND[skill];
-      lines.push(`  /reforge:${cmd}`);
+      lines.push(`  ${slashCommand(cmd)}`);
     }
     lines.push('');
   }
 
   lines.push('Available commands:');
-  lines.push('  /reforge:init "<プロダクトの説明>"');
+  lines.push('  /reforge-init "<プロダクトの説明>"');
+  lines.push('  /reforge-resume');
   lines.push('');
 
   if (result.overwritten.length > 0) {

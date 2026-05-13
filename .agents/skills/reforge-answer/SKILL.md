@@ -9,11 +9,11 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ## Core Rule
 
 - Think in English, respond to the user in the language specified by `meta.lang`.
-- Treat `.reforge/spec.json` as the single source of truth for the product specification.
+- Treat `.reforge/specs/<name>/spec.json` as the single source of truth for the product specification.
 - このスキルは **質問の提示と回答記録のみ** を行う。フェーズマップ、NextAction、次フェーズの案内は出力しない。
 - ライフサイクルナビゲーションが必要な場合は `/reforge-resume` を使用する（ナビゲーターモード）。
 - `/reforge-answer` はマニュアルモードでの Q&A 専用エンドポイント。
-- 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に応じてバッチ提示または `questions.md` 出力に切り替える（後述「質問機能プロトコル」参照）。
+- 1 回のスキル実行で `AskUserQuestion` を呼ぶのは 1 度きり。pending 件数に関係なく常に先頭 4 件までをバッチ提示し、残りは次の実行で処理する（後述「質問機能プロトコル」参照）。
 - Keep the skill self-contained. Do not require external prompt files.
 
 ## Audience and Style (非エンジニア対応)
@@ -45,7 +45,6 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
   - **Lifecycle ステージ語彙**: Output Contract が定義する 6 種類のみ使う:
     - `files_written`（書き込み完了）
     - `questions_batch`（質問をバッチ提示中・AskUserQuestion 経由）
-    - `questions_md`（質問を Markdown 出力中・5問以上）
     - `answered`（回答を反映完了）
     - `blocked`（前提が満たされず中断）
     - `complete`（処理完了・変更なし）
@@ -66,7 +65,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ### コマンド表記の統一
 
 - スラッシュコマンドは **必ずハイフン形式** で表記する: `/reforge-init`、`/reforge-resume`、`/reforge-answer`、`/reforge-update`、`/reforge-render`、`/reforge-plan`、`/reforge-impl`、`/reforge-verify`、`/reforge-validate`、`/reforge-diff`。
-- 旧表記の `/reforge:xxx`（コロン形式）は使わない（reforge/CLAUDE.md と整合）。
+- 旧コロン形式のスラッシュコマンド表記は使わない（reforge/CLAUDE.md と整合）。
 
 ## Canonical Paths
 
@@ -74,7 +73,6 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - `SPECS_DIR = ".reforge/specs"`
 - `SPEC_PATH = ".reforge/specs/<name>/spec.json"` (resolved by Spec Resolution)
 - `QUESTIONS_PATH = ".reforge/specs/<name>/questions.json"`
-- `QUESTIONS_MD_PATH = ".reforge/specs/<name>/questions.md"`
 
 ## Spec Resolution (reforge-answer [<spec-name>])
 
@@ -93,27 +91,15 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 - ライフサイクルステージ `blocked` を報告する。
 - 「`SPEC_PATH` が見つかりません。先に `/reforge-init "<説明>"` を実行してください。」と案内して終了する。
 
-### ステップ 2: questions.md からの再同期チェック
-
-`QUESTIONS_MD_PATH` が存在する場合、ユーザーが Answer 行を記入している可能性があるため、優先的に読み込んで反映する:
-
-- `QUESTIONS_MD_PATH` の各 `## Q` ブロックを解析する。
-- `**Answer:**` 行に非空のテキストが入っている、または選択肢に `[x]` チェックが入っている質問を「回答済み」と判定する。
-- 回答済みの質問について、対応する `pending` エントリの `resolves` に従って `SPEC_PATH` を更新し、`pending` から `answered` へ移動する。
-- 全件処理後、残った pending で `QUESTIONS_MD_PATH` を再生成する。pending が空になった場合は `QUESTIONS_MD_PATH` を削除する。
-- このステップで反映があった場合は `Lifecycle: answered_md` を報告する。
-
-### ステップ 3: questions.json の pending チェック
+### ステップ 2: questions.json の pending チェック
 
 `QUESTIONS_PATH` を読み取る。
 
 - **`pending` が 1 件以上ある場合**:
-  - 「質問機能プロトコル」Step 2 の提示モード判定に従う:
-    - 1〜4 件 → `AskUserQuestion` でバッチ提示。
-    - 5 件以上 → `QUESTIONS_MD_PATH` に書き出して案内。
-  - ユーザーから回答を受け取ったら（バッチ提示時のみ）プロトコルの Step 5 / 6 に従い spec.json と questions.json を一括更新する。
-  - 終了時の出力は **「残り質問 N 件 / 提示モード」のみ**。次のコマンド推奨は出さない。
-  - ライフサイクルステージ `answered`（バッチで反映済み）または `questions_md`（Markdown 出力のみ）を報告して終了する。
+  - 「質問機能プロトコル」Step 3 に従い `AskUserQuestion` で先頭 4 件をバッチ提示する（5件以上の場合も先頭 4 件のみ）。
+  - ユーザーから回答を受け取ったらプロトコルの Step 5 / 6 に従い spec.json と questions.json を一括更新する。
+  - 終了時の出力は **「残り質問 N 件」のみ**。次のコマンド推奨は出さない。
+  - ライフサイクルステージ `answered` を報告して終了する。
 
 - **`pending` が空の場合**:
   - ライフサイクルステージ `complete` を報告する。
@@ -126,7 +112,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 
 ### Step 1: 取得（pending の取得・新規生成）
 
-`.reforge/specs/<name>/questions.json` の `pending` 配列を読み込み、AI-DLC phase 優先度（`meta → audience → intent → requirements → data → flows → views → tech → update`）に従って並べます。新規質問を生成する場合は以下の形式でエントリを追加します。
+`.reforge/specs/<name>/questions.json` の `pending` 配列を読み込み、AI-DLC phase 優先度（`meta → audience → intent → requirements → views → flows → data → tech → update`）に従って並べます。新規質問を生成する場合は以下の形式でエントリを追加します。
 
 ```json
 {
@@ -149,50 +135,17 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 |---|---|
 | 0 件 | 提示しない（`complete` を報告して終了） |
 | 1〜4 件 | バッチ提示モード（`AskUserQuestion` で一括提示） |
-| 5 件以上 | Markdown 出力モード（`QUESTIONS_MD_PATH` に書き出して案内） |
+| 5 件以上 | バッチ提示モード（先頭 4 件のみ `AskUserQuestion` で提示し、残りは次の `/reforge-resume` 実行で処理） |
 
-### Step 3: 提示（バッチ・1〜4 問）
+### Step 3: 提示（バッチ・最大 4 問）
 
-`AskUserQuestion` を **1 回だけ** 呼び出し、`questions` 配列に pending 先頭から最大 4 件を入れて一括提示する。1 問のみ強制してはならない。pending 件数に応じて Step 2 の判定を厳守する。
+`AskUserQuestion` を **1 回だけ** 呼び出し、`questions` 配列に pending 先頭から最大 4 件を入れて一括提示する。pending が 5 件以上の場合も先頭 4 件のみを提示する。
 
 選択型 (`single_choice` / `multi_choice` / `confirm`) は AskUserQuestion の選択肢として渡す。自由記述型 (`text` / `multi_input`) は AskUserQuestion の Other 経由で受け取る。
 
-### Step 4: 提示（Markdown・5 問以上）
-
-`QUESTIONS_MD_PATH`（`.reforge/specs/<name>/questions.md`）を以下のフォーマットで生成する。
-
-````markdown
-# Pending Questions
-
-> 各質問の **Answer:** 行に回答を記入し、`/reforge-answer` または `/reforge-resume` を再実行してください。
-> spec.json と questions.json に一括反映されます。
-> 未記入の質問は pending に残ります。
-
-### Q1: <質問文>
-
-- id: `<id>`
-- phase: `<phase>`
-- type: `<type>`
-- resolves: `<spec.json path>`
-
-### 選択肢（type が single_choice / multi_choice の場合のみ）
-
-- [ ] <option1>
-- [ ] <option2>
-- [ ] その他: ___________
-
-**Answer:** 
-
----
-
-### Q2: ...
-````
-
-生成後、ユーザーには「`.reforge/specs/<slug>/questions.md` を開いて全質問の **Answer:** 行に回答を記入し、`/reforge-resume` を再実行してください。」と案内する。
-
 ### Step 5: 反映（バッチ一括）
 
-ユーザー回答（AskUserQuestion 結果または `questions.md` の Answer 行）を解析し、各質問の `resolves` に列挙された JSON パスへ一括で反映する。
+ユーザー回答（AskUserQuestion 結果）を解析し、各質問の `resolves` に列挙された JSON パスへ一括で反映する。
 
 > **制約**: `resolves` に記載のないパスは変更しない（最小差分の原則）。
 > **制約**: 推測による補完は禁止。回答が不十分な質問は反映をスキップし、その質問のみ pending に残す。
@@ -204,7 +157,6 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 1. `pending` 配列から該当質問エントリを削除する。
 2. `answered` 配列の末尾に同エントリを追加し `answer` フィールドを付与する（`answeredAt` は任意）。
 3. すべての書き込みを 1 回のクオリティゲート実行のもとで一括実施する。
-4. Markdown モードを使った場合は、残った pending のみで `QUESTIONS_MD_PATH` を再生成する（pending が空になった場合は `QUESTIONS_MD_PATH` を削除する）。
 
 ```json
 // answered に移動後のエントリ例
@@ -220,10 +172,9 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 
 ### 追加制約
 
-- **AskUserQuestion 1 呼び出しの原則**: 1 スキル実行内で `AskUserQuestion` を呼ぶのは 1 回のみ。複数呼び出しは禁止。
-- **Markdown フォールバック**: pending が 5 件以上の場合は AskUserQuestion を呼ばず、必ず `QUESTIONS_MD_PATH` に書き出す。
+- **AskUserQuestion 1 呼び出しの原則**: 1 スキル実行内で `AskUserQuestion` を呼ぶのは 1 回のみ（Step 3）。複数呼び出しは禁止。
 - **共有ストレージ**: `.reforge/specs/<name>/questions.json` は全 reforge-engine コマンドの共有ストレージ。読み書きの前に必ず最新を読み込む。
-- **推測での補完禁止**: 不明な spec フィールドは推測で埋めず、必ず質問を生成して `AskUserQuestion` または `questions.md` を通じて確認する。
+- **推測での補完禁止**: 不明な spec フィールドは推測で埋めず、必ず質問を生成して `AskUserQuestion` を通じて確認する。
 
 ## Core Compliance Rules
 
@@ -237,10 +188,9 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 
 マニュアルモード Q&A の出力は最小限に保つ。出力する要素は以下のみ:
 
-- ライフサイクルステージ: `answered`、`answered_md`、`questions_md`、`complete`、または `blocked` のいずれか。
-- 反映先（書き込みがあった場合のみ）: `SPEC_PATH`、`QUESTIONS_PATH`、必要なら `QUESTIONS_MD_PATH`。
+- ライフサイクルステージ: `answered`、`complete`、または `blocked` のいずれか。
+- 反映先（書き込みがあった場合のみ）: `SPEC_PATH`、`QUESTIONS_PATH`。
 - 残り pending 質問数。
-- バッチ提示モード（1〜4 問）か Markdown 出力モード（5 問以上）かを 1 行で示す。
 
 **出力しないもの**:
 - 進行マップ（`[✓]Init → [▶]Questions → ...` のような表示）
@@ -254,16 +204,7 @@ allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ```
 answered
 反映先: spec.json (meta.audience, meta.intent), questions.json
-残り質問: 2 件 (バッチ提示モード)
-```
-
-### 出力例（Markdown 出力モード）
-
-```
-questions_md
-反映先: questions.md
-残り質問: 7 件 (Markdown 出力モード)
-案内: .reforge/specs/<slug>/questions.md を開いて Answer 行に記入してください。
+残り質問: 2 件
 ```
 
 ### 出力例（pending が空のとき）

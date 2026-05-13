@@ -10,7 +10,7 @@ Complete reference for all Reforge skills and the `.reforge/` workspace schema.
 |---|---|---|
 | [`reforge-init`](#reforge-init) | Spec | Initialize `spec.json` and the question queue |
 | [`reforge-resume`](#reforge-resume) | All phases¹ | **Navigator mode** — routes to the right next action at any phase |
-| [`reforge-answer`](#reforge-answer) | Spec³ | **Manual mode** — Q&A only; answer one pending question without phase routing |
+| [`reforge-answer`](#reforge-answer) | Spec³ | **Manual mode** — Q&A only; answer pending questions without phase routing |
 | [`reforge-update`](#reforge-update) | Any phase² | Apply a natural-language change to the spec |
 | [`reforge-diff`](#reforge-diff) | Any phase² | Show JSON-path changes since last snapshot |
 | [`reforge-validate`](#reforge-validate) | Spec | Check spec completeness and consistency |
@@ -52,12 +52,14 @@ Initialize a Reforge workspace from a natural-language product description.
 The spec name is auto-derived from the description as a kebab-case slug (e.g., `"Photo Albums"` → `photo-albums`).
 
 **Behavior:**
-- Populates `meta`, `tech`, `entities`, `views`, and `flows` from what can be inferred
+- Populates `meta`, optional `requirements`, optional `context`, `tech`, `entities`, `views`, and `flows` from what can be inferred
+- Uses Inception-first ordering: `audience`, `intent`, and `requirements` before construction details
+- Records brownfield context for existing-repository feature work when explicit or safely detectable
 - Converts every unanswered product decision into a pending question
-- Presents exactly one question at the end and stops
+- Presents a question batch or writes `questions.md` at the end and stops
 - Never invents enum options, field names, roles, or approval rules without evidence
 
-**Outcome codes:** `files_written`, `question`, `blocked`, `complete`
+**Outcome codes:** `files_written`, `questions_batch`, `questions_md`, `blocked`, `complete`
 
 **Example:**
 ```
@@ -81,7 +83,7 @@ Lifecycle navigator. Evaluates the full workspace state and routes to the correc
 | Condition | Output |
 |---|---|
 | `spec.json` missing or invalid | Block; guide to `/reforge-init` |
-| Pending questions exist | Present the top-priority question; record answer on reply |
+| Pending questions exist | Present up to 4 questions or write `questions.md`; record answers on reply |
 | Validation errors found | Block; guide to `/reforge-validate` |
 | `meta.approved` is false | Block; guide to `/reforge-render` |
 | `tasks.json` missing | Block; guide to `/reforge-plan` |
@@ -92,7 +94,7 @@ Lifecycle navigator. Evaluates the full workspace state and routes to the correc
 **When answering a question:**
 - Applies the answer only to the `resolves` paths listed in the question entry
 - Moves the question from `pending` to `answered`
-- Does not present the next question in the same run — requires another `/reforge-resume` invocation
+- Stops after the current Q&A action - run `/reforge-resume` again to continue
 
 **When to use:** Any time you are unsure what to do next, or want to resume after an interruption. Safe to run at any phase — it never mutates state unless recording a question answer.
 
@@ -100,7 +102,7 @@ Lifecycle navigator. Evaluates the full workspace state and routes to the correc
 
 ### `reforge-answer`
 
-Manual-mode Q&A. Present one pending question and record one answer. Does NOT route phases or recommend the next command.
+Manual-mode Q&A. Present pending questions and record answers. Does NOT route phases or recommend the next command.
 
 **Argument:** `[<spec-name>]` (optional — omit when only one spec exists)
 
@@ -109,7 +111,7 @@ Manual-mode Q&A. Present one pending question and record one answer. Does NOT ro
 **Writes:** `.reforge/specs/<name>/spec.json`, `.reforge/specs/<name>/questions.json` — only when recording an answer
 
 **Behavior:**
-- If `pending[0]` exists, present it; on reply, write the answer to the `resolves` paths and move the question to `answered`.
+- If pending questions exist, present up to 4 or write `questions.md`; on reply, write answers to the `resolves` paths and move answered items to `answered`.
 - If no `pending` questions remain, return `complete` and stop. The user decides which phase command to run next.
 - Output is minimal: lifecycle stage and remaining pending count. No phase map, no NextAction, no command recommendation.
 
@@ -143,6 +145,7 @@ Apply a natural-language change request to `spec.json`.
 **Behavior:**
 - Modifies only the paths affected by the change request
 - Preserves all unaffected fields and sections
+- Preserves optional `requirements` and `context` unless explicitly changed
 - Sets `meta.approved = false` if the spec was previously approved
 - Retires `tasks.json` to `tasks.previous.json` when approval is reset, forcing a re-plan after the next approval
 - Converts ambiguous aspects of the request into pending questions rather than guessing
@@ -301,6 +304,7 @@ Verify that the implementation matches the approved spec. Read-only.
 - Every entity in `spec.json` has at least one corresponding implementation file
 - Every field declared in `entities` is covered in the generated code
 - Every task in `tasks.json` has `status: "done"`
+- Brownfield context is reported when present; acceptance criteria that cannot be proven structurally remain manual checks
 
 **Output:** Per-entity pass/fail report. Does not block on `meta.approved` — can be run at any point for informational purposes.
 
@@ -320,7 +324,26 @@ The single source of truth for the product specification. All Reforge skills rea
     "name": "string",       // product name
     "version": "string",    // spec version
     "lang": "string",       // response language (e.g. "ja", "en")
-    "approved": false       // set to true by reforge-render on human approval
+    "approved": false,      // set to true by reforge-render on human approval
+    "audience": [],         // optional Inception target users
+    "intent": ""            // optional Inception product intent
+  },
+  "requirements": [],
+  "context": {
+    "mode": "greenfield | brownfield | unknown",
+    "repository": {
+      "existing": true,
+      "detectedStack": ["string"],
+      "conventions": ["string"]
+    },
+    "changeScope": {
+      "feature": "string",
+      "affectedAreas": ["string"],
+      "allowedWriteAreas": ["string"],
+      "protectedAreas": ["string"]
+    },
+    "acceptanceCriteria": ["string"],
+    "risks": ["string"]
   },
   "tech": {
     "frontend": "string",   // e.g. "Next.js"
@@ -365,7 +388,7 @@ The question queue shared across all spec skills.
   "pending": [
     {
       "id": "q-1",
-      "phase": "meta | tech | data | views | flows",
+      "phase": "meta | audience | intent | requirements | tech | data | views | flows | update",
       "question": "What authentication method should the app use?",
       "type": "string",
       "resolves": ["tech.auth"]  // JSON paths that the answer fills in
@@ -383,6 +406,10 @@ The question queue shared across all spec skills.
   ]
 }
 ```
+
+### `.reforge/specs/<name>/questions.md`
+
+Optional Markdown question batch written when there are 5 or more pending questions. Users can fill in `Answer:` lines and rerun `/reforge-resume` or `/reforge-answer`.
 
 ### `.reforge/specs/<name>/tasks.json`
 
@@ -418,7 +445,7 @@ The previous `tasks.json`, retired when `reforge-update` resets `meta.approved` 
 ## Constraints Shared by All Skills
 
 - **No guessing.** Skills never invent field names, enum values, roles, approval rules, or tech choices without evidence from the description or a prior answer.
-- **One question per run.** Skills present at most one user-facing question per invocation.
-- **Schema compliance.** Every write preserves the `meta`, `tech`, `entities`, `views`, `flows` structure in `spec.json` and the `pending`, `answered` structure in `questions.json`.
+- **One question tool call per run.** Skills may present up to 4 questions in one batch, or write `questions.md` for larger batches.
+- **Schema compliance.** Every write preserves the `meta`, optional `requirements`, optional `context`, `tech`, `entities`, `views`, `flows` structure in `spec.json` and the `pending`, `answered` structure in `questions.json`.
 - **Language consistency.** Explanations and questions follow `meta.lang`. File paths, JSON keys, status markers, and skill names are always literal.
 - **Standard paths.** The `.reforge/` paths listed above must not be renamed or moved.
