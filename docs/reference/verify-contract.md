@@ -1,9 +1,9 @@
-# Verify Contract
+# Implementation Verification Contract
 
 **Audience:** Users understanding verification boundaries.
 **Prerequisites:** None.
-**Expected Outcome:** Know what `/reforge-verify` checks.
+**Expected Outcome:** Know what `/reforge-impl` must verify for each task.
 
-- **Guarantees:** File presence, field coverage, task state consistency.
-- **Reports:** Brownfield allowed/protected areas, acceptance criteria, and risks when `spec.context` is present.
-- **Does Not Guarantee:** Business correctness, UX quality, security, or acceptance criteria that require manual validation.
+- **Guarantees:** Task-local checks are run when available, touched files are reported, and `plan.md` records task status and implementation notes.
+- **Reports:** Source artifact traceability, file boundary adherence, test commands, failed or skipped checks, and manual verification that remains.
+- **Does Not Guarantee:** Business correctness, UX quality, security, or acceptance criteria that require human review.

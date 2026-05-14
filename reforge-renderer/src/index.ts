@@ -72,6 +72,7 @@ if (require.main === module) {
 
 export * from './types';
 export { loadSpec } from './loader';
+export { loadPrototypeArtifact } from './artifact-loader';
 export { projectSpec } from './projector';
 export { renderSpecProjection } from './composer';
 export { createReforgeServer } from './server';

@@ -1,56 +1,34 @@
-# Spec Schema
+# Artifact Schema
 
-**Audience:** Advanced users extending Reforge.
-**Prerequisites:** None.
-**Expected Outcome:** Understand `spec.json`.
+Reforge no longer has a single specification JSON. The approved artifact bundle is the source of truth.
 
-`spec.json` is the source of truth for one product spec, feature, or initiative.
+```text
+.reforge/<feature>/
+  manifest.json
+  requirements.md
+  user-stories.md
+  us-mock.md
+  design.md
+  prototype.html
+  plan.md
+```
+
+## Manifest
 
 ```json
 {
-  "meta": {
-    "name": "",
-    "version": "0.1.0",
-    "lang": "en",
-    "approved": false,
-    "audience": [],
-    "intent": ""
-  },
-  "requirements": [],
-  "context": {
-    "mode": "greenfield"
-  },
-  "tech": {
-    "frontend": "",
-    "backend": "",
-    "database": "",
-    "orm": "",
-    "styling": "",
-    "testing": ""
-  },
-  "entities": {},
-  "views": {},
-  "flows": {}
+  "version": 1,
+  "feature": "team-invitations",
+  "currentPhase": "prototype",
+  "artifacts": {
+    "requirements": { "path": "requirements.md", "phase": "requirements", "status": "approved" },
+    "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "approved" },
+    "usMock": { "path": "us-mock.md", "phase": "user-stories", "status": "approved" },
+    "design": { "path": "design.md", "phase": "design", "status": "approved" },
+    "prototype": { "path": "prototype.html", "phase": "prototype", "status": "draft" },
+    "plan": { "path": "plan.md", "phase": "plan", "status": "draft" }
+  }
 }
 ```
 
-## Required Sections
-
-- `meta`
-- `tech`
-- `entities`
-- `views`
-- `flows`
-
-## Optional Sections
-
-- `requirements` - user-story style requirements from the Inception phase.
-- `context` - greenfield or brownfield context.
-
-`context.mode` may be:
-
-- `greenfield` - new app, MVP, or prototype.
-- `brownfield` - feature work inside an existing repository.
-- `unknown` - Reforge should ask before assuming.
-
-Brownfield context can include repository conventions, affected areas, allowed write areas, protected areas, acceptance criteria, and risks. Missing context should become questions rather than guesses.
+Statuses are `draft`, `needs_revision`, or `approved`.

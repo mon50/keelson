@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Resume"
-  short_description: "Advance a Reforge workflow by one safe step"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

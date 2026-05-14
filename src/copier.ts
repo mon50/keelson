@@ -4,6 +4,18 @@ import type { InstallError, PackageAssets, TargetEnvironment } from './types';
 import { ALL_SKILLS, ENV_SKILL_DIR } from './types';
 import { loadForwarderTemplate, renderForwarder } from './forwarder';
 
+const LEGACY_REFORGE_SKILLS = new Set<string>([
+  'reforge-init',
+  'reforge-resume',
+  'reforge-answer',
+  'reforge-update',
+  'reforge-diff',
+  'reforge-validate',
+  'reforge-render',
+  'reforge-verify',
+  'reforge-status'
+]);
+
 export interface CopyResult {
   overwritten: string[];
   error?: InstallError;
@@ -16,7 +28,12 @@ export async function copyLocalSkills(
   const destDir = path.join(cwd, '.reforge/skills');
   try {
     await fs.ensureDir(destDir);
-    await fs.copy(assets.coreSkillsDir, destDir, { overwrite: true });
+    await removeKnownLegacyReforgeSkills(destDir);
+    for (const skillName of ALL_SKILLS) {
+      await fs.copy(path.join(assets.coreSkillsDir, skillName), path.join(destDir, skillName), {
+        overwrite: true
+      });
+    }
     return { overwritten: [] };
   } catch (err: unknown) {
     const reason = err instanceof Error ? err.message : String(err);
@@ -34,11 +51,14 @@ export async function copyForwarders(
 ): Promise<CopyResult> {
   try {
     const template = await loadForwarderTemplate(assets.templatesDir, environment);
+    const envSkillRoot = path.join(cwd, ENV_SKILL_DIR[environment]);
+    await fs.ensureDir(envSkillRoot);
+    await removeKnownLegacyReforgeSkills(envSkillRoot);
     const overwritten: string[] = [];
 
     for (const skillName of ALL_SKILLS) {
       const renderedContent = renderForwarder({ environment, skillName, template });
-      const skillDir = path.join(cwd, ENV_SKILL_DIR[environment], skillName);
+      const skillDir = path.join(envSkillRoot, skillName);
       await fs.ensureDir(skillDir);
       const destPath = path.join(skillDir, 'SKILL.md');
       if (await fs.pathExists(destPath)) {
@@ -54,6 +74,19 @@ export async function copyForwarders(
       overwritten: [],
       error: { path: assets.templatesDir, reason }
     };
+  }
+}
+
+async function removeKnownLegacyReforgeSkills(skillsDir: string): Promise<void> {
+  if (!(await fs.pathExists(skillsDir))) {
+    return;
+  }
+
+  const entries = await fs.readdir(skillsDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory() && LEGACY_REFORGE_SKILLS.has(entry.name)) {
+      await fs.remove(path.join(skillsDir, entry.name));
+    }
   }
 }
 

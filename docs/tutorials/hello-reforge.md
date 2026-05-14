@@ -2,32 +2,33 @@
 
 **Audience:** Developers new to Reforge.
 **Prerequisites:** Node.js 18+, Claude Code or Codex installed.
-**Expected Outcome:** You will create a daily report spec and prototype.
+**Expected Outcome:** You will create approved Inception artifacts and a first implementation plan.
 
 ## Step 1: Install Reforge
 ```bash
 npx aid-reforge install
 ```
 
-## Step 2: Initialize
+## Step 2: Requirements
 In your AI agent:
 ```
-/reforge-init "Daily Report App"
+/reforge-requirements "Daily Report App"
 ```
 
-## Step 3: Resume
-Answer the pending question batch to build the spec.
+## Step 3: User Stories And Design
+Approve each artifact before moving to the next phase.
 ```
-/reforge-resume
+/reforge-us
+/reforge-design
 ```
 
-## Step 4: Render
+## Step 4: Prototype
 ```
-/reforge-render
+/reforge-proto
 ```
 
 ## Step 5: Plan & Implement
 ```
 /reforge-plan
-/reforge-impl
+/reforge-impl T-001
 ```

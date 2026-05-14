@@ -1,20 +1,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
+import { ALL_SKILLS } from '../src/types';
 
-const REQUIRED_SKILLS = [
-  'reforge-init',
-  'reforge-update',
-  'reforge-resume',
-  'reforge-diff',
-  'reforge-validate',
-  'reforge-render',
-  'reforge-plan',
-  'reforge-impl',
-  'reforge-verify',
-  'reforge-status'
-];
+const REQUIRED_SKILLS = [...ALL_SKILLS];
 
-async function lintSkills(baseDir: string, isCodex: boolean) {
+async function lintSkills(baseDir: string) {
   let hasErrors = false;
   for (const skillName of REQUIRED_SKILLS) {
     const skillPath = path.join(baseDir, skillName);
@@ -36,14 +26,6 @@ async function lintSkills(baseDir: string, isCodex: boolean) {
       console.error(`❌ Invalid or missing frontmatter name in: ${skillMdPath}`);
       hasErrors = true;
     }
-
-    if (isCodex) {
-      const yamlPath = path.join(skillPath, 'agents', 'openai.yaml');
-      if (!await fs.pathExists(yamlPath)) {
-        console.error(`❌ Missing agents/openai.yaml in: ${skillPath}`);
-        hasErrors = true;
-      }
-    }
   }
   return hasErrors;
 }
@@ -51,10 +33,10 @@ async function lintSkills(baseDir: string, isCodex: boolean) {
 async function main() {
   const rootDir = process.cwd();
   console.log('Linting Claude skills...');
-  const claudeErrors = await lintSkills(path.join(rootDir, '.claude', 'skills'), false);
+  const claudeErrors = await lintSkills(path.join(rootDir, '.claude', 'skills'));
   
   console.log('\nLinting Codex skills...');
-  const codexErrors = await lintSkills(path.join(rootDir, '.agents', 'skills'), true);
+  const codexErrors = await lintSkills(path.join(rootDir, '.agents', 'skills'));
 
   if (claudeErrors || codexErrors) {
     console.error('\n❌ Skill linting failed.');

@@ -1,7 +1,9 @@
 # Troubleshooting
 
-- **Not sure what to do next.** Run `/reforge-resume` — the navigator prints a phase map plus the single NextAction.
-- **Error: `spec.json` not found.** Run `/reforge-init`.
-- **Error: `meta.approved` is false.** Run `/reforge-render` and approve. (After `reforge-update`, `meta.approved` is reset automatically; let `/reforge-resume` route you to render.)
-- **`tasks.json` exists but seems stale after `reforge-update`.** It does not — `reforge-update` retires the old `tasks.json` to `tasks.previous.json` so `/reforge-resume` will route you back to `/reforge-plan` after re-approval.
-- **Error: `Reforge skills were not uninstalled properly.`** Run `npx aid-reforge uninstall`.
+- Missing workspace: run `/reforge-requirements "<idea>"`.
+- User story mismatch: revise with `/reforge-us` or return to `/reforge-requirements`.
+- Existing implementation constraints missing: run `/reforge-design`.
+- Prototype does not match the intended experience: return to `/reforge-us`.
+- Prototype does not match implementation design: return to `/reforge-design`.
+- Plan is not approved: run `/reforge-plan`.
+- Implementation is blocked by missing product detail: return to the owning earlier phase instead of guessing.

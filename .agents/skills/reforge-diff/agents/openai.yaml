@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Diff"
-  short_description: "Show what changed since the last spec snapshot"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

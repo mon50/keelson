@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Validate"
-  short_description: "Validate a Reforge spec and output a compiler-like report"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

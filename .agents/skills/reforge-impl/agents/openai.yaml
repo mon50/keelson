@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Impl"
-  short_description: "Implement one entity based on the approved spec"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

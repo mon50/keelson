@@ -1,6 +1,39 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import { detect } from './detector';
+import type { ArtifactRecord, ReforgeManifest } from './types';
+
+const WORKSPACE_INTERNAL_DIRS = new Set(['skills', 'server']);
+
+function isArtifactRecord(value: unknown): value is ArtifactRecord {
+  const candidate = value as Partial<ArtifactRecord> | undefined;
+  return (
+    Boolean(candidate) &&
+    typeof candidate?.path === 'string' &&
+    typeof candidate?.phase === 'string' &&
+    typeof candidate?.status === 'string'
+  );
+}
+
+function isManifest(value: unknown): value is ReforgeManifest {
+  const candidate = value as Partial<ReforgeManifest> | undefined;
+  const artifacts = candidate?.artifacts as
+    | Partial<Record<keyof ReforgeManifest['artifacts'], unknown>>
+    | undefined;
+
+  return (
+    candidate?.version === 1 &&
+    typeof candidate.feature === 'string' &&
+    typeof candidate.currentPhase === 'string' &&
+    Boolean(artifacts) &&
+    isArtifactRecord(artifacts?.requirements) &&
+    isArtifactRecord(artifacts?.userStories) &&
+    isArtifactRecord(artifacts?.usMock) &&
+    isArtifactRecord(artifacts?.design) &&
+    isArtifactRecord(artifacts?.prototype) &&
+    isArtifactRecord(artifacts?.plan)
+  );
+}
 
 export async function doctor(cwd: string, json: boolean = false): Promise<number> {
   const issues: string[] = [];
@@ -27,25 +60,33 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
   if (!hasReforge) {
     warnings.push('Reforge is not installed in this repository. Run `npx aid-reforge install` first.');
   } else {
-    // Check spec versions
-    const specsDir = path.join(cwd, '.reforge', 'specs');
-    if (await fs.pathExists(specsDir)) {
-      const specs = await fs.readdir(specsDir);
-      for (const specName of specs) {
-        const specPath = path.join(specsDir, specName, 'spec.json');
-        if (await fs.pathExists(specPath)) {
-          try {
-            const specData = await fs.readJson(specPath);
-            if (!specData?.meta?.reforgeVersion) {
-              warnings.push(`Spec '${specName}' is missing meta.reforgeVersion. Please update it to '1.0.0'.`);
-            } else if (specData.meta.reforgeVersion !== '1.0.0') {
-              warnings.push(`Spec '${specName}' has version ${specData.meta.reforgeVersion}, but CLI expects '1.0.0'.`);
-            }
-          } catch (e) {
-            issues.push(`Failed to read spec.json for '${specName}': ${e}`);
-          }
-        }
+    const reforgeDir = path.join(cwd, '.reforge');
+    const entries = await fs.readdir(reforgeDir, { withFileTypes: true });
+    const featureDirs = entries.filter((entry) => {
+      return entry.isDirectory() && !WORKSPACE_INTERNAL_DIRS.has(entry.name);
+    });
+
+    let manifestCount = 0;
+    for (const entry of featureDirs) {
+      const manifestPath = path.join(reforgeDir, entry.name, 'manifest.json');
+      if (!(await fs.pathExists(manifestPath))) {
+        warnings.push(`Feature workspace '${entry.name}' is missing manifest.json.`);
+        continue;
       }
+
+      manifestCount += 1;
+      try {
+        const manifest = await fs.readJson(manifestPath);
+        if (!isManifest(manifest)) {
+          warnings.push(`Feature workspace '${entry.name}' has an invalid manifest.json.`);
+        }
+      } catch (e) {
+        issues.push(`Failed to read manifest.json for '${entry.name}': ${e}`);
+      }
+    }
+
+    if (manifestCount === 0) {
+      warnings.push('No Reforge feature manifests found. Start with `/reforge-requirements "<idea>"`.');
     }
   }
 
