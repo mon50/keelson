@@ -1,7 +1,6 @@
 # Limitations
 
-- Each Reforge lifecycle run targets one spec at a time, though a project can contain multiple specs under `.reforge/specs/`.
-- Complex architectural features (like multi-tenant databases) require manual coding.
-- Entity relationships are basic.
-- Brownfield support is feature-scoped. Reforge records lightweight repository context and constraints; it does not fully reverse engineer a large codebase.
-- `/reforge-verify` is conservative. Some acceptance criteria remain manual checks when they cannot be proven by file and field coverage.
+- Reforge converges requirements, user stories, design, prototype, and task planning. It is not a full autonomous app builder.
+- The simplified prototype is review evidence, not production UI code.
+- Brownfield repository inspection is feature-scoped and evidence-based.
+- `/reforge-impl` implements one approved plan task at a time and should stop when the approved artifacts are insufficient.

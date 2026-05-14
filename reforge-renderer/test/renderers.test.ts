@@ -7,7 +7,7 @@ import { renderPrototypeAreaContent, renderUiView } from '../src/prototype-rende
 import { renderShell } from '../src/template';
 import type { NonUiProjection, ProjectedField, UiViewProjection } from '../src/types';
 import { assertSafeFragment, escapeHtml } from '../src/utils';
-import { dailyReportSpec, noUiSpec } from './fixtures';
+import { commerceSpec, dailyReportSpec, noUiSpec } from './fixtures';
 
 describe('HTML safety utilities', () => {
   it('escapes user-controlled strings', () => {
@@ -74,11 +74,11 @@ describe('shell and slot renderers', () => {
     expect(html).toContain('id="spec-context"');
     expect(html).toContain('id="prototype-area"');
     expect(html).toContain('id="non-ui-spec-area"');
-    expect(html).toContain('aria-label="UIプロトタイプ"');
+    expect(html).toContain('aria-label="Spec Preview"');
     expect(html).toContain('aria-label="非画面仕様"');
   });
 
-  it('prototype renderer returns only UI prototype fragments', () => {
+  it('preview renderer returns only UI preview fragments', () => {
     const html = renderPrototypeAreaContent(uiItems, projection.layouts);
 
     expect(html).toContain('data-layout-panel="pc"');
@@ -94,12 +94,42 @@ describe('shell and slot renderers', () => {
     const html = renderUiView(formItem, 'pc');
     expect(html).toContain('<form');
     expect(html).toContain('field-grid');
+    expect(html).toContain('product-frame');
+    expect(html).toContain('USカバレッジ');
+    expect(html).toContain('日報を提出');
   });
 
   it('renders list viewType with <table>', () => {
     const listItem = uiItems.find((item) => item.viewType === 'list')!;
     const html = renderUiView(listItem, 'pc');
     expect(html).toContain('<table');
+  });
+
+  it('renders commerce uiBlueprint as a marketplace-style product grid', () => {
+    const commerceProjection = projectSpec(commerceSpec());
+    const listItem = commerceProjection.items.find(
+      (item): item is UiViewProjection => item.kind === 'ui' && item.id === 'view-productList'
+    )!;
+    const html = renderUiView(listItem, 'pc');
+
+    expect(html).toContain('commerce-search');
+    expect(html).toContain('filter-panel');
+    expect(html).toContain('product-card');
+    expect(html).toContain('cart-summary');
+    expect(html).toContain('カートに入れる');
+  });
+
+  it('syncs commerce card titles to the selected title field', () => {
+    const spec = commerceSpec();
+    spec.views!.productList.fields = ['brand', 'price', 'productName', 'rating', 'delivery'];
+    const commerceProjection = projectSpec(spec);
+    const listItem = commerceProjection.items.find(
+      (item): item is UiViewProjection => item.kind === 'ui' && item.id === 'view-productList'
+    )!;
+    const html = renderUiView(listItem, 'pc');
+
+    expect(html).toContain('<h4 data-value-field="productName">');
+    expect(html).not.toContain('<h4 data-value-field="brand">');
   });
 
   it('renders detail viewType with <dl>', () => {
@@ -135,6 +165,7 @@ describe('shell and slot renderers', () => {
     const html = renderSpecProjection(projection);
 
     expect(html).toContain('日報入力');
+    expect(html).toContain('担当者として、日報を短時間で提出したい');
     expect(html).toContain('DB・バックエンド');
     expect(html.indexOf('id="prototype-area"')).toBeLessThan(html.indexOf('id="non-ui-spec-area"'));
     expect(html).toBe(renderSpecProjection(projectSpec(dailyReportSpec())));

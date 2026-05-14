@@ -1,18 +1,17 @@
-# Tasks Schema
+# Plan Schema
 
-**Audience:** Users debugging Reforge execution.
-**Prerequisites:** None.
-**Expected Outcome:** Understand `tasks.json`.
+Implementation tasks live in `plan.md`, not a JSON task queue.
 
-```json
-{
-  "tasks": [
-    {
-      "id": "report",
-      "entity": "report",
-      "status": "pending",
-      "subtasks": ["db", "api", "ui", "test"]
-    }
-  ]
-}
-```
+Each task should include:
+
+- stable id, for example `T-001`
+- title
+- source requirement or user story
+- design references
+- likely files to change
+- implementation steps
+- tests or checks
+- acceptance criteria
+- dependencies
+
+`/reforge-impl [task-id]` implements one task at a time and records implementation notes back in `plan.md`.

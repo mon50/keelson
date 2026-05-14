@@ -35,8 +35,12 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   }
 
   lines.push('Available commands:');
-  lines.push('  /reforge-init "<プロダクトの説明>"');
-  lines.push('  /reforge-resume');
+  lines.push('  /reforge-requirements "<作りたい体験や機能>"');
+  lines.push('  /reforge-us');
+  lines.push('  /reforge-design');
+  lines.push('  /reforge-proto');
+  lines.push('  /reforge-plan');
+  lines.push('  /reforge-impl');
   lines.push('');
 
   if (result.overwritten.length > 0) {

@@ -10,9 +10,8 @@ export const FORWARDER_TEMPLATE_FILE = {
 } as const satisfies Record<TargetEnvironment, string>;
 
 export const FORWARDER_ARGUMENT_HINT: Partial<Record<SkillName, string>> = {
-  'reforge-init': '\\"<product description>\\"',
-  'reforge-update': '\\"<change request>\\"',
-  'reforge-impl': '[entity]'
+  'reforge-requirements': '\\"<idea>\\"',
+  'reforge-impl': '[task-id]'
 };
 
 export interface RenderForwarderOptions {

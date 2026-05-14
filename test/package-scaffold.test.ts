@@ -77,10 +77,10 @@ describe('root reforge package scaffold', () => {
       process.stdout.write = originalWrite;
     }
 
-    expect(fs.existsSync(path.join(tmpDir, '.reforge/skills/reforge-init/SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.claude/skills/reforge-init/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.reforge/skills/reforge-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.claude/skills/reforge-requirements/SKILL.md'))).toBe(true);
     expect(stdout.join('\n')).toContain('Available commands:');
-    expect(stdout.join('\n')).toContain('/reforge-init "<プロダクトの説明>"');
+    expect(stdout.join('\n')).toContain('/reforge-requirements "<作りたい体験や機能>"');
   });
 
   it('returns exit code 1 and reports install errors to stderr', async () => {

@@ -90,25 +90,25 @@ describe('installable forwarder templates', () => {
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-init',
+          skillName: 'reforge-requirements',
           template
         })
       )
-    ).toContain('argument-hint: "\\"<product description>\\""');
+    ).toContain('argument-hint: "\\"<idea>\\""');
     expect(
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-update',
+          skillName: 'reforge-us',
           template
         })
       )
-    ).toContain('argument-hint: "\\"<change request>\\""');
+    ).not.toContain('argument-hint:');
     expect(
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-render',
+          skillName: 'reforge-proto',
           template
         })
       )
@@ -121,6 +121,6 @@ describe('installable forwarder templates', () => {
           template
         })
       )
-    ).toContain('argument-hint: "[entity]"');
+    ).toContain('argument-hint: "[task-id]"');
   });
 });

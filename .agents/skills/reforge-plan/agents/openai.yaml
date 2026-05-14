@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Plan"
-  short_description: "Generate tasks deterministically from the approved spec"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

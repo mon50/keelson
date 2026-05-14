@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+import { loadPrototypeArtifact } from './artifact-loader';
 import { loadSpec } from './loader';
 import { projectSpec } from './projector';
 import { renderSpecProjection } from './composer';
@@ -36,10 +37,43 @@ export function createReforgeServer(): ReforgeServer {
       return;
     }
 
-    const html = renderSpecProjection(projectSpec(result.spec));
+    const artifact = await loadPrototypeArtifact(cwd, result.specPath, result.spec);
+    if (!artifact.ok) {
+      res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(renderErrorPage(artifact.error.message));
+      return;
+    }
+    if (
+      artifact.artifact &&
+      result.spec.meta.approved === true &&
+      result.spec.uiArtifacts?.mode === 'locked' &&
+      result.spec.uiArtifacts.approvedDigest &&
+      !digestMatches(result.spec.uiArtifacts.approvedDigest, artifact.artifact.digest)
+    ) {
+      res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(
+        renderErrorPage(
+          '`uiArtifacts.approvedDigest` が Prototype Artifact のHTMLと一致しません。再生成または再承認してください。'
+        )
+      );
+      return;
+    }
+
+    const html = artifact.artifact?.html ?? renderSpecProjection(projectSpec(result.spec));
+    const artifactHeaderPath = artifact.artifact
+      ? encodePathHeader(artifact.artifact.relativePath)
+      : undefined;
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
+      'X-Reforge-Render-Mode': artifact.artifact ? 'prototype-artifact' : 'spec-preview',
+      ...(artifact.artifact
+        ? {
+            'X-Reforge-Prototype-Artifact': artifactHeaderPath,
+            'X-Reforge-Artifact-Path': artifactHeaderPath,
+            'X-Reforge-Prototype-Digest': artifact.artifact.digest
+          }
+        : {})
     });
     res.end(html);
   }
@@ -117,8 +151,17 @@ export function createReforgeServer(): ReforgeServer {
   };
 }
 
+function digestMatches(expected: string, actual: string): boolean {
+  const normalized = expected.startsWith('sha256:') ? expected.slice('sha256:'.length) : expected;
+  return normalized === actual;
+}
+
+function encodePathHeader(relativePath: string): string {
+  return relativePath.split('/').map(encodeURIComponent).join('/');
+}
+
 function renderErrorPage(message: string): string {
-  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>Reforge render error</title></head><body><main><h1>仕様確認UIを生成できません</h1><p>${escapeHtml(
+  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>Reforge render error</title></head><body><main><h1>Spec Preview / Prototype Artifact を表示できません</h1><p>${escapeHtml(
     message
   )}</p></main></body></html>`;
 }

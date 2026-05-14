@@ -37,29 +37,28 @@ describe('report()', () => {
     getOutput = s.get;
   });
 
-  it('success=true のとき全10コマンドが stdout に含まれる', () => {
+  it('success=true のとき新しい全コマンドが stdout に含まれる', () => {
     report(makeSuccessResult(), { stdout });
 
     const out = getOutput();
-    expect(out).toContain('/reforge-validate');
-    expect(out).toContain('/reforge-init');
-    expect(out).toContain('/reforge-resume');
-    expect(out).toContain('/reforge-answer');
-    expect(out).toContain('/reforge-update');
-    expect(out).toContain('/reforge-diff');
+    expect(out).toContain('/reforge-requirements');
+    expect(out).toContain('/reforge-us');
+    expect(out).toContain('/reforge-design');
+    expect(out).toContain('/reforge-proto');
     expect(out).toContain('/reforge-plan');
-    expect(out).toContain('/reforge-render');
     expect(out).toContain('/reforge-impl');
-    expect(out).toContain('/reforge-verify');
+    expect(out).not.toContain('/reforge-init');
+    expect(out).not.toContain('/reforge-render');
+    expect(out).not.toContain('/reforge-verify');
     expect(out).not.toContain('/reforge:');
   });
 
-  it('インストール済み環境 (claude-code) とスキル数 (10) が表示される', () => {
+  it('インストール済み環境 (claude-code) とスキル数が表示される', () => {
     report(makeSuccessResult(), { stdout });
 
     const out = getOutput();
     expect(out).toContain('claude-code');
-    expect(out).toContain('10');
+    expect(out).toContain(String(ALL_SKILLS.length));
   });
 
   it('overwritten が空の場合、上書きリストが表示されない', () => {
@@ -73,19 +72,19 @@ describe('report()', () => {
 
   it('overwritten に値がある場合、上書きファイルが表示される', () => {
     report(
-      makeSuccessResult({ overwritten: ['.claude/skills/reforge-init/SKILL.md'] }),
+      makeSuccessResult({ overwritten: ['.claude/skills/reforge-requirements/SKILL.md'] }),
       { stdout }
     );
 
     const out = getOutput();
-    expect(out).toContain('.claude/skills/reforge-init/SKILL.md');
+    expect(out).toContain('.claude/skills/reforge-requirements/SKILL.md');
   });
 
-  it('次のステップとして /reforge-init の案内が含まれる', () => {
+  it('次のステップとして /reforge-requirements の案内が含まれる', () => {
     report(makeSuccessResult(), { stdout });
 
     const out = getOutput();
-    expect(out).toContain('/reforge-init');
+    expect(out).toContain('/reforge-requirements "<作りたい体験や機能>"');
   });
 
   it('success=false の場合、エラーが stderr に出力される', () => {

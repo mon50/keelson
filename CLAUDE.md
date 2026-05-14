@@ -1,49 +1,25 @@
 # Reforge
 
-Natural-language product spec converger for Claude Code.
+AI-DLC Inception and prototype convergence for Claude Code and Codex.
 
 ## Commands
 
 | Command | Description |
-|---------|-------------|
-| `/reforge-init "<description>"` | Initialize `.reforge/specs/<name>/spec.json` and `questions.json` |
-| `/reforge-resume` | **Navigator mode** — Q&A + phase routing |
-| `/reforge-answer` | **Manual mode** — Q&A only (no phase routing) |
-| `/reforge-update "<change>"` | Apply a natural-language change to the existing spec |
-| `/reforge-diff` | Show JSON-path differences between the previous and current spec |
-| `/reforge-validate` | Validate `spec.json` for completeness and consistency |
-| `/reforge-render` | Start the local prototype server for human approval |
-| `/reforge-plan` | Generate `tasks.json` from the approved spec |
-| `/reforge-impl [entity]` | Implement one entity end-to-end (DB + API + UI + tests) |
-| `/reforge-verify` | Check implementation against the spec |
+|---|---|
+| `/reforge-requirements "<idea>"` | Create or revise Requirements |
+| `/reforge-us` | Create User Stories and US mock operations |
+| `/reforge-design` | Create cc-sdd-style implementation Design |
+| `/reforge-proto` | Create and review simplified prototype |
+| `/reforge-plan` | Generate implementation plan |
+| `/reforge-impl [task-id]` | Implement one approved plan task |
 
 ## Workflow
 
-1. `/reforge-init "日報アプリを作りたい"` — generate initial spec and question queue
-2. Answer the presented question; run `/reforge-resume` to continue
-3. Repeat until no pending questions remain
-4. `/reforge-validate` — confirm the spec is complete and consistent
-5. `/reforge-render` — review UI prototype and approve
-6. `/reforge-plan` — generate implementation tasks
-7. `/reforge-impl` — implement entity by entity
-8. `/reforge-verify` — verify implementation against spec
+1. `/reforge-requirements "作りたい体験や機能"`
+2. `/reforge-us`
+3. `/reforge-design`
+4. `/reforge-proto`
+5. `/reforge-plan`
+6. `/reforge-impl`
 
-At any point: `/reforge-update "<change>"` to revise, `/reforge-diff` to review changes.
-
-## Workspace Files
-
-Reforge reads and writes to `.reforge/specs/<name>/` in your project directory:
-
-| File | Purpose |
-|------|---------|
-| `.reforge/specs/<name>/spec.json` | Current product specification (single source of truth) |
-| `.reforge/specs/<name>/questions.json` | Pending and answered question queue |
-| `.reforge/specs/<name>/spec.previous.json` | Previous spec snapshot (used by `/reforge-diff`) |
-| `.reforge/specs/<name>/tasks.json` | Implementation task queue (created by `/reforge-plan`) |
-| `.reforge/specs/<name>/tasks.previous.json` | Retired task queue when `/reforge-update` resets approval; signals `/reforge-resume` to route to `/reforge-plan` after re-approval |
-
-Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to share session progress across machines.
-
-## Skills Location
-
-`.claude/skills/reforge-*/SKILL.md`
+Artifacts live in `.reforge/<feature>/`. Approved `requirements.md`, `user-stories.md`, `us-mock.md`, `design.md`, and `prototype.html` form the source of truth for planning and implementation.

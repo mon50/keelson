@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Status"
-  short_description: "Inspect the current Reforge phase and blockers"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

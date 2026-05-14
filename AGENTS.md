@@ -1,50 +1,39 @@
 # Reforge
 
-Natural-language product spec converger for Claude Code and Codex.
+AI-DLC Inception and prototype convergence for Claude Code and Codex.
 
 ## Commands
 
 | Codex Command | Claude Code Command | Description |
-|---------------|---------------------|-------------|
-| `$reforge-init "<description>"` | `/reforge-init "<description>"` | Initialize `.reforge/specs/<name>/spec.json` and `questions.json` |
-| `$reforge-resume` | `/reforge-resume` | **Navigator mode** — Q&A + phase routing |
-| `$reforge-answer` | `/reforge-answer` | **Manual mode** Q&A — answer one pending question without phase routing |
-| `$reforge-update "<change>"` | `/reforge-update "<change>"` | Apply a natural-language change to the existing spec |
-| `$reforge-diff` | `/reforge-diff` | Show JSON-path differences between the previous and current spec |
-| `$reforge-validate` | `/reforge-validate` | Validate `spec.json` for completeness and consistency |
-| `$reforge-render` | `/reforge-render` | Start the local prototype server for human approval |
-| `$reforge-plan` | `/reforge-plan` | Generate `tasks.json` from the approved spec |
-| `$reforge-impl [entity]` | `/reforge-impl [entity]` | Implement one entity end-to-end (DB + API + UI + tests) |
-| `$reforge-verify` | `/reforge-verify` | Check implementation against the spec |
+|---|---|---|
+| `$reforge-requirements "<idea>"` | `/reforge-requirements "<idea>"` | Create or revise Requirements |
+| `$reforge-us` | `/reforge-us` | Create User Stories and US mock operations |
+| `$reforge-design` | `/reforge-design` | Create cc-sdd-style implementation Design |
+| `$reforge-proto` | `/reforge-proto` | Create and review simplified prototype |
+| `$reforge-plan` | `/reforge-plan` | Generate implementation plan |
+| `$reforge-impl [task-id]` | `/reforge-impl [task-id]` | Implement one approved plan task |
 
 ## Workflow
 
-1. `$reforge-init "日報アプリを作りたい"` — generate initial spec and question queue
-2. Answer the presented question; run `$reforge-resume` to continue
-3. Repeat until no pending questions remain
-4. `$reforge-validate` — confirm the spec is complete and consistent
-5. `$reforge-render` — review UI prototype and approve
-6. `$reforge-plan` — generate implementation tasks
-7. `$reforge-impl` — implement entity by entity
-8. `$reforge-verify` — verify implementation against spec
-
-At any point: `$reforge-update "<change>"` to revise, `$reforge-diff` to review changes.
+1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`
+2. `$reforge-us` — produce `user-stories.md` and `us-mock.md`
+3. `$reforge-design` — produce `design.md` from US and existing implementation evidence
+4. `$reforge-proto` — produce `prototype.html` and validate the user-story experience
+5. `$reforge-plan` — produce `plan.md`
+6. `$reforge-impl` — implement one task at a time using a cc-sdd-style loop
 
 ## Workspace Files
 
-Reforge reads and writes to `.reforge/specs/<name>/` in your project directory:
+Reforge writes feature artifacts to `.reforge/<feature>/`:
 
 | File | Purpose |
-|------|---------|
-| `.reforge/specs/<name>/spec.json` | Current product specification (single source of truth) |
-| `.reforge/specs/<name>/questions.json` | Pending and answered question queue |
-| `.reforge/specs/<name>/spec.previous.json` | Previous spec snapshot (used by `$reforge-diff`) |
-| `.reforge/specs/<name>/tasks.json` | Implementation task queue (created by `$reforge-plan`) |
-| `.reforge/specs/<name>/tasks.previous.json` | Retired task queue when `$reforge-update` resets approval; signals `$reforge-resume` to route to `$reforge-plan` after re-approval |
+|---|---|
+| `manifest.json` | Artifact index, status, digest metadata |
+| `requirements.md` | AI-DLC Requirements |
+| `user-stories.md` | User story set |
+| `us-mock.md` | User operations and UI moments |
+| `design.md` | Implementation design and file boundaries |
+| `prototype.html` | Simplified review prototype |
+| `plan.md` | Implementation tasks and notes |
 
-Add `.reforge/` to `.gitignore` to keep workspace state local, or commit it to share session progress across machines.
-
-## Skills Location
-
-- Claude Code: `.claude/skills/reforge-*/SKILL.md`
-- Codex: `.agents/skills/reforge-*/SKILL.md`
+`manifest.json` is not the specification. Approved Markdown/HTML artifacts are the source of truth.

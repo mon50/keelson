@@ -1,7 +1,0 @@
-interface:
-  display_name: "Reforge Init"
-  short_description: "Initialize a new Reforge spec"
-policy:
-  allow_implicit_invocation: false
-dependencies:
-  tools: []

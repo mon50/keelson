@@ -1,6 +1,17 @@
 # Recovery and Rollback
 
-**Symptoms:** Spec got messed up.
-**Command:** Use `git checkout .reforge` or copy from `spec.previous.json`.
-**Success Signal:** `spec.json` is back to a valid state.
-**Common Failure:** `reforge-validate` fails after manual edits.
+**Symptoms:** An artifact got too broad, contradicted another artifact, or was approved too early.
+**Command:** Edit the owning artifact or rerun its phase command.
+**Success Signal:** `manifest.json` points to the corrected artifact and downstream artifacts are regenerated when needed.
+**Common Failure:** Editing `manifest.json` instead of the artifact text.
+
+The source of truth is the approved artifact bundle:
+
+- `requirements.md`
+- `user-stories.md`
+- `us-mock.md`
+- `design.md`
+- `prototype.html`
+- `plan.md`
+
+If a downstream phase reveals a product mismatch, return to `/reforge-requirements`. If the mismatch is an operation or UI moment, return to `/reforge-us`. If the mismatch is implementation structure, return to `/reforge-design`.

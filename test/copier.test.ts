@@ -4,6 +4,7 @@ import * as fse from 'fs-extra';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { copyLocalSkills, copyRendererServer, copyForwarders } from '../src/copier';
+import { ALL_SKILLS } from '../src/types';
 import type { PackageAssets } from '../src/types';
 
 const coreSkillsDir = path.resolve(__dirname, '../skills/core');
@@ -29,21 +30,43 @@ describe('copyLocalSkills()', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('コピー後に .reforge/skills/reforge-init/SKILL.md が存在する', async () => {
+  it('コピー後に .reforge/skills/reforge-requirements/SKILL.md が存在する', async () => {
     const assets = makeAssets();
     await copyLocalSkills(tmpDir, assets);
-    const skillMd = path.join(tmpDir, '.reforge/skills/reforge-init/SKILL.md');
+    const skillMd = path.join(tmpDir, '.reforge/skills/reforge-requirements/SKILL.md');
     expect(fs.existsSync(skillMd)).toBe(true);
   });
 
-  it('10スキルすべてが .reforge/skills/ 配下にコピーされる', async () => {
+  it('全スキルが .reforge/skills/ 配下にコピーされる', async () => {
     const assets = makeAssets();
     await copyLocalSkills(tmpDir, assets);
     const skillsDir = path.join(tmpDir, '.reforge/skills');
     const dirs = fs.readdirSync(skillsDir).filter((entry) => {
       return fs.statSync(path.join(skillsDir, entry)).isDirectory();
     });
-    expect(dirs.length).toBe(10);
+    expect(dirs.length).toBe(ALL_SKILLS.length);
+  });
+
+  it('既知の旧 reforge-* スキルは .reforge/skills/ から削除される', async () => {
+    const legacyDir = path.join(tmpDir, '.reforge/skills/reforge-init');
+    await fse.ensureDir(legacyDir);
+    await fse.writeFile(path.join(legacyDir, 'SKILL.md'), 'legacy');
+
+    const assets = makeAssets();
+    await copyLocalSkills(tmpDir, assets);
+
+    expect(fs.existsSync(legacyDir)).toBe(false);
+  });
+
+  it('ユーザー作成の reforge-* スキルは .reforge/skills/ から削除しない', async () => {
+    const customDir = path.join(tmpDir, '.reforge/skills/reforge-review');
+    await fse.ensureDir(customDir);
+    await fse.writeFile(path.join(customDir, 'SKILL.md'), 'custom');
+
+    const assets = makeAssets();
+    await copyLocalSkills(tmpDir, assets);
+
+    expect(fs.existsSync(path.join(customDir, 'SKILL.md'))).toBe(true);
   });
 
   it('正常完了時は result.overwritten が配列で result.error が undefined', async () => {
@@ -128,14 +151,14 @@ describe('copyForwarders() - Claude Code', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('Claude Code 環境で copyForwarders を呼び出すと .claude/skills/reforge-init/SKILL.md が存在する', async () => {
+  it('Claude Code 環境で copyForwarders を呼び出すと .claude/skills/reforge-requirements/SKILL.md が存在する', async () => {
     const result = await copyForwarders(tmpDir, 'claude-code', assets);
     expect(result.error).toBeUndefined();
-    const skillMd = path.join(tmpDir, '.claude/skills/reforge-init/SKILL.md');
+    const skillMd = path.join(tmpDir, '.claude/skills/reforge-requirements/SKILL.md');
     expect(fs.existsSync(skillMd)).toBe(true);
   });
 
-  it('10スキルすべてが .claude/skills/ に生成される', async () => {
+  it('全スキルが .claude/skills/ に生成される', async () => {
     await copyForwarders(tmpDir, 'claude-code', assets);
     const skillsDir = path.join(tmpDir, '.claude/skills');
     const skillFiles: string[] = [];
@@ -145,14 +168,14 @@ describe('copyForwarders() - Claude Code', () => {
         skillFiles.push(candidate);
       }
     }
-    expect(skillFiles.length).toBe(10);
+    expect(skillFiles.length).toBe(ALL_SKILLS.length);
   });
 
-  it('生成された SKILL.md がフォワーダー形式（.reforge/skills/reforge-init/SKILL.md を含む）', async () => {
+  it('生成された SKILL.md がフォワーダー形式（.reforge/skills/reforge-requirements/SKILL.md を含む）', async () => {
     await copyForwarders(tmpDir, 'claude-code', assets);
-    const skillMd = path.join(tmpDir, '.claude/skills/reforge-init/SKILL.md');
+    const skillMd = path.join(tmpDir, '.claude/skills/reforge-requirements/SKILL.md');
     const content = fs.readFileSync(skillMd, 'utf8');
-    expect(content).toContain('.reforge/skills/reforge-init/SKILL.md');
+    expect(content).toContain('.reforge/skills/reforge-requirements/SKILL.md');
   });
 
   it('既存ファイルを上書きした場合 result.overwritten にパスが含まれる', async () => {
@@ -161,8 +184,28 @@ describe('copyForwarders() - Claude Code', () => {
     // 再度コピーすると overwritten に含まれる
     const result = await copyForwarders(tmpDir, 'claude-code', assets);
     expect(result.error).toBeUndefined();
-    const expectedPath = path.join(tmpDir, '.claude/skills/reforge-init/SKILL.md');
+    const expectedPath = path.join(tmpDir, '.claude/skills/reforge-requirements/SKILL.md');
     expect(result.overwritten).toContain(expectedPath);
+  });
+
+  it('既知の旧 forwarder は Claude Code 環境から削除される', async () => {
+    const legacyDir = path.join(tmpDir, '.claude/skills/reforge-init');
+    await fse.ensureDir(legacyDir);
+    await fse.writeFile(path.join(legacyDir, 'SKILL.md'), 'legacy');
+
+    await copyForwarders(tmpDir, 'claude-code', assets);
+
+    expect(fs.existsSync(legacyDir)).toBe(false);
+  });
+
+  it('ユーザー作成の reforge-* forwarder は Claude Code 環境から削除しない', async () => {
+    const customDir = path.join(tmpDir, '.claude/skills/reforge-review');
+    await fse.ensureDir(customDir);
+    await fse.writeFile(path.join(customDir, 'SKILL.md'), 'custom');
+
+    await copyForwarders(tmpDir, 'claude-code', assets);
+
+    expect(fs.existsSync(path.join(customDir, 'SKILL.md'))).toBe(true);
   });
 });
 
@@ -183,10 +226,20 @@ describe('copyForwarders() - Codex', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('Codex 環境で copyForwarders を呼び出すと .agents/skills/reforge-init/SKILL.md が存在する', async () => {
+  it('Codex 環境で copyForwarders を呼び出すと .agents/skills/reforge-requirements/SKILL.md が存在する', async () => {
     const result = await copyForwarders(tmpDir, 'codex', assets);
     expect(result.error).toBeUndefined();
-    const skillMd = path.join(tmpDir, '.agents/skills/reforge-init/SKILL.md');
+    const skillMd = path.join(tmpDir, '.agents/skills/reforge-requirements/SKILL.md');
     expect(fs.existsSync(skillMd)).toBe(true);
+  });
+
+  it('ユーザー作成の reforge-* forwarder は Codex 環境から削除しない', async () => {
+    const customDir = path.join(tmpDir, '.agents/skills/reforge-review');
+    await fse.ensureDir(customDir);
+    await fse.writeFile(path.join(customDir, 'SKILL.md'), 'custom');
+
+    await copyForwarders(tmpDir, 'codex', assets);
+
+    expect(fs.existsSync(path.join(customDir, 'SKILL.md'))).toBe(true);
   });
 });
