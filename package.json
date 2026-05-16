@@ -1,6 +1,6 @@
 {
   "name": "aid-reforge",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Installer CLI for Reforge skills",
   "license": "MIT",
   "type": "commonjs",
