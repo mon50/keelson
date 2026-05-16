@@ -10,9 +10,11 @@
 - `npx aid-reforge uninstall`: Removes Reforge.
 
 ## Skills
-- `/reforge-requirements "<idea>"` — create or revise `requirements.md`
+- `/reforge-requirements "<idea>"` — create or revise `requirements.md`, initialize `manifest.json`, and create `audit.md`
 - `/reforge-us` — create `user-stories.md` and `us-mock.html`
 - `/reforge-design` — produce implementation design from approved requirements and stories
 - `/reforge-proto` — create the simplified prototype for review
 - `/reforge-plan` — create `plan.md` from approved artifacts
 - `/reforge-impl [task-id]` — implement one approved task
+
+Each skill appends to `.reforge/<feature>/audit.md` and updates its `Resume Point` before handing control back to the user.

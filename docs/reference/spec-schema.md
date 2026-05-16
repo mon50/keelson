@@ -5,6 +5,7 @@ Reforge no longer has a single specification JSON. The approved artifact bundle 
 ```text
 .reforge/<feature>/
   manifest.json
+  audit.md
   requirements.md
   user-stories.md
   us-mock.html
@@ -32,3 +33,15 @@ Reforge no longer has a single specification JSON. The approved artifact bundle 
 ```
 
 Statuses are `draft`, `needs_revision`, or `approved`.
+
+## Audit Trail
+
+`audit.md` is a support file, not a manifest artifact and not a phase gate. It preserves continuity across sessions.
+
+Required headings:
+
+- `# Audit Trail`
+- `## Chronological Log`
+- `## Resume Point`
+
+Each phase should append a dated log entry for the user input, agent decision, artifact changes, and validation result. The `Resume Point` section should be updated in place with the current phase, approved artifacts, next command, blockers, and last validation.

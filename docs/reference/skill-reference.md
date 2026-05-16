@@ -18,3 +18,7 @@
 - Plan must be approved before Implementation.
 
 Later phases route back to the owning phase when they uncover ambiguity or mismatch.
+
+## Audit Trail
+
+Every skill updates `.reforge/<feature>/audit.md`. The log captures user inputs, key decisions, changed artifacts, checks, and a `Resume Point` showing the next command for a future session.

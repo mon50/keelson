@@ -132,9 +132,12 @@ describe('skill copy contract', () => {
       'us-mock.html',
       'design.md',
       'prototype.html',
-      'plan.md'
+      'plan.md',
+      'audit.md'
     ]) {
       expect(docs).toContain(file);
     }
+
+    expect(docs).toContain('Resume Point');
   });
 });

@@ -22,4 +22,4 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 5. `/reforge-plan`
 6. `/reforge-impl`
 
-Artifacts live in `.reforge/<feature>/`. Approved `requirements.md`, `user-stories.md`, `us-mock.html`, `design.md`, and `prototype.html` form the source of truth for planning and implementation.
+Artifacts live in `.reforge/<feature>/`. Approved `requirements.md`, `user-stories.md`, `us-mock.html`, `design.md`, and `prototype.html` form the source of truth for planning and implementation. `audit.md` records the interaction history, decisions, checks, and the next resume point for the following session.

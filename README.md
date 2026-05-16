@@ -10,7 +10,7 @@ Backward compatibility with the old `spec.json` / question queue / entity CRUD w
 
 | Phase | Command | Output |
 |---|---|---|
-| Requirements | `/reforge-requirements "<idea>"` | `requirements.md`, `manifest.json` |
+| Requirements | `/reforge-requirements "<idea>"` | `requirements.md`, `manifest.json`, `audit.md` |
 | User Stories | `/reforge-us` | `user-stories.md`, `us-mock.html` |
 | Design | `/reforge-design` | `design.md` |
 | Prototype | `/reforge-proto` | `prototype.html` |
@@ -31,6 +31,7 @@ The source of truth is the approved artifact bundle, not one JSON file:
 ```text
 .reforge/<feature>/
   manifest.json
+  audit.md
   requirements.md
   user-stories.md
   us-mock.html
@@ -39,7 +40,7 @@ The source of truth is the approved artifact bundle, not one JSON file:
   plan.md
 ```
 
-`manifest.json` is only an index for paths, phase status, and digests. The approved Markdown/HTML artifacts are the specification.
+`manifest.json` is only an index for paths, phase status, and digests. The approved Markdown/HTML artifacts are the specification. `audit.md` is the continuity log: it records user inputs, decisions, artifact changes, validation results, and a `Resume Point` section that tells the next session where to start.
 
 ## Quick Start
 

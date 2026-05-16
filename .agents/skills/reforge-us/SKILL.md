@@ -14,6 +14,7 @@ Convert approved requirements into user stories and a US mock. This phase proves
 
 - `.reforge/<feature>/manifest.json`
 - `.reforge/<feature>/requirements.md`
+- `.reforge/<feature>/audit.md` if present; create it if missing.
 
 Block if `artifacts.requirements.status` is not `approved`.
 
@@ -22,6 +23,11 @@ Block if `artifacts.requirements.status` is not `approved`.
 - `user-stories.md`
 - `us-mock.html`
 - updated `manifest.json`
+- updated `audit.md`
+
+## Continuity
+
+Before writing, read `audit.md` to understand prior decisions and the current `## Resume Point`. Append a user-stories entry for the user input, story decisions, artifact changes, and validation. Update `## Resume Point` before reporting.
 
 ## User-Stories Contract
 
@@ -78,4 +84,5 @@ If the stories and US mock are acceptable, ask for approval. When approved, set 
 - Every user story has a matching US mock operation.
 - Every UI-relevant story has a prototype implication.
 - UI-relevant stories reflect the `## UI Design Expectations` from `requirements.md`.
+- `audit.md` records story coverage decisions, approval or revision status, and the next command.
 - Report changed files and next gate: `/reforge-design` when approved.

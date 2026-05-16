@@ -10,7 +10,7 @@ Reforge はラフなプロダクト案を、承認済みの Requirements、User 
 
 | フェーズ | コマンド | 成果物 |
 |---|---|---|
-| Requirements | `/reforge-requirements "<作りたい体験や機能>"` | `requirements.md`, `manifest.json` |
+| Requirements | `/reforge-requirements "<作りたい体験や機能>"` | `requirements.md`, `manifest.json`, `audit.md` |
 | User Stories | `/reforge-us` | `user-stories.md`, `us-mock.html` |
 | Design | `/reforge-design` | `design.md` |
 | Prototype | `/reforge-proto` | `prototype.html` |
@@ -31,6 +31,7 @@ SSoT は単一 JSON ではなく、承認済み artifact bundle です。
 ```text
 .reforge/<feature>/
   manifest.json
+  audit.md
   requirements.md
   user-stories.md
   us-mock.html
@@ -39,7 +40,7 @@ SSoT は単一 JSON ではなく、承認済み artifact bundle です。
   plan.md
 ```
 
-`manifest.json` は索引です。仕様本体は承認済み Markdown / HTML artifact です。
+`manifest.json` は索引です。仕様本体は承認済み Markdown / HTML artifact です。`audit.md` は継続ログで、ユーザー入力、意思決定、artifact 変更、検証結果、次セッションの開始位置を示す `Resume Point` を記録します。
 
 ## Design Stance
 

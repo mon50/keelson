@@ -15,7 +15,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 
 ## Workflow
 
-1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`, including UI design expectations for user-facing work
+1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`, `manifest.json`, and `audit.md`, including UI design expectations for user-facing work
 2. `$reforge-us` — produce `user-stories.md` and `us-mock.html`
 3. `$reforge-design` — produce `design.md` from US and existing implementation evidence
 4. `$reforge-proto` — produce `prototype.html` and validate the user-story experience
@@ -29,6 +29,7 @@ Reforge writes feature artifacts to `.reforge/<feature>/`:
 | File | Purpose |
 |---|---|
 | `manifest.json` | Artifact index, status, digest metadata |
+| `audit.md` | Chronological interaction log and session resume point |
 | `requirements.md` | AI-DLC Requirements |
 | `user-stories.md` | User story set |
 | `us-mock.html` | Browser-readable user operations and UI moments |
@@ -37,6 +38,7 @@ Reforge writes feature artifacts to `.reforge/<feature>/`:
 | `plan.md` | Implementation tasks and notes |
 
 `manifest.json` is not the specification. Approved Markdown/HTML artifacts are the source of truth.
+`audit.md` is not a phase-gated specification artifact; it records what happened and where the next session should resume.
 
 ## Release
 

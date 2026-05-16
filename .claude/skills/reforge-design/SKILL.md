@@ -16,8 +16,11 @@ Turn approved requirements, user stories, and US mock operations into a concrete
 - `user-stories.md`
 - `us-mock.html`
 - `manifest.json`
+- `audit.md` if present; create it if missing.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.
+
+Read `audit.md` first to recover prior decisions and the current `## Resume Point`.
 
 ## Repository Inspection
 
@@ -70,4 +73,5 @@ Ask for approval after writing. When approved, set `artifacts.design.status` to 
 - Design has explicit file boundaries.
 - Visual design direction is grounded in requirements and existing UI evidence, or records what remains unknown.
 - Prototype guidance states what the simplified prototype must demonstrate.
+- `audit.md` records implementation evidence inspected, design decisions, approval or revision status, and the next command.
 - Report changed files and next gate: `/reforge-proto`.
