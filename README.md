@@ -11,7 +11,7 @@ Backward compatibility with the old `spec.json` / question queue / entity CRUD w
 | Phase | Command | Output |
 |---|---|---|
 | Requirements | `/reforge-requirements "<idea>"` | `requirements.md`, `manifest.json` |
-| User Stories | `/reforge-us` | `user-stories.md`, `us-mock.md` |
+| User Stories | `/reforge-us` | `user-stories.md`, `us-mock.html` |
 | Design | `/reforge-design` | `design.md` |
 | Prototype | `/reforge-proto` | `prototype.html` |
 | Plan | `/reforge-plan` | `plan.md` |
@@ -33,7 +33,7 @@ The source of truth is the approved artifact bundle, not one JSON file:
   manifest.json
   requirements.md
   user-stories.md
-  us-mock.md
+  us-mock.html
   design.md
   prototype.html
   plan.md

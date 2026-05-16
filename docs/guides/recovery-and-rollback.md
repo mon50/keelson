@@ -9,7 +9,7 @@ The source of truth is the approved artifact bundle:
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `prototype.html`
 - `plan.md`

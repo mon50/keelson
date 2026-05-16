@@ -14,7 +14,7 @@ Create `plan.md` for implementation.
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `prototype.html`
 - `manifest.json`

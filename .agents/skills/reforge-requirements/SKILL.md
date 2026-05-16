@@ -60,7 +60,7 @@ Minimum manifest:
   "artifacts": {
     "requirements": { "path": "requirements.md", "phase": "requirements", "status": "draft" },
     "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "draft" },
-    "usMock": { "path": "us-mock.md", "phase": "user-stories", "status": "draft" },
+    "usMock": { "path": "us-mock.html", "phase": "user-stories", "status": "draft" },
     "design": { "path": "design.md", "phase": "design", "status": "draft" },
     "prototype": { "path": "prototype.html", "phase": "prototype", "status": "draft" },
     "plan": { "path": "plan.md", "phase": "plan", "status": "draft" }

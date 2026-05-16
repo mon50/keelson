@@ -14,7 +14,7 @@ Turn approved requirements, user stories, and US mock operations into a concrete
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `manifest.json`
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.

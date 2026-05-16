@@ -5,7 +5,7 @@ Reforge は artifact-first の AI-DLC Inception ワークフローです。旧 `
 ## フェーズ
 
 1. `/reforge-requirements "<作りたい体験や機能>"` で `requirements.md` を作成
-2. `/reforge-us` で `user-stories.md` と `us-mock.md` を作成
+2. `/reforge-us` で `user-stories.md` と `us-mock.html` を作成
 3. `/reforge-design` で既存実装を踏まえた `design.md` を作成
 4. `/reforge-proto` で体験検証用の `prototype.html` を作成
 5. `/reforge-plan` で `plan.md` を作成
@@ -18,7 +18,7 @@ Reforge は artifact-first の AI-DLC Inception ワークフローです。旧 `
   manifest.json
   requirements.md
   user-stories.md
-  us-mock.md
+  us-mock.html
   design.md
   prototype.html
   plan.md

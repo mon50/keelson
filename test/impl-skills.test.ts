@@ -20,7 +20,7 @@ describe('reforge-impl skill', () => {
     for (const artifact of [
       'requirements.md',
       'user-stories.md',
-      'us-mock.md',
+      'us-mock.html',
       'design.md',
       'prototype.html',
       'plan.md',

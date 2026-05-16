@@ -80,7 +80,7 @@ describe('artifact manifest contract', () => {
       artifacts: {
         requirements: artifact('requirements.md', 'requirements', 'approved'),
         userStories: artifact('user-stories.md', 'user-stories', 'approved'),
-        usMock: artifact('us-mock.md', 'user-stories', 'approved'),
+        usMock: artifact('us-mock.html', 'user-stories', 'approved'),
         design: artifact('design.md', 'design', 'approved'),
         prototype: artifact('prototype.html', 'prototype', 'approved'),
         plan: artifact('plan.md', 'plan', 'approved')
@@ -129,7 +129,7 @@ describe('skill copy contract', () => {
     for (const file of [
       'requirements.md',
       'user-stories.md',
-      'us-mock.md',
+      'us-mock.html',
       'design.md',
       'prototype.html',
       'plan.md'

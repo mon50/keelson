@@ -20,7 +20,7 @@ Block if `artifacts.requirements.status` is not `approved`.
 ## Outputs
 
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - updated `manifest.json`
 
 ## User-Stories Contract
@@ -38,17 +38,27 @@ Every story must have a stable id such as `US-001`, role, goal, benefit, and acc
 
 ## US Mock Contract
 
-`us-mock.md` must translate each user story into user operations and UI moments:
+Output file: `us-mock.html`
 
-- story id
-- entry point
-- user action sequence
-- expected visible feedback
-- data shown or captured
-- edge or empty state
-- prototype implication
+`us-mock.html` must translate each user story into a browser-readable scenario mock:
 
-This is not implementation design. It is the experience contract for `/reforge-proto`.
+- story id and title as section headings
+- entry point: page, route, or state where the story begins
+- user action sequence as numbered steps
+- expected visible feedback, including success, failure, loading, and empty states when relevant
+- data shown or captured, including API call summaries when known
+- edge or empty state as a note, callout, or separate panel
+- prototype implication for `/reforge-proto`
+
+HTML requirements:
+
+- Inline CSS only; do not depend on external assets or packages.
+- No JavaScript is required; keep it static unless the user explicitly asks for interaction.
+- The file must open directly in a browser.
+- Use `<details>` and `<summary>` so scenarios can be collapsed.
+- Add navigation links between story sections.
+
+This is not implementation design and not the final prototype. It is the experience contract for `/reforge-proto`.
 
 ## Revision Loop
 
@@ -56,7 +66,7 @@ If a story exposes an unclear or contradictory requirement:
 
 1. Do not paper over the issue.
 2. Mark `artifacts.requirements.status` as `needs_revision`.
-3. Record the mismatch in `us-mock.md`.
+3. Record the mismatch in `us-mock.html`.
 4. Stop and route back to `/reforge-requirements`.
 
 If the stories and US mock are acceptable, ask for approval. When approved, set both `artifacts.userStories.status` and `artifacts.usMock.status` to `approved`.

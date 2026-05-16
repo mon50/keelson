@@ -59,6 +59,36 @@ async function ensureInstallDirs(cwd: string): Promise<InstallError | undefined>
   }
 }
 
+function hasReforgeGitignoreEntry(content: string): boolean {
+  return content.split(/\r?\n/).some((line) => {
+    const trimmed = line.trim();
+    return (
+      trimmed === '.reforge' ||
+      trimmed === '.reforge/' ||
+      trimmed === '/.reforge' ||
+      trimmed === '/.reforge/'
+    );
+  });
+}
+
+async function ensureReforgeGitignored(cwd: string): Promise<InstallError | undefined> {
+  const gitignorePath = path.join(cwd, '.gitignore');
+  try {
+    const content = (await fs.pathExists(gitignorePath))
+      ? await fs.readFile(gitignorePath, 'utf8')
+      : '';
+    if (hasReforgeGitignoreEntry(content)) {
+      return undefined;
+    }
+
+    const separator = content.length > 0 && !content.endsWith('\n') ? '\n' : '';
+    await fs.appendFile(gitignorePath, `${separator}.reforge/\n`);
+    return undefined;
+  } catch (err: unknown) {
+    return toInstallError(gitignorePath, err);
+  }
+}
+
 export async function install(cwd: string, options?: InstallOptions): Promise<InstallResult> {
   const assets = options?.assets ?? resolveDefaultAssets();
 
@@ -67,6 +97,10 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
     const initError = await ensureInstallDirs(cwd);
     if (initError) {
       return emptyResult({ error: initError });
+    }
+    const gitignoreError = await ensureReforgeGitignored(cwd);
+    if (gitignoreError) {
+      return emptyResult({ error: gitignoreError });
     }
 
     const localResult = await copyLocalSkills(cwd, assets);

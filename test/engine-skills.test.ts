@@ -44,8 +44,11 @@ describe('reforge-us skill', () => {
 
     expect(markdown).toContain('Block if `artifacts.requirements.status` is not `approved`.');
     expect(markdown).toContain('user-stories.md');
-    expect(markdown).toContain('us-mock.md');
+    expect(markdown).toContain('us-mock.html');
     expect(markdown).toContain('Every story must have a stable id such as `US-001`');
+    expect(markdown).toContain('browser-readable scenario mock');
+    expect(markdown).toContain('Use `<details>` and `<summary>`');
+    expect(markdown).toContain('Inline CSS only');
     expect(markdown).toContain('prototype implication');
     expect(markdown).toContain('route back to `/reforge-requirements`');
     expect(markdown).toContain('/reforge-design');

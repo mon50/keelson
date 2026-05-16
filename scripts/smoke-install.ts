@@ -22,9 +22,15 @@ async function main() {
       throw new Error('Skills were not installed in .claude/skills');
     }
 
-    const initSkill = path.join(claudeSkillsDir, 'reforge-init', 'SKILL.md');
-    if (!await fs.pathExists(initSkill)) {
-      throw new Error('reforge-init skill was not installed');
+    const requirementsSkill = path.join(claudeSkillsDir, 'reforge-requirements', 'SKILL.md');
+    if (!await fs.pathExists(requirementsSkill)) {
+      throw new Error('reforge-requirements skill was not installed');
+    }
+
+    const gitignorePath = path.join(testDir, '.gitignore');
+    const gitignore = await fs.readFile(gitignorePath, 'utf8');
+    if (!gitignore.split(/\r?\n/).includes('.reforge/')) {
+      throw new Error('.reforge/ was not added to .gitignore');
     }
 
     // Run doctor

@@ -14,7 +14,7 @@ Create a simple prototype that validates the user-story experience and the desig
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `manifest.json`
 
@@ -30,7 +30,7 @@ Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `a
 
 The prototype must:
 
-- demonstrate each user story's core operation from `us-mock.md`
+- demonstrate each user story's core operation from `us-mock.html`
 - use copy and states aligned with requirements
 - follow the UI composition and existing-implementation evidence in `design.md`
 - stay simple: static HTML/CSS/JS is enough

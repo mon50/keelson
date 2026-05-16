@@ -15,7 +15,7 @@ Implement one task from `plan.md` using the approved Reforge artifact bundle as 
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `prototype.html`
 - `plan.md`

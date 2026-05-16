@@ -16,7 +16,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 ## Workflow
 
 1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`
-2. `$reforge-us` — produce `user-stories.md` and `us-mock.md`
+2. `$reforge-us` — produce `user-stories.md` and `us-mock.html`
 3. `$reforge-design` — produce `design.md` from US and existing implementation evidence
 4. `$reforge-proto` — produce `prototype.html` and validate the user-story experience
 5. `$reforge-plan` — produce `plan.md`
@@ -31,9 +31,20 @@ Reforge writes feature artifacts to `.reforge/<feature>/`:
 | `manifest.json` | Artifact index, status, digest metadata |
 | `requirements.md` | AI-DLC Requirements |
 | `user-stories.md` | User story set |
-| `us-mock.md` | User operations and UI moments |
+| `us-mock.html` | Browser-readable user operations and UI moments |
 | `design.md` | Implementation design and file boundaries |
 | `prototype.html` | Simplified review prototype |
 | `plan.md` | Implementation tasks and notes |
 
 `manifest.json` is not the specification. Approved Markdown/HTML artifacts are the source of truth.
+
+## Release
+
+Reforge releases are tag-driven. This repository does not currently create GitHub Release objects; pushing a `v*` tag triggers `.github/workflows/release.yml`, which builds and publishes the npm package.
+
+1. Merge the release change to `main` and fast-forward local `main`.
+2. Confirm `package.json` has the intended version and `npm view aid-reforge version` still shows the previous version.
+3. Run the release checks locally, at minimum `npm run build` and the relevant tests.
+4. Create an annotated tag on `main`, for example `git tag -a v0.3.0 -m "v0.3.0"`.
+5. Push the tag with `git push origin v0.3.0`.
+6. Verify the GitHub Actions `Release` workflow succeeds and `npm view aid-reforge version` reports the new version.
