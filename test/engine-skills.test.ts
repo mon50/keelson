@@ -31,10 +31,12 @@ describe('reforge-requirements skill', () => {
       '## In Scope',
       '## Out of Scope',
       '## Acceptance Signals',
+      '## UI Design Expectations',
       '## Constraints',
       '## Open Questions',
       '## Next Gate'
     ]);
+    expect(markdown).toContain('Do not leave UI design expectations implicit');
   });
 });
 
@@ -49,6 +51,7 @@ describe('reforge-us skill', () => {
     expect(markdown).toContain('browser-readable scenario mock');
     expect(markdown).toContain('Use `<details>` and `<summary>`');
     expect(markdown).toContain('Inline CSS only');
+    expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
     expect(markdown).toContain('prototype implication');
     expect(markdown).toContain('route back to `/reforge-requirements`');
     expect(markdown).toContain('/reforge-design');
@@ -84,9 +87,11 @@ describe('reforge-design skill', () => {
       '## Data Model',
       '## API / Server Behavior',
       '## UI Composition',
+      '## Visual Design Direction',
       '## Test Strategy',
       '## Prototype Guidance'
     ]);
+    expect(markdown).toContain('requirements.md` UI design expectations');
   });
 });
 

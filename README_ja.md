@@ -40,3 +40,9 @@ SSoT は単一 JSON ではなく、承認済み artifact bundle です。
 ```
 
 `manifest.json` は索引です。仕様本体は承認済み Markdown / HTML artifact です。
+
+## Design Stance
+
+- Requirements では WHAT / WHY に加えて、ユーザーが期待する UI デザイン方針も明示します。
+- User Stories ではユーザー操作と UI モーメントを確認します。
+- Design では既存実装とデザイン証拠に基づいて実装境界を決めます。

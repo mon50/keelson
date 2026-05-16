@@ -48,6 +48,7 @@ Output file: `us-mock.html`
 - expected visible feedback, including success, failure, loading, and empty states when relevant
 - data shown or captured, including API call summaries when known
 - edge or empty state as a note, callout, or separate panel
+- UI design expectations inherited from `requirements.md`
 - prototype implication for `/reforge-proto`
 
 HTML requirements:
@@ -76,4 +77,5 @@ If the stories and US mock are acceptable, ask for approval. When approved, set 
 - Every in-scope requirement is covered by at least one user story.
 - Every user story has a matching US mock operation.
 - Every UI-relevant story has a prototype implication.
+- UI-relevant stories reflect the `## UI Design Expectations` from `requirements.md`.
 - Report changed files and next gate: `/reforge-design` when approved.

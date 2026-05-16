@@ -15,7 +15,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 
 ## Workflow
 
-1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`
+1. `$reforge-requirements "作りたい体験や機能"` — produce `requirements.md`, including UI design expectations for user-facing work
 2. `$reforge-us` — produce `user-stories.md` and `us-mock.html`
 3. `$reforge-design` — produce `design.md` from US and existing implementation evidence
 4. `$reforge-proto` — produce `prototype.html` and validate the user-story experience

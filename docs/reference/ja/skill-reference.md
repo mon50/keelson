@@ -2,7 +2,7 @@
 
 | Skill | フェーズ | 目的 |
 |---|---|---|
-| `reforge-requirements` | Requirements | AI-DLC Requirements を作成・修正 |
+| `reforge-requirements` | Requirements | UI デザイン期待値を含む AI-DLC Requirements を作成・修正 |
 | `reforge-us` | User Stories | User Stories と US モックを作成 |
 | `reforge-design` | Design | 既存実装を踏まえた実装設計を作成 |
 | `reforge-proto` | Prototype | 体験確認用の簡易プロトタイプを作成 |

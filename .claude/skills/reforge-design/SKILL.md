@@ -26,6 +26,7 @@ When this is a brownfield feature, inspect existing implementation evidence befo
 - package and framework config
 - routing directories
 - component directories
+- design-system, style, theme, or token files
 - API/server directories
 - database schema or migration directories
 - test patterns
@@ -44,6 +45,7 @@ Do not claim full repository understanding. Record evidence and uncertainty.
 - `## Data Model`
 - `## API / Server Behavior`
 - `## UI Composition`
+- `## Visual Design Direction`
 - `## State, Errors, and Empty States`
 - `## Files To Touch`
 - `## Files Not To Touch`
@@ -51,7 +53,7 @@ Do not claim full repository understanding. Record evidence and uncertainty.
 - `## Prototype Guidance`
 - `## Risks And Open Questions`
 
-The design must trace back to user story ids and US mock operations.
+The design must trace back to user story ids, US mock operations, and `requirements.md` UI design expectations.
 
 ## Revision Loop
 
@@ -66,5 +68,6 @@ Ask for approval after writing. When approved, set `artifacts.design.status` to 
 - Design is specific enough for planning tasks.
 - Design identifies existing implementation locations when present.
 - Design has explicit file boundaries.
+- Visual design direction is grounded in requirements and existing UI evidence, or records what remains unknown.
 - Prototype guidance states what the simplified prototype must demonstrate.
 - Report changed files and next gate: `/reforge-proto`.

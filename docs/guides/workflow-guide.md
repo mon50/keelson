@@ -4,7 +4,7 @@ Reforge is now an artifact-first AI-DLC Inception workflow. It no longer uses a 
 
 ## Phases
 
-1. `/reforge-requirements "<idea>"` creates `requirements.md`.
+1. `/reforge-requirements "<idea>"` creates `requirements.md`, including UI design expectations for user-facing work.
 2. `/reforge-us` creates `user-stories.md` and `us-mock.html`.
 3. `/reforge-design` creates `design.md` from approved user stories and existing implementation evidence.
 4. `/reforge-proto` creates `prototype.html` to validate the US experience and design direction.
