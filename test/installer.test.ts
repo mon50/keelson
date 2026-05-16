@@ -138,6 +138,28 @@ describe('install()', () => {
     expect(result.success).toBe(true);
   });
 
+  it('install() 後 .gitignore に .reforge/ が追加される', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.claude'));
+
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+
+    expect(result.success).toBe(true);
+    expect(fs.readFileSync(path.join(tmpDir, '.gitignore'), 'utf8')).toContain('.reforge/');
+  });
+
+  it('既存 .gitignore に .reforge がある場合は重複追加しない', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.claude'));
+    await fse.writeFile(path.join(tmpDir, '.gitignore'), 'node_modules/\n.reforge/\n');
+
+    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
+    const result = await install(tmpDir, { assets });
+    const gitignore = fs.readFileSync(path.join(tmpDir, '.gitignore'), 'utf8');
+
+    expect(result.success).toBe(true);
+    expect(gitignore.match(/^\.reforge\/$/gm)).toHaveLength(1);
+  });
+
   it('assets.coreSkillsDir が存在しない場合は InstallResult.success === false が返る（例外スローなし）', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 

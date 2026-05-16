@@ -20,11 +20,12 @@ describe('reforge-impl skill', () => {
     for (const artifact of [
       'requirements.md',
       'user-stories.md',
-      'us-mock.md',
+      'us-mock.html',
       'design.md',
       'prototype.html',
       'plan.md',
-      'manifest.json'
+      'manifest.json',
+      'audit.md'
     ]) {
       expect(markdown).toContain(artifact);
     }
@@ -43,7 +44,9 @@ describe('reforge-impl skill', () => {
       'Add or update tests first',
       'Implement the smallest change',
       'Run the relevant tests or checks',
-      'Update `plan.md` with task status and implementation notes'
+      'Update `plan.md` with task status and implementation notes',
+      'Append an implementation entry to `audit.md`',
+      'next pending task'
     ]) {
       expect(markdown).toContain(step);
     }

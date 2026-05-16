@@ -14,9 +14,10 @@ Create a simple prototype that validates the user-story experience and the desig
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `manifest.json`
+- `audit.md` if present; create it if missing.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, and `artifacts.design.status` are `approved`.
 
@@ -25,12 +26,17 @@ Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `a
 - `prototype.html`
 - optional `prototype-notes.md`
 - updated `manifest.json`
+- updated `audit.md`
+
+## Continuity
+
+Read `audit.md` before prototyping to recover prior decisions and the current `## Resume Point`. Append prototype decisions, review result, and validation notes. Update `## Resume Point` before reporting.
 
 ## Prototype Contract
 
 The prototype must:
 
-- demonstrate each user story's core operation from `us-mock.md`
+- demonstrate each user story's core operation from `us-mock.html`
 - use copy and states aligned with requirements
 - follow the UI composition and existing-implementation evidence in `design.md`
 - stay simple: static HTML/CSS/JS is enough
@@ -50,4 +56,5 @@ After writing `prototype.html`, ask the user whether the prototype proves the in
 - Prototype covers every approved user story or explicitly marks manual-only stories.
 - Prototype reflects design file boundaries and existing UI direction.
 - Prototype does not become the implementation contract by itself; `design.md` remains the implementation source.
+- `audit.md` records prototype validation outcome and the next command.
 - Report changed files and next gate: `/reforge-plan`.

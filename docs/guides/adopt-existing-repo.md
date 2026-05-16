@@ -64,7 +64,7 @@ During Requirements and User Stories, make sure these decisions are explicit:
 - What acceptance criteria must be true before the feature is done?
 - Which tests or checks should verify it?
 
-Reforge records this in `requirements.md`, `user-stories.md`, `us-mock.md`, and `design.md`. `manifest.json` indexes artifact status only.
+Reforge records this in `requirements.md`, `user-stories.md`, `us-mock.html`, and `design.md`. `manifest.json` indexes artifact status only.
 
 ## Implementation
 

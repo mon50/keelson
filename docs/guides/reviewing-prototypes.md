@@ -1,6 +1,6 @@
 # Reviewing Prototypes
 
-Use `/reforge-proto` after `requirements.md`, `user-stories.md`, `us-mock.md`, and `design.md` are approved.
+Use `/reforge-proto` after `requirements.md`, `user-stories.md`, `us-mock.html`, and `design.md` are approved.
 
 Review `prototype.html` for two things:
 

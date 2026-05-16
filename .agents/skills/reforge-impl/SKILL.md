@@ -15,13 +15,16 @@ Implement one task from `plan.md` using the approved Reforge artifact bundle as 
 
 - `requirements.md`
 - `user-stories.md`
-- `us-mock.md`
+- `us-mock.html`
 - `design.md`
 - `prototype.html`
 - `plan.md`
 - `manifest.json`
+- `audit.md` if present; create it if missing.
 
 Block unless `artifacts.plan.status` is `approved`.
+
+Read `audit.md` first to recover prior decisions and the current `## Resume Point`.
 
 ## Task Selection
 
@@ -44,7 +47,9 @@ For each task:
 4. Implement the smallest change that satisfies the task.
 5. Run the relevant tests or checks.
 6. Update `plan.md` with task status and implementation notes.
-7. Report files changed, checks run, and any remaining manual verification.
+7. Append an implementation entry to `audit.md` with task id, files changed, checks run, and remaining work.
+8. Update `## Resume Point` in `audit.md` to the next pending task or the owning phase if blocked.
+9. Report files changed, checks run, and any remaining manual verification.
 
 ## Boundaries
 
@@ -58,3 +63,4 @@ For each task:
 - The implemented task traces to requirements, user stories, design, and plan.
 - Tests/checks cover the task or the report explicitly states why manual verification remains.
 - `plan.md` records what changed and what remains.
+- `audit.md` records the implementation outcome and next resume point.

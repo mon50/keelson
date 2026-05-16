@@ -10,8 +10,8 @@ Reforge はラフなプロダクト案を、承認済みの Requirements、User 
 
 | フェーズ | コマンド | 成果物 |
 |---|---|---|
-| Requirements | `/reforge-requirements "<作りたい体験や機能>"` | `requirements.md`, `manifest.json` |
-| User Stories | `/reforge-us` | `user-stories.md`, `us-mock.md` |
+| Requirements | `/reforge-requirements "<作りたい体験や機能>"` | `requirements.md`, `manifest.json`, `audit.md` |
+| User Stories | `/reforge-us` | `user-stories.md`, `us-mock.html` |
 | Design | `/reforge-design` | `design.md` |
 | Prototype | `/reforge-proto` | `prototype.html` |
 | Plan | `/reforge-plan` | `plan.md` |
@@ -31,12 +31,19 @@ SSoT は単一 JSON ではなく、承認済み artifact bundle です。
 ```text
 .reforge/<feature>/
   manifest.json
+  audit.md
   requirements.md
   user-stories.md
-  us-mock.md
+  us-mock.html
   design.md
   prototype.html
   plan.md
 ```
 
-`manifest.json` は索引です。仕様本体は承認済み Markdown / HTML artifact です。
+`manifest.json` は索引です。仕様本体は承認済み Markdown / HTML artifact です。`audit.md` は継続ログで、ユーザー入力、意思決定、artifact 変更、検証結果、次セッションの開始位置を示す `Resume Point` を記録します。
+
+## Design Stance
+
+- Requirements では WHAT / WHY に加えて、ユーザーが期待する UI デザイン方針も明示します。
+- User Stories ではユーザー操作と UI モーメントを確認します。
+- Design では既存実装とデザイン証拠に基づいて実装境界を決めます。

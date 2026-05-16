@@ -11,4 +11,4 @@ The new workflow focuses on pre-implementation convergence:
 - Plan turns the approved artifacts into implementation tasks.
 - Implementation proceeds one task at a time using a cc-sdd-style loop.
 
-The source of truth is the approved artifact bundle, not chat history and not a single generated JSON file.
+The source of truth is the approved artifact bundle, not chat history and not a single generated JSON file. `audit.md` keeps chat-derived continuity and the next resume point, but it does not override approved artifacts.

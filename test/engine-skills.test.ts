@@ -15,13 +15,14 @@ function expectHeadings(markdown: string, headings: readonly string[]): void {
 }
 
 describe('reforge-requirements skill', () => {
-  it('creates requirements.md and manifest.json without the legacy question queue', () => {
+  it('creates requirements.md, manifest.json, and audit.md without the legacy question queue', () => {
     const markdown = skill('reforge-requirements');
 
     expect(markdown).toContain('name: reforge-requirements');
     expect(markdown).toContain('argument-hint: "\\"<idea>\\""');
     expect(markdown).toContain('requirements.md');
     expect(markdown).toContain('manifest.json');
+    expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Write open questions inside the artifact that owns them.');
     expect(markdown).toContain('/reforge-us');
     expectHeadings(markdown, [
@@ -31,10 +32,14 @@ describe('reforge-requirements skill', () => {
       '## In Scope',
       '## Out of Scope',
       '## Acceptance Signals',
+      '## UI Design Expectations',
       '## Constraints',
       '## Open Questions',
       '## Next Gate'
     ]);
+    expect(markdown).toContain('Do not leave UI design expectations implicit');
+    expect(markdown).toContain('# Audit Trail');
+    expect(markdown).toContain('## Resume Point');
   });
 });
 
@@ -44,10 +49,16 @@ describe('reforge-us skill', () => {
 
     expect(markdown).toContain('Block if `artifacts.requirements.status` is not `approved`.');
     expect(markdown).toContain('user-stories.md');
-    expect(markdown).toContain('us-mock.md');
+    expect(markdown).toContain('us-mock.html');
     expect(markdown).toContain('Every story must have a stable id such as `US-001`');
+    expect(markdown).toContain('browser-readable scenario mock');
+    expect(markdown).toContain('Use `<details>` and `<summary>`');
+    expect(markdown).toContain('Inline CSS only');
+    expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
     expect(markdown).toContain('prototype implication');
     expect(markdown).toContain('route back to `/reforge-requirements`');
+    expect(markdown).toContain('updated `audit.md`');
+    expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/reforge-design');
     expectHeadings(markdown, [
       '# User Stories',
@@ -72,6 +83,8 @@ describe('reforge-design skill', () => {
     expect(markdown).toContain('Files Not To Touch');
     expect(markdown).toContain('route to `/reforge-requirements`');
     expect(markdown).toContain('route to `/reforge-us`');
+    expect(markdown).toContain('audit.md');
+    expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/reforge-proto');
     expectHeadings(markdown, [
       '# Design',
@@ -81,9 +94,11 @@ describe('reforge-design skill', () => {
       '## Data Model',
       '## API / Server Behavior',
       '## UI Composition',
+      '## Visual Design Direction',
       '## Test Strategy',
       '## Prototype Guidance'
     ]);
+    expect(markdown).toContain('requirements.md` UI design expectations');
   });
 });
 
@@ -98,6 +113,8 @@ describe('reforge-proto skill', () => {
     expect(markdown).toContain('demonstrate each user story');
     expect(markdown).toContain('mark `artifacts.usMock.status` as `needs_revision`');
     expect(markdown).toContain('mark `artifacts.design.status` as `needs_revision`');
+    expect(markdown).toContain('updated `audit.md`');
+    expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/reforge-plan');
   });
 });
@@ -112,6 +129,8 @@ describe('reforge-plan skill', () => {
     );
     expect(markdown).toContain('stable id such as `T-001`');
     expect(markdown).toContain('No task may rely only on the prototype');
+    expect(markdown).toContain('audit.md');
+    expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/reforge-impl');
     expectHeadings(markdown, [
       '# Implementation Plan',
