@@ -36,8 +36,7 @@ describe('root keelson package scaffold', () => {
       'dist',
       'skills/core',
       'skills/templates',
-      'skills/runtime',
-      'keelson-renderer/dist'
+      'skills/runtime'
     ]);
   });
 
@@ -113,7 +112,7 @@ describe('root keelson package scaffold', () => {
     console.error = (...args: unknown[]) => stderr.push(args.join(' '));
 
     try {
-      await expect(main(['render'], tmpDir)).resolves.toBe(1);
+      await expect(main(['unknown-command'], tmpDir)).resolves.toBe(1);
     } finally {
       console.error = originalError;
     }

@@ -1,6 +1,8 @@
 # Keelson Workflow Guide
 
-Keelson is now an artifact-first AI-DLC Inception workflow. It no longer uses a legacy `spec.json` lifecycle.
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
+Keelson is an artifact-first AI-DLC Inception workflow.
 
 ## Phases
 

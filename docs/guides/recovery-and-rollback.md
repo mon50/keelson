@@ -1,5 +1,7 @@
 # Recovery and Rollback
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 **Symptoms:** An artifact got too broad, contradicted another artifact, or was approved too early.
 **Command:** Edit the owning artifact or rerun its phase command.
 **Success Signal:** `manifest.json` points to the corrected artifact and downstream artifacts are regenerated when needed.

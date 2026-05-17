@@ -1,6 +1,8 @@
 # Questions
 
-Keelson no longer stores a separate question queue. Open questions live in the artifact that owns them:
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
+Open questions live in the artifact that owns them:
 
 - Requirements questions: `requirements.md`
 - User story and operation questions: `user-stories.md` or `us-mock.html`

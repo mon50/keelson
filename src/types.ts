@@ -90,7 +90,6 @@ export interface PackageAssets {
   packageRoot: string;
   coreSkillsDir: string;
   templatesDir: string;
-  rendererServerDir: string;
 }
 
 export interface InstallConfig {
@@ -108,7 +107,6 @@ export interface InstallError {
 export interface InstallResult {
   success: boolean;
   skillsInstalled: SkillName[];
-  rendererServerInstalled?: string;
   forwardingInstalled: Partial<Record<TargetEnvironment, SkillName[]>>;
   overwritten: string[];
   error?: InstallError;

@@ -1,6 +1,8 @@
 # Artifact Schema
 
-Keelson no longer has a single specification JSON. The approved artifact bundle is the source of truth.
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
+The approved artifact bundle is the source of truth.
 
 ```text
 .keelson/<feature>/

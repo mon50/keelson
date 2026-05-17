@@ -15,7 +15,7 @@ function expectHeadings(markdown: string, headings: readonly string[]): void {
 }
 
 describe('keel-requirements skill', () => {
-  it('creates requirements.md, manifest.json, and audit.md without the legacy question queue', () => {
+  it('creates requirements.md, manifest.json, and audit.md', () => {
     const markdown = skill('keel-requirements');
 
     expect(markdown).toContain('name: keel-requirements');

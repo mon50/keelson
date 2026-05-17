@@ -1,5 +1,7 @@
 # Prototype Artifact Architecture
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 `prototype.html` is a simplified review artifact created by `/keel-proto`.
 
 It must be grounded in:

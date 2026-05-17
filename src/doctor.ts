@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { detect } from './detector';
 import type { ArtifactRecord, KeelsonManifest } from './types';
 
-const WORKSPACE_INTERNAL_DIRS = new Set(['skills', 'server']);
+const WORKSPACE_INTERNAL_DIRS = new Set(['skills']);
 
 function isArtifactRecord(value: unknown): value is ArtifactRecord {
   const candidate = value as Partial<ArtifactRecord> | undefined;

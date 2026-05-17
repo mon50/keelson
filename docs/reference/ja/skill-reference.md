@@ -1,5 +1,7 @@
 # Skill Reference
 
+<sub>[← Keelson Docs](../../README.md) · [English](../../README.md#english) | [日本語](../../README.md#日本語)</sub>
+
 | Skill | フェーズ | 目的 |
 |---|---|---|
 | `keel-requirements` | Requirements | UI デザイン期待値を含む AI-DLC Requirements を作成・修正 |

@@ -1,5 +1,7 @@
 # CLI and Skills Reference
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 **Audience:** Daily users of Keelson.
 **Prerequisites:** Keelson installed.
 **Expected Outcome:** Know which command to use when.

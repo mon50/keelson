@@ -11,11 +11,10 @@
     "dist",
     "skills/core",
     "skills/templates",
-    "skills/runtime",
-    "keelson-renderer/dist"
+    "skills/runtime"
   ],
   "scripts": {
-    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && npm ci --prefix keelson-renderer && npm run build --prefix keelson-renderer && tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/bin/cli.js', 0o755)\"",
+    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/bin/cli.js', 0o755)\"",
     "test": "vitest run"
   },
   "engines": {

@@ -20,5 +20,3 @@ Thumbs.db
 # Node.js build and dependency artifacts
 node_modules/
 dist/
-keelson-renderer/node_modules/
-keelson-renderer/dist/

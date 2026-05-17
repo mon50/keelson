@@ -1,5 +1,7 @@
 # Implementation Verification Contract
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 **Audience:** Users understanding verification boundaries.
 **Prerequisites:** None.
 **Expected Outcome:** Know what `/keel-impl` must verify for each task.

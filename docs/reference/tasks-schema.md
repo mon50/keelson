@@ -1,6 +1,8 @@
 # Plan Schema
 
-Implementation tasks live in `plan.md`, not a JSON task queue.
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
+Implementation tasks live in `plan.md`.
 
 Each task should include:
 

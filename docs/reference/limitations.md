@@ -1,5 +1,7 @@
 # Limitations
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 - Keelson converges requirements, user stories, design, prototype, and task planning. It is not a full autonomous app builder.
 - The simplified prototype is review evidence, not production UI code.
 - Brownfield repository inspection is feature-scoped and evidence-based.
