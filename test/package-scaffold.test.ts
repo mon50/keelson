@@ -18,26 +18,26 @@ const packageJson = JSON.parse(
   devDependencies: Record<string, string>;
 };
 
-describe('root reforge package scaffold', () => {
+describe('root keelson package scaffold', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reforge-cli-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'keelson-cli-'));
   });
 
   afterEach(() => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('defines the npm package boundary for npx aid-reforge install', () => {
-    expect(packageJson.name).toBe('aid-reforge');
-    expect(packageJson.bin).toEqual({ 'aid-reforge': './dist/bin/cli.js' });
+  it('defines the npm package boundary for npx keelson install', () => {
+    expect(packageJson.name).toBe('keelson');
+    expect(packageJson.bin).toEqual({ 'keelson': './dist/bin/cli.js' });
     expect(packageJson.files).toEqual([
       'dist',
       'skills/core',
       'skills/templates',
       'skills/runtime',
-      'reforge-renderer/dist'
+      'keelson-renderer/dist'
     ]);
   });
 
@@ -77,10 +77,10 @@ describe('root reforge package scaffold', () => {
       process.stdout.write = originalWrite;
     }
 
-    expect(fs.existsSync(path.join(tmpDir, '.reforge/skills/reforge-requirements/SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.claude/skills/reforge-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.claude/skills/keel-requirements/SKILL.md'))).toBe(true);
     expect(stdout.join('\n')).toContain('Available commands:');
-    expect(stdout.join('\n')).toContain('/reforge-requirements "<作りたい体験や機能>"');
+    expect(stdout.join('\n')).toContain('/keel-requirements "<作りたい体験や機能>"');
   });
 
   it('returns exit code 1 and reports install errors to stderr', async () => {
@@ -118,6 +118,6 @@ describe('root reforge package scaffold', () => {
       console.error = originalError;
     }
 
-    expect(stderr.join('\n')).toContain('Usage: aid-reforge [install');
+    expect(stderr.join('\n')).toContain('Usage: keelson [install');
   });
 });

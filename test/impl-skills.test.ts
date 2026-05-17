@@ -4,13 +4,13 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = path.resolve(__dirname, '..');
 const markdown = fs.readFileSync(
-  path.join(repoRoot, 'skills/core/reforge-impl/SKILL.md'),
+  path.join(repoRoot, 'skills/core/keel-impl/SKILL.md'),
   'utf8'
 );
 
-describe('reforge-impl skill', () => {
+describe('keel-impl skill', () => {
   it('declares the cc-sdd-style implementation command contract', () => {
-    expect(markdown).toContain('name: reforge-impl');
+    expect(markdown).toContain('name: keel-impl');
     expect(markdown).toContain('argument-hint: [task-id]');
     expect(markdown).toContain('Implement one task from `plan.md`');
     expect(markdown).toContain('Block unless `artifacts.plan.status` is `approved`.');
@@ -31,10 +31,10 @@ describe('reforge-impl skill', () => {
     }
 
     expect(markdown).toContain('Do not ask new product questions during implementation.');
-    expect(markdown).toContain('missing requirement: `/reforge-requirements`');
-    expect(markdown).toContain('missing user operation: `/reforge-us`');
-    expect(markdown).toContain('missing implementation detail: `/reforge-design`');
-    expect(markdown).toContain('prototype/design mismatch: `/reforge-proto`');
+    expect(markdown).toContain('missing requirement: `/keel-requirements`');
+    expect(markdown).toContain('missing user operation: `/keel-us`');
+    expect(markdown).toContain('missing implementation detail: `/keel-design`');
+    expect(markdown).toContain('prototype/design mismatch: `/keel-proto`');
   });
 
   it('documents the implementation loop and plan update gate', () => {

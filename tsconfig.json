@@ -13,5 +13,5 @@
     "types": ["node"]
   },
   "include": ["bin/**/*.ts", "src/**/*.ts"],
-  "exclude": ["dist", "node_modules", "reforge-renderer", "test"]
+  "exclude": ["dist", "node_modules", "keelson-renderer", "test"]
 }

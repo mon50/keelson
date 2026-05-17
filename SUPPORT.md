@@ -1,9 +1,9 @@
 # Support
 
-If you need help with Reforge, please consider the following options:
+If you need help with Keelson, please consider the following options:
 
 ## Documentation
-First, check out the [Reforge Documentation](docs/README.md).
+First, check out the [Keelson Documentation](docs/README.md).
 - [Workflow Guide](docs/guides/workflow-guide.md)
 - [Skill Reference](docs/reference/skill-reference.md)
 

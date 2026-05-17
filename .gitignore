@@ -1,5 +1,5 @@
-# Reforge workspace state (per-project, not part of the OSS distribution)
-.reforge/
+# Keelson workspace state (per-project, not part of the OSS distribution)
+.keelson/
 
 # Kiro SDLC development tooling (not part of the OSS product)
 .kiro/
@@ -20,5 +20,5 @@ Thumbs.db
 # Node.js build and dependency artifacts
 node_modules/
 dist/
-reforge-renderer/node_modules/
-reforge-renderer/dist/
+keelson-renderer/node_modules/
+keelson-renderer/dist/

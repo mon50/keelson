@@ -14,4 +14,4 @@ Each task should include:
 - acceptance criteria
 - dependencies
 
-`/reforge-impl [task-id]` implements one task at a time and records implementation notes back in `plan.md`.
+`/keel-impl [task-id]` implements one task at a time and records implementation notes back in `plan.md`.

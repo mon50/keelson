@@ -14,17 +14,17 @@ function expectHeadings(markdown: string, headings: readonly string[]): void {
   }
 }
 
-describe('reforge-requirements skill', () => {
+describe('keel-requirements skill', () => {
   it('creates requirements.md, manifest.json, and audit.md without the legacy question queue', () => {
-    const markdown = skill('reforge-requirements');
+    const markdown = skill('keel-requirements');
 
-    expect(markdown).toContain('name: reforge-requirements');
+    expect(markdown).toContain('name: keel-requirements');
     expect(markdown).toContain('argument-hint: "\\"<idea>\\""');
     expect(markdown).toContain('requirements.md');
     expect(markdown).toContain('manifest.json');
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Write open questions inside the artifact that owns them.');
-    expect(markdown).toContain('/reforge-us');
+    expect(markdown).toContain('/keel-us');
     expectHeadings(markdown, [
       '# Requirements',
       '## Product Intent',
@@ -43,9 +43,9 @@ describe('reforge-requirements skill', () => {
   });
 });
 
-describe('reforge-us skill', () => {
+describe('keel-us skill', () => {
   it('turns approved requirements into user stories and US mock operations', () => {
-    const markdown = skill('reforge-us');
+    const markdown = skill('keel-us');
 
     expect(markdown).toContain('Block if `artifacts.requirements.status` is not `approved`.');
     expect(markdown).toContain('user-stories.md');
@@ -56,10 +56,10 @@ describe('reforge-us skill', () => {
     expect(markdown).toContain('Inline CSS only');
     expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
     expect(markdown).toContain('prototype implication');
-    expect(markdown).toContain('route back to `/reforge-requirements`');
+    expect(markdown).toContain('route back to `/keel-requirements`');
     expect(markdown).toContain('updated `audit.md`');
     expect(markdown).toContain('Resume Point');
-    expect(markdown).toContain('/reforge-design');
+    expect(markdown).toContain('/keel-design');
     expectHeadings(markdown, [
       '# User Stories',
       '## Story Map',
@@ -71,9 +71,9 @@ describe('reforge-us skill', () => {
   });
 });
 
-describe('reforge-design skill', () => {
+describe('keel-design skill', () => {
   it('grounds implementation design in approved artifacts and existing code evidence', () => {
-    const markdown = skill('reforge-design');
+    const markdown = skill('keel-design');
 
     expect(markdown).toContain(
       'Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.'
@@ -81,11 +81,11 @@ describe('reforge-design skill', () => {
     expect(markdown).toContain('existing implementation evidence');
     expect(markdown).toContain('Files To Touch');
     expect(markdown).toContain('Files Not To Touch');
-    expect(markdown).toContain('route to `/reforge-requirements`');
-    expect(markdown).toContain('route to `/reforge-us`');
+    expect(markdown).toContain('route to `/keel-requirements`');
+    expect(markdown).toContain('route to `/keel-us`');
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Resume Point');
-    expect(markdown).toContain('/reforge-proto');
+    expect(markdown).toContain('/keel-proto');
     expectHeadings(markdown, [
       '# Design',
       '## Source Artifacts',
@@ -102,9 +102,9 @@ describe('reforge-design skill', () => {
   });
 });
 
-describe('reforge-proto skill', () => {
+describe('keel-proto skill', () => {
   it('creates the simplified prototype after design approval and routes mismatches upstream', () => {
-    const markdown = skill('reforge-proto');
+    const markdown = skill('keel-proto');
 
     expect(markdown).toContain('prototype.html');
     expect(markdown).toContain(
@@ -115,13 +115,13 @@ describe('reforge-proto skill', () => {
     expect(markdown).toContain('mark `artifacts.design.status` as `needs_revision`');
     expect(markdown).toContain('updated `audit.md`');
     expect(markdown).toContain('Resume Point');
-    expect(markdown).toContain('/reforge-plan');
+    expect(markdown).toContain('/keel-plan');
   });
 });
 
-describe('reforge-plan skill', () => {
+describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
-    const markdown = skill('reforge-plan');
+    const markdown = skill('keel-plan');
 
     expect(markdown).toContain('Create `plan.md`');
     expect(markdown).toContain(
@@ -131,7 +131,7 @@ describe('reforge-plan skill', () => {
     expect(markdown).toContain('No task may rely only on the prototype');
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Resume Point');
-    expect(markdown).toContain('/reforge-impl');
+    expect(markdown).toContain('/keel-impl');
     expectHeadings(markdown, [
       '# Implementation Plan',
       '## Source Artifacts',

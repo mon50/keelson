@@ -13,7 +13,7 @@ async function main() {
   
   try {
     // Run install
-    console.log('Installing Reforge in test directory...');
+    console.log('Installing Keelson in test directory...');
     execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} install`, { cwd: testDir, stdio: 'inherit' });
 
     // Check if skills are installed
@@ -22,15 +22,15 @@ async function main() {
       throw new Error('Skills were not installed in .claude/skills');
     }
 
-    const requirementsSkill = path.join(claudeSkillsDir, 'reforge-requirements', 'SKILL.md');
+    const requirementsSkill = path.join(claudeSkillsDir, 'keel-requirements', 'SKILL.md');
     if (!await fs.pathExists(requirementsSkill)) {
-      throw new Error('reforge-requirements skill was not installed');
+      throw new Error('keel-requirements skill was not installed');
     }
 
     const gitignorePath = path.join(testDir, '.gitignore');
     const gitignore = await fs.readFile(gitignorePath, 'utf8');
-    if (!gitignore.split(/\r?\n/).includes('.reforge/')) {
-      throw new Error('.reforge/ was not added to .gitignore');
+    if (!gitignore.split(/\r?\n/).includes('.keelson/')) {
+      throw new Error('.keelson/ was not added to .gitignore');
     }
 
     // Run doctor
@@ -38,13 +38,13 @@ async function main() {
     execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} doctor`, { cwd: testDir, stdio: 'inherit' });
 
     // Run uninstall
-    console.log('Uninstalling Reforge...');
+    console.log('Uninstalling Keelson...');
     execSync(`npx tsx ${path.join(rootDir, 'bin/cli.ts')} uninstall`, { cwd: testDir, stdio: 'inherit' });
 
     if (await fs.pathExists(claudeSkillsDir)) {
       const skillsLeft = await fs.readdir(claudeSkillsDir);
-      if (skillsLeft.some(s => s.startsWith('reforge-'))) {
-        throw new Error('Reforge skills were not uninstalled properly');
+      if (skillsLeft.some(s => s.startsWith('keelson-'))) {
+        throw new Error('Keelson skills were not uninstalled properly');
       }
     }
 

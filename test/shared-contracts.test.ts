@@ -6,7 +6,7 @@ import {
   ALL_SKILLS,
   SKILL_COMMAND,
   type ArtifactRecord,
-  type ReforgeManifest,
+  type KeelsonManifest,
   type TaskEntry,
   type TasksJson
 } from '../src/types';
@@ -14,24 +14,24 @@ import {
 const repoRoot = path.resolve(__dirname, '..');
 
 const expectedSkills = [
-  'reforge-requirements',
-  'reforge-us',
-  'reforge-design',
-  'reforge-proto',
-  'reforge-plan',
-  'reforge-impl'
+  'keel-requirements',
+  'keel-us',
+  'keel-design',
+  'keel-proto',
+  'keel-plan',
+  'keel-impl'
 ] as const;
 
 const legacySkills = [
-  'reforge-init',
-  'reforge-resume',
-  'reforge-answer',
-  'reforge-update',
-  'reforge-diff',
-  'reforge-validate',
-  'reforge-render',
-  'reforge-verify',
-  'reforge-status'
+  'keelson-init',
+  'keelson-resume',
+  'keelson-answer',
+  'keelson-update',
+  'keelson-diff',
+  'keelson-validate',
+  'keelson-render',
+  'keelson-verify',
+  'keelson-status'
 ] as const;
 
 function read(relativePath: string): string {
@@ -42,12 +42,12 @@ describe('public command contract', () => {
   it('exports only the new artifact-first workflow skills', () => {
     expect(ALL_SKILLS).toEqual(expectedSkills);
     expect(SKILL_COMMAND).toEqual({
-      'reforge-requirements': 'requirements "<idea>"',
-      'reforge-us': 'us',
-      'reforge-design': 'design',
-      'reforge-proto': 'proto',
-      'reforge-plan': 'plan',
-      'reforge-impl': 'impl [task-id]'
+      'keel-requirements': 'requirements "<idea>"',
+      'keel-us': 'us',
+      'keel-design': 'design',
+      'keel-proto': 'proto',
+      'keel-plan': 'plan',
+      'keel-impl': 'impl [task-id]'
     });
   });
 
@@ -73,7 +73,7 @@ describe('artifact manifest contract', () => {
       approvedAt: '2026-05-14T00:00:00Z'
     });
 
-    const manifest: ReforgeManifest = {
+    const manifest: KeelsonManifest = {
       version: 1,
       feature: 'daily-report',
       currentPhase: 'implementation',

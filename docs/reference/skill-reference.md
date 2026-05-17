@@ -2,12 +2,12 @@
 
 | Skill | Phase | Purpose |
 |---|---|---|
-| `reforge-requirements` | Requirements | Create or revise AI-DLC Requirements, including UI design expectations |
-| `reforge-us` | User Stories | Create user stories and US mock operations |
-| `reforge-design` | Design | Produce implementation design from stories and existing code evidence |
-| `reforge-proto` | Prototype | Create a simplified prototype for experience review |
-| `reforge-plan` | Plan | Generate implementation tasks in `plan.md` |
-| `reforge-impl` | Implementation | Implement one approved task with a cc-sdd-style loop |
+| `keel-requirements` | Requirements | Create or revise AI-DLC Requirements, including UI design expectations |
+| `keel-us` | User Stories | Create user stories and US mock operations |
+| `keel-design` | Design | Produce implementation design from stories and existing code evidence |
+| `keel-proto` | Prototype | Create a simplified prototype for experience review |
+| `keel-plan` | Plan | Generate implementation tasks in `plan.md` |
+| `keel-impl` | Implementation | Implement one approved task with a cc-sdd-style loop |
 
 ## Phase Gates
 
@@ -21,4 +21,4 @@ Later phases route back to the owning phase when they uncover ambiguity or misma
 
 ## Audit Trail
 
-Every skill updates `.reforge/<feature>/audit.md`. The log captures user inputs, key decisions, changed artifacts, checks, and a `Resume Point` showing the next command for a future session.
+Every skill updates `.keelson/<feature>/audit.md`. The log captures user inputs, key decisions, changed artifacts, checks, and a `Resume Point` showing the next command for a future session.

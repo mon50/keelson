@@ -1,6 +1,6 @@
-# Contributing to Reforge
+# Contributing to Keelson
 
-Thank you for your interest in contributing to Reforge! Reforge is an agentic framework designed to bring structured workflows to AI coding assistants like Claude Code and Codex.
+Thank you for your interest in contributing to Keelson! Keelson is an agentic framework designed to bring structured workflows to AI coding assistants like Claude Code and Codex.
 
 ## How to Contribute
 

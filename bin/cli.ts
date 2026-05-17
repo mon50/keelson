@@ -22,7 +22,7 @@ export async function main(
 ): Promise<number> {
   if (!checkNodeVersion(process.version, MIN_NODE_MAJOR)) {
     console.error(
-      `Reforge requires Node.js ${MIN_NODE_MAJOR} or newer. Current version: ${process.version}`
+      `Keelson requires Node.js ${MIN_NODE_MAJOR} or newer. Current version: ${process.version}`
     );
     return 1;
   }
@@ -45,7 +45,7 @@ export async function main(
     return uninstall(cwd, args.includes('--purge-workspace'));
   }
 
-  console.error('Usage: aid-reforge [install|doctor|uninstall]');
+  console.error('Usage: keelson [install|doctor|uninstall]');
   return 1;
 }
 
