@@ -1,6 +1,6 @@
 # Keelson ワークフローガイド
 
-<sub>[← Keelson Docs](../../README.md) · [English](../../README.md#english) | [日本語](../../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../../README.md) · [English](../workflow-guide.md) | 日本語</sub>
 
 Keelson は artifact-first の AI-DLC Inception ワークフローです。
 

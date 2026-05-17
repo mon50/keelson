@@ -1,6 +1,6 @@
 # Skill Reference
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/skill-reference.md)</sub>
 
 | Skill | Phase | Purpose |
 |---|---|---|
@@ -9,7 +9,7 @@
 | `keel-design` | Design | Produce implementation design from stories and existing code evidence |
 | `keel-proto` | Prototype | Create a simplified prototype for experience review |
 | `keel-plan` | Plan | Generate implementation tasks in `plan.md` |
-| `keel-impl` | Implementation | Implement one approved task with a cc-sdd-style loop |
+| `keel-impl` | Implementation | Implement one approved task with a Kiro-style loop |
 
 ## Phase Gates
 

@@ -1,6 +1,6 @@
 ---
 name: keel-design
-description: Produce a cc-sdd-style design from approved requirements and user stories, grounded in existing implementation when present.
+description: Produce a Kiro-style design from approved requirements and user stories, grounded in existing implementation when present.
 allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion
 ---
 
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion
 
 ## Purpose
 
-Turn approved requirements, user stories, and US mock operations into a concrete implementation design. This is close to cc-sdd Design, but still belongs before prototype approval.
+Turn approved requirements, user stories, and US mock operations into a concrete implementation design. This is close to Kiro Design, but still belongs before prototype approval.
 
 ## Inputs
 

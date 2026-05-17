@@ -9,7 +9,7 @@ const markdown = fs.readFileSync(
 );
 
 describe('keel-impl skill', () => {
-  it('declares the cc-sdd-style implementation command contract', () => {
+  it('declares the Kiro-style implementation command contract', () => {
     expect(markdown).toContain('name: keel-impl');
     expect(markdown).toContain('argument-hint: [task-id]');
     expect(markdown).toContain('Implement one task from `plan.md`');

@@ -1,6 +1,6 @@
 # Implementation Verification Contract
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/verify-contract.md)</sub>
 
 **Audience:** Users understanding verification boundaries.
 **Prerequisites:** None.

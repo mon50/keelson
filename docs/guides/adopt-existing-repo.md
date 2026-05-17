@@ -1,6 +1,6 @@
 # Adopting An Existing Repo
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/adopt-existing-repo.md)</sub>
 
 **Audience:** Developers adding a feature to an existing codebase with Claude Code or Codex.
 **Prerequisites:** Keelson installed in the repository.
