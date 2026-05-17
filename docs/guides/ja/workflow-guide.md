@@ -1,6 +1,8 @@
 # Keelson ワークフローガイド
 
-Keelson は artifact-first の AI-DLC Inception ワークフローです。旧 `spec.json` ライフサイクルは使いません。
+<sub>[← Keelson Docs](../../README.md) · [English](../../README.md#english) | [日本語](../../README.md#日本語)</sub>
+
+Keelson は artifact-first の AI-DLC Inception ワークフローです。
 
 ## フェーズ
 

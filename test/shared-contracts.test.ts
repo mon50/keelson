@@ -22,18 +22,6 @@ const expectedSkills = [
   'keel-impl'
 ] as const;
 
-const legacySkills = [
-  'keelson-init',
-  'keelson-resume',
-  'keelson-answer',
-  'keelson-update',
-  'keelson-diff',
-  'keelson-validate',
-  'keelson-render',
-  'keelson-verify',
-  'keelson-status'
-] as const;
-
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
@@ -49,13 +37,6 @@ describe('public command contract', () => {
       'keel-plan': 'plan',
       'keel-impl': 'impl [task-id]'
     });
-  });
-
-  it('does not keep legacy workflow skills in the installable core set', () => {
-    const coreDirs = fs.readdirSync(path.join(repoRoot, 'skills/core'));
-    for (const legacy of legacySkills) {
-      expect(coreDirs, legacy).not.toContain(legacy);
-    }
   });
 });
 

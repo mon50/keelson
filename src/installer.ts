@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import type { InstallError, InstallResult, PackageAssets } from './types';
 import { ALL_SKILLS } from './types';
 import { detect } from './detector';
-import { copyLocalSkills, copyRendererServer, copyForwarders } from './copier';
+import { copyLocalSkills, copyForwarders } from './copier';
 
 export interface InstallOptions {
   assets?: PackageAssets;
@@ -23,10 +23,6 @@ function resolveDefaultAssets(): PackageAssets {
   return {
     coreSkillsDir: resolvePackagePath('../../skills/core', '../skills/core'),
     templatesDir: resolvePackagePath('../../skills/templates', '../skills/templates'),
-    rendererServerDir: resolvePackagePath(
-      '../../keelson-renderer/dist',
-      '../keelson-renderer/dist'
-    ),
     packageRoot: resolvePackagePath('../..', '..')
   };
 }
@@ -52,7 +48,6 @@ async function ensureInstallDirs(cwd: string): Promise<InstallError | undefined>
   const keelsonDir = path.join(cwd, '.keelson');
   try {
     await fs.ensureDir(path.join(keelsonDir, 'skills'));
-    await fs.ensureDir(path.join(keelsonDir, 'server'));
     return undefined;
   } catch (err: unknown) {
     return toInstallError(keelsonDir, err);
@@ -109,12 +104,6 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
       return emptyResult({ overwritten: allOverwritten, error: localResult.error });
     }
 
-    const rendererResult = await copyRendererServer(cwd, assets);
-    allOverwritten.push(...rendererResult.overwritten);
-    if (rendererResult.error) {
-      return emptyResult({ overwritten: allOverwritten, error: rendererResult.error });
-    }
-
     const forwardingInstalled: InstallResult['forwardingInstalled'] = {};
     for (const env of environments) {
       const fwdResult = await copyForwarders(cwd, env, assets);
@@ -128,7 +117,6 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
     return {
       success: true,
       skillsInstalled: [...ALL_SKILLS],
-      rendererServerInstalled: path.join(cwd, '.keelson/server'),
       forwardingInstalled,
       overwritten: allOverwritten
     };

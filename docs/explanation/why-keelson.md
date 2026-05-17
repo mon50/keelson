@@ -1,5 +1,7 @@
 # Why Keelson?
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 Keelson keeps AI coding agents from turning vague intent into hidden assumptions.
 
 The new workflow focuses on pre-implementation convergence:

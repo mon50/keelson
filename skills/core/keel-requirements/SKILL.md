@@ -51,7 +51,7 @@ The file must contain these headings:
 - `## Open Questions`
 - `## Next Gate`
 
-Write open questions directly in `requirements.md`; do not maintain a separate question queue.
+Write open questions directly in `requirements.md`.
 
 `## UI Design Expectations` must capture user-facing design requirements without choosing implementation details:
 

@@ -15,7 +15,6 @@ function makeAssets(overrides?: Partial<PackageAssets>): PackageAssets {
     packageRoot: repoRoot,
     coreSkillsDir: path.join(repoRoot, 'skills/core'),
     templatesDir: path.join(repoRoot, 'skills/templates'),
-    rendererServerDir: path.join(repoRoot, 'keelson-renderer/dist'),
     ...overrides
   };
 }
@@ -36,13 +35,9 @@ function expectForwarding(resultSkills: readonly SkillName[] | undefined): void 
 
 describe('install()', () => {
   let tmpDir: string;
-  let fakeRendererDir: string;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'keelson-installer-'));
-    fakeRendererDir = path.join(tmpDir, 'fake-renderer');
-    await fse.ensureDir(fakeRendererDir);
-    await fse.writeFile(path.join(fakeRendererDir, 'index.js'), '// renderer');
   });
 
   afterEach(() => {
@@ -52,8 +47,7 @@ describe('install()', () => {
   it('.claude/ のみ存在する環境で install() 後 .keelson/skills/keel-requirements/SKILL.md が存在する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
@@ -62,8 +56,7 @@ describe('install()', () => {
   it('.claude/ のみ存在する環境で install() 後 .claude/skills/keel-requirements/SKILL.md が存在する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, '.claude/skills/keel-requirements/SKILL.md'))).toBe(true);
@@ -72,8 +65,7 @@ describe('install()', () => {
   it('.claude/ のみ存在する環境で .agents/skills/ は生成されない', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    await install(tmpDir, { assets });
+    await install(tmpDir, { assets: makeAssets() });
 
     expect(fs.existsSync(path.join(tmpDir, '.agents/skills'))).toBe(false);
   });
@@ -81,8 +73,7 @@ describe('install()', () => {
   it('.claude/ のみ存在する場合は Claude Code のみに全スキルを配置する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expectForwarding(result.forwardingInstalled['claude-code']);
@@ -94,8 +85,7 @@ describe('install()', () => {
   it('.agents/ のみ存在する場合は Codex のみに全スキルを配置する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.agents'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expect(result.forwardingInstalled['claude-code']).toBeUndefined();
@@ -108,8 +98,7 @@ describe('install()', () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
     await fse.ensureDir(path.join(tmpDir, '.agents'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expectForwarding(result.forwardingInstalled['claude-code']);
@@ -119,8 +108,7 @@ describe('install()', () => {
   });
 
   it('どちらの環境ディレクトリも存在しない場合は Claude Code のみに全スキルを配置する', async () => {
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expectForwarding(result.forwardingInstalled['claude-code']);
@@ -132,8 +120,7 @@ describe('install()', () => {
   it('InstallResult.success === true が返る', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
   });
@@ -141,8 +128,7 @@ describe('install()', () => {
   it('install() 後 .gitignore に .keelson/ が追加される', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expect(fs.readFileSync(path.join(tmpDir, '.gitignore'), 'utf8')).toContain('.keelson/');
@@ -152,8 +138,7 @@ describe('install()', () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
     await fse.writeFile(path.join(tmpDir, '.gitignore'), 'node_modules/\n.keelson/\n');
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
     const gitignore = fs.readFileSync(path.join(tmpDir, '.gitignore'), 'utf8');
 
     expect(result.success).toBe(true);
@@ -163,11 +148,7 @@ describe('install()', () => {
   it('assets.coreSkillsDir が存在しない場合は InstallResult.success === false が返る（例外スローなし）', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({
-      coreSkillsDir: '/nonexistent/path/to/skills',
-      rendererServerDir: fakeRendererDir
-    });
-
+    const assets = makeAssets({ coreSkillsDir: '/nonexistent/path/to/skills' });
     const result = await install(tmpDir, { assets });
 
     expect(result.success).toBe(false);
@@ -177,36 +158,29 @@ describe('install()', () => {
   it('result.skillsInstalled に全スキルが含まれる', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
     expect(result.skillsInstalled).toEqual([...ALL_SKILLS]);
   });
 
-  it('コピー前に .keelson/skills と .keelson/server を初期化し、コピー失敗でも例外を投げない', async () => {
+  it('コピー前に .keelson/skills を初期化し、コピー失敗でも例外を投げない', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({
-      coreSkillsDir: path.join(tmpDir, 'missing-skills'),
-      rendererServerDir: fakeRendererDir
-    });
+    const assets = makeAssets({ coreSkillsDir: path.join(tmpDir, 'missing-skills') });
     const result = await install(tmpDir, { assets });
 
     expect(result.success).toBe(false);
     expect(result.error?.path).toBe(assets.coreSkillsDir);
     expect(fs.existsSync(path.join(tmpDir, '.keelson/skills'))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/server'))).toBe(true);
   });
 
-  it('install() 後 .keelson/server/index.js が存在し、Claude Code に全スキルを登録する', async () => {
+  it('install() 後 Claude Code に全スキルを登録する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
-    const assets = makeAssets({ rendererServerDir: fakeRendererDir });
-    const result = await install(tmpDir, { assets });
+    const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/server/index.js'))).toBe(true);
     expect(result.forwardingInstalled['claude-code']).toHaveLength(ALL_SKILLS.length);
   });
 
@@ -227,7 +201,6 @@ describe('install()', () => {
     }
 
     expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/server/index.js'))).toBe(true);
     expectAllSkillsInstalled(tmpDir, '.claude');
     expect(stdout.join('\n')).toContain('Available commands:');
   });

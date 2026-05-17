@@ -1,5 +1,7 @@
 # Skill Reference
 
+<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+
 | Skill | Phase | Purpose |
 |---|---|---|
 | `keel-requirements` | Requirements | Create or revise AI-DLC Requirements, including UI design expectations |
