@@ -21,7 +21,7 @@
 >
 > The keelson is the backbone beam that runs the length of a hull and locks every frame true. Keelson keeps your build true to the approved spec.
 
-Keelson turns a rough product idea into approved **Requirements → User Stories → US mock → Design → Prototype → Plan**, then drives implementation task-by-task with a cc-sdd-style `/keel-impl` loop. Every phase has an approval gate, so the AI never sails ahead of a decision you have made.
+Keelson turns a rough product idea into approved **Requirements → User Stories → US mock → Design → Prototype → Plan**, then drives implementation task-by-task with a Kiro-style `/keel-impl` loop. Every phase has an approval gate, so the AI never sails ahead of a decision you have made.
 
 ## Why Keelson
 
@@ -103,7 +103,7 @@ Keelson owns the pre-implementation convergence loop:
 - **Prototype** validates whether the US experience and design direction hold together.
 - **Plan** creates implementation tasks.
 
-`/keel-impl` follows a cc-sdd-style loop: one task, inspect code, test intent, implement, verify, record notes.
+`/keel-impl` follows a Kiro-style loop: one task, inspect code, test intent, implement, verify, record notes.
 
 ## Documentation
 

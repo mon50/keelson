@@ -1,6 +1,6 @@
 # Prototype Artifact Architecture
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/ui-artifact-architecture.md)</sub>
 
 `prototype.html` is a simplified review artifact created by `/keel-proto`.
 

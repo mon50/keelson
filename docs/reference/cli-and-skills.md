@@ -1,6 +1,6 @@
 # CLI and Skills Reference
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/cli-and-skills.md)</sub>
 
 **Audience:** Daily users of Keelson.
 **Prerequisites:** Keelson installed.

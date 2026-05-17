@@ -8,7 +8,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 |---|---|
 | `/keel-requirements "<idea>"` | Create or revise Requirements |
 | `/keel-us` | Create User Stories and US mock operations |
-| `/keel-design` | Create cc-sdd-style implementation Design |
+| `/keel-design` | Create Kiro-style implementation Design |
 | `/keel-proto` | Create and review simplified prototype |
 | `/keel-plan` | Generate implementation plan |
 | `/keel-impl [task-id]` | Implement one approved plan task |

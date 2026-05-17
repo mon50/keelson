@@ -58,6 +58,6 @@ Append the plan approval or revision result to `audit.md`, including selected ne
 
 - No task may rely only on the prototype; each task must trace to `design.md` and at least one requirement or user story.
 - No task may modify files listed under `Files Not To Touch`.
-- The plan must be suitable for cc-sdd-style implementation: one task, tests, review, then next task.
+- The plan must be suitable for Kiro-style implementation: one task, tests, review, then next task.
 - `audit.md` records plan decisions, approval status, and the next implementation command.
 - Report changed files and next gate: `/keel-impl`.

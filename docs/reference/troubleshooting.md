@@ -1,6 +1,6 @@
 # Troubleshooting
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/troubleshooting.md)</sub>
 
 - Missing workspace: run `/keel-requirements "<idea>"`.
 - User story mismatch: revise with `/keel-us` or return to `/keel-requirements`.

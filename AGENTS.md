@@ -8,7 +8,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 |---|---|---|
 | `$keel-requirements "<idea>"` | `/keel-requirements "<idea>"` | Create or revise Requirements |
 | `$keel-us` | `/keel-us` | Create User Stories and US mock operations |
-| `$keel-design` | `/keel-design` | Create cc-sdd-style implementation Design |
+| `$keel-design` | `/keel-design` | Create Kiro-style implementation Design |
 | `$keel-proto` | `/keel-proto` | Create and review simplified prototype |
 | `$keel-plan` | `/keel-plan` | Generate implementation plan |
 | `$keel-impl [task-id]` | `/keel-impl [task-id]` | Implement one approved plan task |
@@ -20,7 +20,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 3. `$keel-design` — produce `design.md` from US and existing implementation evidence
 4. `$keel-proto` — produce `prototype.html` and validate the user-story experience
 5. `$keel-plan` — produce `plan.md`
-6. `$keel-impl` — implement one task at a time using a cc-sdd-style loop
+6. `$keel-impl` — implement one task at a time using a Kiro-style loop
 
 ## Workspace Files
 

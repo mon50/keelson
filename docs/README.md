@@ -47,15 +47,32 @@ Start with the [README](../README.md) for an overview and installation.
 
 概要とインストールは [README (日本語)](../README_ja.md) を参照してください。
 
+### チュートリアル
+
+- [Hello, Keelson](tutorials/ja/hello-keelson.md) — 最初の機能をはじめから終わりまで
+
 ### ガイド
 
 - [ワークフローガイド](guides/ja/workflow-guide.md) — 6 フェーズのステップバイステップ解説
+- [既存リポジトリへの導入](guides/ja/adopt-existing-repo.md) — 既存コードベース向けのブラウンフィールドワークフロー
+- [プロトタイプのレビュー](guides/ja/reviewing-prototypes.md) — プロトタイプ承認ゲートの進め方
+- [フェーズナビゲーション](guides/ja/status-vs-resume.md) — 進捗確認とセッションの継続
+- [リカバリとロールバック](guides/ja/recovery-and-rollback.md) — 不正な状態からの回復
 
 ### リファレンス
 
+- [CLI とスキル](reference/ja/cli-and-skills.md) — `keelson` CLI と全 `/keel-*` スキル
 - [スキルリファレンス](reference/ja/skill-reference.md) — スキルごとの入力・出力・制約
+- [アーティファクトスキーマ](reference/ja/spec-schema.md) — `.keelson/<feature>/` アーティファクト束
+- [質問](reference/ja/questions-schema.md) — 未解決の疑問の置き場所
+- [プランスキーマ](reference/ja/tasks-schema.md) — `plan.md` タスクの構造
+- [検証コントラクト](reference/ja/verify-contract.md) — 実装検証のルール
+- [サポートマトリクス](reference/ja/support-matrix.md) — 対応エージェントと環境
+- [制限事項](reference/ja/limitations.md) — 既知の制限
+- [トラブルシューティング](reference/ja/troubleshooting.md) — よくある問題と対処
 
-### 英語のみのドキュメント
+### 解説
 
-上記以外のガイド・リファレンス・解説は現在英語のみです。[English](#english) セクションから参照できます（日本語版は順次追加予定）。
+- [なぜ Keelson か?](explanation/ja/why-keelson.md) — プロダクトの立場と設計思想
+- [プロトタイプアーティファクトのアーキテクチャ](explanation/ja/ui-artifact-architecture.md) — UI アーティファクトの位置づけ
 

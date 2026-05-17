@@ -1,6 +1,6 @@
 # Keelson Workflow Guide
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/workflow-guide.md)</sub>
 
 Keelson is an artifact-first AI-DLC Inception workflow.
 
@@ -38,7 +38,7 @@ Keelson is an artifact-first AI-DLC Inception workflow.
 
 ## Implementation
 
-Implementation follows a cc-sdd-style loop: select one task, inspect code, add or update tests when a matching pattern exists, implement the smallest change, run checks, and record implementation notes in `plan.md`.
+Implementation follows a Kiro-style loop: select one task, inspect code, add or update tests when a matching pattern exists, implement the smallest change, run checks, and record implementation notes in `plan.md`.
 
 ## Session Continuity
 

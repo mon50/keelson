@@ -1,6 +1,6 @@
 # Skill Reference
 
-<sub>[← Keelson Docs](../../README.md) · [English](../../README.md#english) | [日本語](../../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../../README.md) · [English](../skill-reference.md) | 日本語</sub>
 
 | Skill | フェーズ | 目的 |
 |---|---|---|
@@ -9,7 +9,7 @@
 | `keel-design` | Design | 既存実装を踏まえた実装設計を作成 |
 | `keel-proto` | Prototype | 体験確認用の簡易プロトタイプを作成 |
 | `keel-plan` | Plan | `plan.md` に実装タスクを生成 |
-| `keel-impl` | Implementation | cc-sdd 風に 1 task ずつ実装 |
+| `keel-impl` | Implementation | Kiro 風に 1 task ずつ実装 |
 
 ## Audit Trail
 

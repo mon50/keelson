@@ -1,6 +1,6 @@
 # Hello Keelson Tutorial
 
-<sub>[← Keelson Docs](../README.md) · [English](../README.md#english) | [日本語](../README.md#日本語)</sub>
+<sub>[← Keelson Docs](../README.md) · English | [日本語](ja/hello-keelson.md)</sub>
 
 **Audience:** Developers new to Keelson.
 **Prerequisites:** Node.js 18+, Claude Code or Codex installed.

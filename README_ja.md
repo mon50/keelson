@@ -21,7 +21,7 @@
 >
 > キールソン（竜骨上の通し梁）が船体のフレームをまっすぐ締結するように、Keelson は実装を承認済み仕様どおりに保ちます。
 
-Keelson はラフなプロダクト案を、承認済みの **Requirements → User Stories → US モック → Design → Prototype → Plan** に収束させ、その後の実装を cc-sdd 流の `/keel-impl` ループで task 単位に進めます。各フェーズに承認ゲートがあり、あなたが下した判断より先に AI が進むことはありません。
+Keelson はラフなプロダクト案を、承認済みの **Requirements → User Stories → US モック → Design → Prototype → Plan** に収束させ、その後の実装を Kiro 流の `/keel-impl` ループで task 単位に進めます。各フェーズに承認ゲートがあり、あなたが下した判断より先に AI が進むことはありません。
 
 ## Keelson を使う理由
 
@@ -103,7 +103,7 @@ Keelson は実装前の収束ループを担います。
 - **Prototype** — US の体験と Design の方向性が噛み合うか検証する。
 - **Plan** — 実装タスクを作成する。
 
-`/keel-impl` は cc-sdd 流のループです。1タスク、コード調査、テスト意図、実装、検証、メモ記録。
+`/keel-impl` は Kiro 流のループです。1タスク、コード調査、テスト意図、実装、検証、メモ記録。
 
 ## ドキュメント
 

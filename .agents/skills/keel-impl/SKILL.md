@@ -1,6 +1,6 @@
 ---
 name: keel-impl
-description: Implement one approved plan task using a cc-sdd-style loop: task selection, test-first intent, implementation, verification, and implementation notes.
+description: Implement one approved plan task using a Kiro-style loop: task selection, test-first intent, implementation, verification, and implementation notes.
 allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
 argument-hint: [task-id]
 ---
@@ -37,7 +37,7 @@ Do not ask new product questions during implementation. If a task cannot be impl
 - missing implementation detail: `/keel-design`
 - prototype/design mismatch: `/keel-proto`
 
-## cc-sdd Implementation Loop
+## Kiro Implementation Loop
 
 For each task:
 
