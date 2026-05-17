@@ -1,4 +1,4 @@
-# Reforge Documentation
+# Keelson Documentation
 
 <div align="center"><sub>
 <a href="#english">English</a> | <a href="#japanese">日本語</a>
@@ -10,8 +10,8 @@
 
 ### Getting Started
 
-- [README](../README.md) — What Reforge does and how to install it
-- [Why Reforge?](explanation/why-reforge.md) — Product stance and design philosophy
+- [README](../README.md) — What Keelson does and how to install it
+- [Why Keelson?](explanation/why-keelson.md) — Product stance and design philosophy
 
 ### Guides
 
@@ -20,7 +20,7 @@
 
 ### Reference
 
-- [Skill Reference](reference/skill-reference.md) — Per-skill inputs, outputs, constraints, and the `.reforge/` schema
+- [Skill Reference](reference/skill-reference.md) — Per-skill inputs, outputs, constraints, and the `.keelson/` schema
 
 ---
 
@@ -28,8 +28,8 @@
 
 ### はじめに
 
-- [README (日本語)](../README_ja.md) — Reforge の概要とインストール方法
-- [Why Reforge?](explanation/why-reforge.md) — Reforge の設計思想
+- [README (日本語)](../README_ja.md) — Keelson の概要とインストール方法
+- [Why Keelson?](explanation/why-keelson.md) — Keelson の設計思想
 
 ### ガイド
 
@@ -38,4 +38,4 @@
 
 ### リファレンス
 
-- [スキルリファレンス](reference/ja/skill-reference.md) — スキルごとの入力・出力・制約、および `.reforge/` スキーマ
+- [スキルリファレンス](reference/ja/skill-reference.md) — スキルごとの入力・出力・制約、および `.keelson/` スキーマ

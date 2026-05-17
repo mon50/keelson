@@ -24,8 +24,8 @@ function resolveDefaultAssets(): PackageAssets {
     coreSkillsDir: resolvePackagePath('../../skills/core', '../skills/core'),
     templatesDir: resolvePackagePath('../../skills/templates', '../skills/templates'),
     rendererServerDir: resolvePackagePath(
-      '../../reforge-renderer/dist',
-      '../reforge-renderer/dist'
+      '../../keelson-renderer/dist',
+      '../keelson-renderer/dist'
     ),
     packageRoot: resolvePackagePath('../..', '..')
   };
@@ -49,40 +49,40 @@ function emptyResult(overrides?: Partial<InstallResult>): InstallResult {
 }
 
 async function ensureInstallDirs(cwd: string): Promise<InstallError | undefined> {
-  const reforgeDir = path.join(cwd, '.reforge');
+  const keelsonDir = path.join(cwd, '.keelson');
   try {
-    await fs.ensureDir(path.join(reforgeDir, 'skills'));
-    await fs.ensureDir(path.join(reforgeDir, 'server'));
+    await fs.ensureDir(path.join(keelsonDir, 'skills'));
+    await fs.ensureDir(path.join(keelsonDir, 'server'));
     return undefined;
   } catch (err: unknown) {
-    return toInstallError(reforgeDir, err);
+    return toInstallError(keelsonDir, err);
   }
 }
 
-function hasReforgeGitignoreEntry(content: string): boolean {
+function hasKeelsonGitignoreEntry(content: string): boolean {
   return content.split(/\r?\n/).some((line) => {
     const trimmed = line.trim();
     return (
-      trimmed === '.reforge' ||
-      trimmed === '.reforge/' ||
-      trimmed === '/.reforge' ||
-      trimmed === '/.reforge/'
+      trimmed === '.keelson' ||
+      trimmed === '.keelson/' ||
+      trimmed === '/.keelson' ||
+      trimmed === '/.keelson/'
     );
   });
 }
 
-async function ensureReforgeGitignored(cwd: string): Promise<InstallError | undefined> {
+async function ensureKeelsonGitignored(cwd: string): Promise<InstallError | undefined> {
   const gitignorePath = path.join(cwd, '.gitignore');
   try {
     const content = (await fs.pathExists(gitignorePath))
       ? await fs.readFile(gitignorePath, 'utf8')
       : '';
-    if (hasReforgeGitignoreEntry(content)) {
+    if (hasKeelsonGitignoreEntry(content)) {
       return undefined;
     }
 
     const separator = content.length > 0 && !content.endsWith('\n') ? '\n' : '';
-    await fs.appendFile(gitignorePath, `${separator}.reforge/\n`);
+    await fs.appendFile(gitignorePath, `${separator}.keelson/\n`);
     return undefined;
   } catch (err: unknown) {
     return toInstallError(gitignorePath, err);
@@ -98,7 +98,7 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
     if (initError) {
       return emptyResult({ error: initError });
     }
-    const gitignoreError = await ensureReforgeGitignored(cwd);
+    const gitignoreError = await ensureKeelsonGitignored(cwd);
     if (gitignoreError) {
       return emptyResult({ error: gitignoreError });
     }
@@ -128,7 +128,7 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
     return {
       success: true,
       skillsInstalled: [...ALL_SKILLS],
-      rendererServerInstalled: path.join(cwd, '.reforge/server'),
+      rendererServerInstalled: path.join(cwd, '.keelson/server'),
       forwardingInstalled,
       overwritten: allOverwritten
     };

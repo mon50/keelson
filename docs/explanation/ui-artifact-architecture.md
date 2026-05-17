@@ -1,6 +1,6 @@
 # Prototype Artifact Architecture
 
-`prototype.html` is a simplified review artifact created by `/reforge-proto`.
+`prototype.html` is a simplified review artifact created by `/keel-proto`.
 
 It must be grounded in:
 

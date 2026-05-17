@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
-- Reforge Agent Skills (init, update, resume, diff, validate, render, plan, impl, verify, status)
-- Reforge CLI with `install`, `doctor`, and `uninstall` commands.
+- Keelson Agent Skills (init, update, resume, diff, validate, render, plan, impl, verify, status)
+- Keelson CLI with `install`, `doctor`, and `uninstall` commands.
 - Local HTML Renderer for UI prototypes.
 - Support for Claude Code and Codex environments.
 - Comprehensive workflow and skill documentation.

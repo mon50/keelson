@@ -41,16 +41,16 @@ describe('report()', () => {
     report(makeSuccessResult(), { stdout });
 
     const out = getOutput();
-    expect(out).toContain('/reforge-requirements');
-    expect(out).toContain('/reforge-us');
-    expect(out).toContain('/reforge-design');
-    expect(out).toContain('/reforge-proto');
-    expect(out).toContain('/reforge-plan');
-    expect(out).toContain('/reforge-impl');
-    expect(out).not.toContain('/reforge-init');
-    expect(out).not.toContain('/reforge-render');
-    expect(out).not.toContain('/reforge-verify');
-    expect(out).not.toContain('/reforge:');
+    expect(out).toContain('/keel-requirements');
+    expect(out).toContain('/keel-us');
+    expect(out).toContain('/keel-design');
+    expect(out).toContain('/keel-proto');
+    expect(out).toContain('/keel-plan');
+    expect(out).toContain('/keel-impl');
+    expect(out).not.toContain('/keelson-init');
+    expect(out).not.toContain('/keelson-render');
+    expect(out).not.toContain('/keelson-verify');
+    expect(out).not.toContain('/keelson:');
   });
 
   it('インストール済み環境 (claude-code) とスキル数が表示される', () => {
@@ -72,19 +72,19 @@ describe('report()', () => {
 
   it('overwritten に値がある場合、上書きファイルが表示される', () => {
     report(
-      makeSuccessResult({ overwritten: ['.claude/skills/reforge-requirements/SKILL.md'] }),
+      makeSuccessResult({ overwritten: ['.claude/skills/keel-requirements/SKILL.md'] }),
       { stdout }
     );
 
     const out = getOutput();
-    expect(out).toContain('.claude/skills/reforge-requirements/SKILL.md');
+    expect(out).toContain('.claude/skills/keel-requirements/SKILL.md');
   });
 
-  it('次のステップとして /reforge-requirements の案内が含まれる', () => {
+  it('次のステップとして /keel-requirements の案内が含まれる', () => {
     report(makeSuccessResult(), { stdout });
 
     const out = getOutput();
-    expect(out).toContain('/reforge-requirements "<作りたい体験や機能>"');
+    expect(out).toContain('/keel-requirements "<作りたい体験や機能>"');
   });
 
   it('success=false の場合、エラーが stderr に出力される', () => {

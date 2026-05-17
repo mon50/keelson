@@ -8,7 +8,7 @@ describe('EnvironmentDetector.detect()', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reforge-detector-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'keelson-detector-'));
   });
 
   afterEach(() => {

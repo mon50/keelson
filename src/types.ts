@@ -3,28 +3,28 @@ export const TARGET_ENVIRONMENTS = ['claude-code', 'codex'] as const;
 export type TargetEnvironment = (typeof TARGET_ENVIRONMENTS)[number];
 
 export const ALL_SKILLS = [
-  'reforge-requirements',
-  'reforge-us',
-  'reforge-design',
-  'reforge-proto',
-  'reforge-plan',
-  'reforge-impl'
+  'keel-requirements',
+  'keel-us',
+  'keel-design',
+  'keel-proto',
+  'keel-plan',
+  'keel-impl'
 ] as const;
 
 export type SkillName = (typeof ALL_SKILLS)[number];
 
 export const SKILL_COMMAND = {
-  'reforge-requirements': 'requirements "<idea>"',
-  'reforge-us': 'us',
-  'reforge-design': 'design',
-  'reforge-proto': 'proto',
-  'reforge-plan': 'plan',
-  'reforge-impl': 'impl [task-id]'
+  'keel-requirements': 'requirements "<idea>"',
+  'keel-us': 'us',
+  'keel-design': 'design',
+  'keel-proto': 'proto',
+  'keel-plan': 'plan',
+  'keel-impl': 'impl [task-id]'
 } as const satisfies Record<SkillName, string>;
 
 export type SkillCommand = (typeof SKILL_COMMAND)[SkillName];
 
-export type ReforgePhase =
+export type KeelsonPhase =
   | 'requirements'
   | 'user-stories'
   | 'design'
@@ -36,18 +36,18 @@ export type ArtifactStatus = 'draft' | 'needs_revision' | 'approved';
 
 export interface ArtifactRecord {
   path: string;
-  phase: ReforgePhase;
+  phase: KeelsonPhase;
   status: ArtifactStatus;
   digest?: string;
   approvedAt?: string;
   notes?: string;
 }
 
-export interface ReforgeManifest {
+export interface KeelsonManifest {
   version: 1;
   feature: string;
   lang?: string;
-  currentPhase: ReforgePhase;
+  currentPhase: KeelsonPhase;
   artifacts: {
     requirements: ArtifactRecord;
     userStories: ArtifactRecord;
@@ -79,7 +79,7 @@ export const ENV_SKILL_DIR = {
   codex: '.agents/skills'
 } as const satisfies Record<TargetEnvironment, string>;
 
-export const REFORGE_DIR = '.reforge' as const;
+export const KEELSON_DIR = '.keelson' as const;
 
 export interface SelectorOptions {
   input?: NodeJS.ReadableStream;

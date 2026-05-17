@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import { detect } from './detector';
-import type { ArtifactRecord, ReforgeManifest } from './types';
+import type { ArtifactRecord, KeelsonManifest } from './types';
 
 const WORKSPACE_INTERNAL_DIRS = new Set(['skills', 'server']);
 
@@ -15,10 +15,10 @@ function isArtifactRecord(value: unknown): value is ArtifactRecord {
   );
 }
 
-function isManifest(value: unknown): value is ReforgeManifest {
-  const candidate = value as Partial<ReforgeManifest> | undefined;
+function isManifest(value: unknown): value is KeelsonManifest {
+  const candidate = value as Partial<KeelsonManifest> | undefined;
   const artifacts = candidate?.artifacts as
-    | Partial<Record<keyof ReforgeManifest['artifacts'], unknown>>
+    | Partial<Record<keyof KeelsonManifest['artifacts'], unknown>>
     | undefined;
 
   return (
@@ -48,27 +48,27 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
   // 2. Check workspace
   const isGit = await fs.pathExists(path.join(cwd, '.git'));
   if (!isGit) {
-    warnings.push('Not a git repository. Reforge works best in a version-controlled directory.');
+    warnings.push('Not a git repository. Keelson works best in a version-controlled directory.');
   }
 
   const environments = await detect(cwd);
   if (environments.length === 0) {
-    warnings.push('No AI coding agent environment detected (.claude/ or .agents/). Reforge skills may not be visible.');
+    warnings.push('No AI coding agent environment detected (.claude/ or .agents/). Keelson skills may not be visible.');
   }
 
-  const hasReforge = await fs.pathExists(path.join(cwd, '.reforge'));
-  if (!hasReforge) {
-    warnings.push('Reforge is not installed in this repository. Run `npx aid-reforge install` first.');
+  const hasKeelson = await fs.pathExists(path.join(cwd, '.keelson'));
+  if (!hasKeelson) {
+    warnings.push('Keelson is not installed in this repository. Run `npx keelson install` first.');
   } else {
-    const reforgeDir = path.join(cwd, '.reforge');
-    const entries = await fs.readdir(reforgeDir, { withFileTypes: true });
+    const keelsonDir = path.join(cwd, '.keelson');
+    const entries = await fs.readdir(keelsonDir, { withFileTypes: true });
     const featureDirs = entries.filter((entry) => {
       return entry.isDirectory() && !WORKSPACE_INTERNAL_DIRS.has(entry.name);
     });
 
     let manifestCount = 0;
     for (const entry of featureDirs) {
-      const manifestPath = path.join(reforgeDir, entry.name, 'manifest.json');
+      const manifestPath = path.join(keelsonDir, entry.name, 'manifest.json');
       if (!(await fs.pathExists(manifestPath))) {
         warnings.push(`Feature workspace '${entry.name}' is missing manifest.json.`);
         continue;
@@ -86,7 +86,7 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
     }
 
     if (manifestCount === 0) {
-      warnings.push('No Reforge feature manifests found. Start with `/reforge-requirements "<idea>"`.');
+      warnings.push('No Keelson feature manifests found. Start with `/keel-requirements "<idea>"`.');
     }
   }
 
@@ -94,14 +94,14 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
     console.log(JSON.stringify({ issues, warnings, ready: issues.length === 0 }, null, 2));
   } else {
     if (issues.length === 0 && warnings.length === 0) {
-      console.log('✅ Reforge environment is ready.');
+      console.log('✅ Keelson environment is ready.');
     } else {
       if (issues.length > 0) {
-        console.error('❌ Reforge environment has issues:');
+        console.error('❌ Keelson environment has issues:');
         issues.forEach((issue) => console.error(`  - ${issue}`));
       }
       if (warnings.length > 0) {
-        console.warn('⚠️ Reforge environment has warnings:');
+        console.warn('⚠️ Keelson environment has warnings:');
         warnings.forEach((warn) => console.warn(`  - ${warn}`));
       }
     }

@@ -47,15 +47,15 @@ describe('installable forwarder templates', () => {
       expect(markdown).not.toContain('{{');
       expect(frontmatter).toContain(`name: ${skillName}`);
       expect(frontmatter).toContain(
-        `description: Reforge ${SKILL_COMMAND[skillName]} command forwarding to the project-local SSoT skill.`
+        `description: Keelson ${SKILL_COMMAND[skillName]} command forwarding to the project-local SSoT skill.`
       );
       expect(frontmatter).toContain(
         'allowed-tools: Read, Bash, Write, Edit, Glob, AskUserQuestion'
       );
       expect(markdown).toContain(`# ${skillName}`);
-      expect(markdown).toContain(`.reforge/skills/${skillName}/SKILL.md`);
+      expect(markdown).toContain(`.keelson/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
-      expect(markdown).toContain('npx aid-reforge install');
+      expect(markdown).toContain('npx keelson install');
     }
   });
 
@@ -73,13 +73,13 @@ describe('installable forwarder templates', () => {
       expect(markdown).not.toContain('{{');
       expect(frontmatter).toContain(`name: ${skillName}`);
       expect(frontmatter).toContain(
-        `description: Reforge ${SKILL_COMMAND[skillName]} command forwarding to the project-local SSoT skill.`
+        `description: Keelson ${SKILL_COMMAND[skillName]} command forwarding to the project-local SSoT skill.`
       );
       expect(frontmatter).not.toContain('allowed-tools:');
       expect(markdown).toContain(`# ${skillName}`);
-      expect(markdown).toContain(`.reforge/skills/${skillName}/SKILL.md`);
+      expect(markdown).toContain(`.keelson/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
-      expect(markdown).toContain('npx aid-reforge install');
+      expect(markdown).toContain('npx keelson install');
     }
   });
 
@@ -90,7 +90,7 @@ describe('installable forwarder templates', () => {
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-requirements',
+          skillName: 'keel-requirements',
           template
         })
       )
@@ -99,7 +99,7 @@ describe('installable forwarder templates', () => {
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-us',
+          skillName: 'keel-us',
           template
         })
       )
@@ -108,7 +108,7 @@ describe('installable forwarder templates', () => {
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-proto',
+          skillName: 'keel-proto',
           template
         })
       )
@@ -117,7 +117,7 @@ describe('installable forwarder templates', () => {
       frontmatterOf(
         renderForwarder({
           environment: 'claude-code',
-          skillName: 'reforge-impl',
+          skillName: 'keel-impl',
           template
         })
       )

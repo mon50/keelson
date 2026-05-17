@@ -1,9 +1,9 @@
 # Artifact Schema
 
-Reforge no longer has a single specification JSON. The approved artifact bundle is the source of truth.
+Keelson no longer has a single specification JSON. The approved artifact bundle is the source of truth.
 
 ```text
-.reforge/<feature>/
+.keelson/<feature>/
   manifest.json
   audit.md
   requirements.md

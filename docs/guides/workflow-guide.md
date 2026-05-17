@@ -1,20 +1,20 @@
-# Reforge Workflow Guide
+# Keelson Workflow Guide
 
-Reforge is now an artifact-first AI-DLC Inception workflow. It no longer uses a legacy `spec.json` lifecycle.
+Keelson is now an artifact-first AI-DLC Inception workflow. It no longer uses a legacy `spec.json` lifecycle.
 
 ## Phases
 
-1. `/reforge-requirements "<idea>"` creates `requirements.md`, `manifest.json`, and `audit.md`, including UI design expectations for user-facing work.
-2. `/reforge-us` creates `user-stories.md` and `us-mock.html`.
-3. `/reforge-design` creates `design.md` from approved user stories and existing implementation evidence.
-4. `/reforge-proto` creates `prototype.html` to validate the US experience and design direction.
-5. `/reforge-plan` creates `plan.md`.
-6. `/reforge-impl [task-id]` implements one approved plan task.
+1. `/keel-requirements "<idea>"` creates `requirements.md`, `manifest.json`, and `audit.md`, including UI design expectations for user-facing work.
+2. `/keel-us` creates `user-stories.md` and `us-mock.html`.
+3. `/keel-design` creates `design.md` from approved user stories and existing implementation evidence.
+4. `/keel-proto` creates `prototype.html` to validate the US experience and design direction.
+5. `/keel-plan` creates `plan.md`.
+6. `/keel-impl [task-id]` implements one approved plan task.
 
 ## Artifacts
 
 ```text
-.reforge/<feature>/
+.keelson/<feature>/
   manifest.json
   audit.md
   requirements.md
@@ -29,10 +29,10 @@ Reforge is now an artifact-first AI-DLC Inception workflow. It no longer uses a 
 
 ## Revision Loops
 
-- Requirements ambiguity found in US, Design, Proto, or Impl: return to `/reforge-requirements`.
-- User operation mismatch found in Design or Proto: return to `/reforge-us`.
-- Implementation/design mismatch found in Proto or Impl: return to `/reforge-design`.
-- Prototype experience mismatch: return to `/reforge-us`.
+- Requirements ambiguity found in US, Design, Proto, or Impl: return to `/keel-requirements`.
+- User operation mismatch found in Design or Proto: return to `/keel-us`.
+- Implementation/design mismatch found in Proto or Impl: return to `/keel-design`.
+- Prototype experience mismatch: return to `/keel-us`.
 
 ## Implementation
 
@@ -40,4 +40,4 @@ Implementation follows a cc-sdd-style loop: select one task, inspect code, add o
 
 ## Session Continuity
 
-At the start of a resumed workflow, read `.reforge/<feature>/audit.md` first, then load the artifacts named in its `Resume Point`. If `audit.md` is missing in an older workspace, recreate it from `manifest.json` and the current artifacts before advancing.
+At the start of a resumed workflow, read `.keelson/<feature>/audit.md` first, then load the artifacts named in its `Resume Point`. If `audit.md` is missing in an older workspace, recreate it from `manifest.json` and the current artifacts before advancing.

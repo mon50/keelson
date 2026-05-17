@@ -2,7 +2,7 @@ import type { InstallResult, ReporterOptions, TargetEnvironment } from './types'
 import { SKILL_COMMAND } from './types';
 
 function slashCommand(command: string): string {
-  return `/reforge-${command}`;
+  return `/keelson-${command}`;
 }
 
 export function report(result: InstallResult, options?: ReporterOptions): void {
@@ -21,7 +21,7 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   const environments = Object.keys(result.forwardingInstalled) as TargetEnvironment[];
 
   lines.push('');
-  lines.push('✅ Reforge installed successfully!');
+  lines.push('✅ Keelson installed successfully!');
   lines.push('');
 
   for (const env of environments) {
@@ -35,12 +35,12 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   }
 
   lines.push('Available commands:');
-  lines.push('  /reforge-requirements "<作りたい体験や機能>"');
-  lines.push('  /reforge-us');
-  lines.push('  /reforge-design');
-  lines.push('  /reforge-proto');
-  lines.push('  /reforge-plan');
-  lines.push('  /reforge-impl');
+  lines.push('  /keel-requirements "<作りたい体験や機能>"');
+  lines.push('  /keel-us');
+  lines.push('  /keel-design');
+  lines.push('  /keel-proto');
+  lines.push('  /keel-plan');
+  lines.push('  /keel-impl');
   lines.push('');
 
   if (result.overwritten.length > 0) {
