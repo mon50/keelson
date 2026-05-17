@@ -1,8 +1,15 @@
 import type { InstallResult, ReporterOptions, TargetEnvironment } from './types';
 import { SKILL_COMMAND } from './types';
 
+const KEEL_BANNER = [
+  '   ╭───────────────────────────╮',
+  '   ╰─╮ │  │  │  │  │  │  │  │ ╭─╯',
+  '     ╰─┴──┴──┴──┴──┴──┴──┴──┴─╯',
+  '          K E E L S O N'
+];
+
 function slashCommand(command: string): string {
-  return `/keelson-${command}`;
+  return `/keel-${command}`;
 }
 
 export function report(result: InstallResult, options?: ReporterOptions): void {
@@ -20,6 +27,10 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   const lines: string[] = [];
   const environments = Object.keys(result.forwardingInstalled) as TargetEnvironment[];
 
+  lines.push('');
+  for (const bannerLine of KEEL_BANNER) {
+    lines.push(bannerLine);
+  }
   lines.push('');
   lines.push('✅ Keelson installed successfully!');
   lines.push('');

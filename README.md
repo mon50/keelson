@@ -2,6 +2,15 @@
 
 AI-DLC Inception and prototype convergence for Claude Code and Codex.
 
+```text
+   ╭───────────────────────────╮
+   ╰─╮ │  │  │  │  │  │  │  │ ╭─╯
+     ╰─┴──┴──┴──┴──┴──┴──┴──┴─╯
+          K E E L S O N
+```
+
+*The keelson is the backbone beam that runs the length of a hull and locks every frame true. Keelson keeps your build true to the approved spec.*
+
 Keelson turns a rough product idea into approved Requirements, User Stories, US mock flows, Design, a simplified Prototype, and an implementation Plan. Implementation then continues task-by-task with a cc-sdd-style `/keel-impl` loop.
 
 Backward compatibility with the old `spec.json` / question queue / entity CRUD workflow is intentionally removed.

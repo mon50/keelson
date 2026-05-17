@@ -51,6 +51,7 @@ describe('report()', () => {
     expect(out).not.toContain('/keelson-render');
     expect(out).not.toContain('/keelson-verify');
     expect(out).not.toContain('/keelson:');
+    expect(out).not.toContain('/keelson-');
   });
 
   it('インストール済み環境 (claude-code) とスキル数が表示される', () => {
