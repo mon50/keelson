@@ -38,6 +38,7 @@ describe('keel-requirements skill', () => {
       '## Next Gate'
     ]);
     expect(markdown).toContain('Do not leave UI design expectations implicit');
+    expect(markdown).toContain('Never guess an unknown');
     expect(markdown).toContain('# Audit Trail');
     expect(markdown).toContain('## Resume Point');
   });
@@ -56,6 +57,7 @@ describe('keel-us skill', () => {
     expect(markdown).toContain('Inline CSS only');
     expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
     expect(markdown).toContain('prototype implication');
+    expect(markdown).toContain('Never guess to cover a gap');
     expect(markdown).toContain('### Review Controls');
     expect(markdown).toContain('Copy review feedback');
     expect(markdown).toContain('route back to `/keel-requirements`');
@@ -101,6 +103,7 @@ describe('keel-design skill', () => {
       '## Prototype Guidance'
     ]);
     expect(markdown).toContain('requirements.md` UI design expectations');
+    expect(markdown).toContain('Never guess the existing stack');
   });
 });
 
@@ -120,6 +123,7 @@ describe('keel-proto skill', () => {
     expect(markdown).toContain('Panorama (horizontal)');
     expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/keel-plan');
+    expect(markdown).toContain('Never invent UI, copy, or flows');
   });
 });
 
@@ -155,6 +159,7 @@ describe('keel-plan skill', () => {
     );
     expect(markdown).toContain('stable id such as `T-001`');
     expect(markdown).toContain('No task may rely only on the prototype');
+    expect(markdown).toContain('Never invent tasks, files');
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/keel-impl');

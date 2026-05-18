@@ -51,4 +51,12 @@ describe('keel-impl skill', () => {
       expect(markdown).toContain(step);
     }
   });
+
+  it('enforces design.md file boundaries before editing', () => {
+    expect(markdown).toContain('## Files To Touch');
+    expect(markdown).toContain('out-of-scope edit');
+    expect(markdown).toContain('Files Not To Touch');
+    expect(markdown).toContain('Route back to `/keel-design`');
+    expect(markdown).toContain('Never widen scope silently');
+  });
 });
