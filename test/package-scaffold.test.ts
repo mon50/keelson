@@ -29,8 +29,8 @@ describe('root keelson package scaffold', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('defines the npm package boundary for npx @keelson/cli install', () => {
-    expect(packageJson.name).toBe('@keelson/cli');
+  it('defines the npm package boundary for npx keelson-cli install', () => {
+    expect(packageJson.name).toBe('keelson-cli');
     expect(packageJson.bin).toEqual({ 'keelson': './dist/bin/cli.js' });
     expect(packageJson.files).toEqual([
       'dist',

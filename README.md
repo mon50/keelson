@@ -4,7 +4,7 @@
 
 **English** | [日本語](README_ja.md)
 
-[![npm](https://img.shields.io/npm/v/@keelson/cli)](https://www.npmjs.com/package/@keelson/cli)
+[![npm](https://img.shields.io/npm/v/keelson-cli)](https://www.npmjs.com/package/keelson-cli)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -34,7 +34,7 @@ Keelson turns a rough product idea into approved **Requirements → User Stories
 
 ```bash
 cd your-project
-npx @keelson/cli install
+npx keelson-cli install
 ```
 
 Then run the workflow inside Claude Code or Codex:
@@ -91,7 +91,7 @@ The source of truth is the approved artifact bundle:
 | Claude Code | `/keel-*` | ✅ Supported |
 | Codex | `/keel-*` | ✅ Supported |
 
-`npx @keelson/cli install` detects `.claude/` and `.agents/` and installs skills into whichever environments are present.
+`npx keelson-cli install` detects `.claude/` and `.agents/` and installs skills into whichever environments are present.
 
 ## Design Stance
 

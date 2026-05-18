@@ -7,9 +7,9 @@
 **Expected Outcome:** Know which command to use when.
 
 ## CLI
-- `npx @keelson/cli install`: Copies canonical skills to `.keelson/skills`, installs forwarders to `.claude/skills` or `.agents/skills`, and adds `.keelson/` to `.gitignore` when missing.
-- `npx @keelson/cli doctor`: Validates workspace.
-- `npx @keelson/cli uninstall`: Removes Keelson.
+- `npx keelson-cli install`: Copies canonical skills to `.keelson/skills`, installs forwarders to `.claude/skills` or `.agents/skills`, and adds `.keelson/` to `.gitignore` when missing.
+- `npx keelson-cli doctor`: Validates workspace.
+- `npx keelson-cli uninstall`: Removes Keelson.
 
 ## Skills
 - `/keel-requirements "<idea>"` — create or revise `requirements.md`, initialize `manifest.json`, and create `audit.md`

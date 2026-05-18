@@ -8,7 +8,7 @@
 
 ## Step 1: Install Keelson
 ```bash
-npx @keelson/cli install
+npx keelson-cli install
 ```
 
 ## Step 2: Requirements

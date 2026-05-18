@@ -27,7 +27,7 @@
 ## はじめ方
 
 ```bash
-npx @keelson/cli install
+npx keelson-cli install
 ```
 
 そして、リポジトリ全体の書き直しではなく、機能を依頼します。

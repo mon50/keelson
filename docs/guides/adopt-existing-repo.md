@@ -27,7 +27,7 @@ Anything unclear should remain a pending question.
 ## Start
 
 ```bash
-npx @keelson/cli install
+npx keelson-cli install
 ```
 
 Then ask for the feature, not for a full repo rewrite:
