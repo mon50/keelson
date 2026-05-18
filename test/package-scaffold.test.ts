@@ -35,8 +35,7 @@ describe('root keelson package scaffold', () => {
     expect(packageJson.files).toEqual([
       'dist',
       'skills/core',
-      'skills/templates',
-      'skills/runtime'
+      'skills/templates'
     ]);
   });
 
