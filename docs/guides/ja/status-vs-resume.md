@@ -17,4 +17,6 @@ Keelson は明示的なフェーズコマンドを使います。
 5. `/keel-plan`
 6. `/keel-impl [task-id]`
 
+`/keel-status` はいつでも実行できます。Keelson が `manifest.json` と `audit.md` を読み取り、アーティファクトを一切変更せずに次のコマンドを案内します。
+
 `manifest.json` はアーティファクトの状態を答えます。`audit.md` は過去セッションで何が起きたか、そして次にどこから再開するかを答えます。

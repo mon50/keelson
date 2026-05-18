@@ -12,6 +12,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `$keel-proto` | `/keel-proto` | Create and review simplified prototype |
 | `$keel-plan` | `/keel-plan` | Generate implementation plan |
 | `$keel-impl [task-id]` | `/keel-impl [task-id]` | Implement one approved plan task |
+| `$keel-status` | `/keel-status` | Report the current phase and next command (read-only) |
 
 ## Workflow
 
@@ -21,6 +22,8 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 4. `$keel-proto` — produce `prototype.html` and validate the user-story experience
 5. `$keel-plan` — produce `plan.md`
 6. `$keel-impl` — implement one task at a time using a Kiro-style loop
+
+Run `$keel-status` (`/keel-status`) at any time to report the current phase and the recommended next command. It reads `manifest.json` and `audit.md` only and never changes artifacts.
 
 ## Workspace Files
 
@@ -45,8 +48,8 @@ Keelson writes feature artifacts to `.keelson/<feature>/`:
 Keelson releases are tag-driven. This repository does not currently create GitHub Release objects; pushing a `v*` tag triggers `.github/workflows/release.yml`, which builds and publishes the npm package.
 
 1. Merge the release change to `main` and fast-forward local `main`.
-2. Confirm `package.json` has the intended version and `npm view keelson version` still shows the previous version.
+2. Confirm `package.json` has the intended version and `npm view keelson-cli version` still shows the previous version.
 3. Run the release checks locally, at minimum `npm run build` and the relevant tests.
 4. Create an annotated tag on `main`, for example `git tag -a v0.3.0 -m "v0.3.0"`.
 5. Push the tag with `git push origin v0.3.0`.
-6. Verify the GitHub Actions `Release` workflow succeeds and `npm view keelson version` reports the new version.
+6. Verify the GitHub Actions `Release` workflow succeeds and `npm view keelson-cli version` reports the new version.

@@ -119,6 +119,28 @@ describe('keel-proto skill', () => {
   });
 });
 
+describe('keel-status skill', () => {
+  it('navigates by reading manifest.json and audit.md without editing artifacts', () => {
+    const markdown = skill('keel-status');
+
+    expect(markdown).toContain('name: keel-status');
+    expect(markdown).toContain('allowed-tools: Read, Glob, AskUserQuestion');
+    expect(markdown).toContain('read-only navigator');
+    expect(markdown).toContain('manifest.json');
+    expect(markdown).toContain('audit.md');
+    expect(markdown).toContain('## Resume Point');
+    expect(markdown).toContain('Never write or edit');
+    expectHeadings(markdown, [
+      '# keel-status',
+      '## Purpose',
+      '## Inputs',
+      '## Status Report Contract',
+      '## Next Command Logic',
+      '## Quality Gate'
+    ]);
+  });
+});
+
 describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
     const markdown = skill('keel-plan');
