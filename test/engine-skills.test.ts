@@ -56,6 +56,8 @@ describe('keel-us skill', () => {
     expect(markdown).toContain('Inline CSS only');
     expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
     expect(markdown).toContain('prototype implication');
+    expect(markdown).toContain('### Review Controls');
+    expect(markdown).toContain('Copy review feedback');
     expect(markdown).toContain('route back to `/keel-requirements`');
     expect(markdown).toContain('updated `audit.md`');
     expect(markdown).toContain('Resume Point');
@@ -114,8 +116,32 @@ describe('keel-proto skill', () => {
     expect(markdown).toContain('mark `artifacts.usMock.status` as `needs_revision`');
     expect(markdown).toContain('mark `artifacts.design.status` as `needs_revision`');
     expect(markdown).toContain('updated `audit.md`');
+    expect(markdown).toContain('### Layout');
+    expect(markdown).toContain('Panorama (horizontal)');
     expect(markdown).toContain('Resume Point');
     expect(markdown).toContain('/keel-plan');
+  });
+});
+
+describe('keel-status skill', () => {
+  it('navigates by reading manifest.json and audit.md without editing artifacts', () => {
+    const markdown = skill('keel-status');
+
+    expect(markdown).toContain('name: keel-status');
+    expect(markdown).toContain('allowed-tools: Read, Glob, AskUserQuestion');
+    expect(markdown).toContain('read-only navigator');
+    expect(markdown).toContain('manifest.json');
+    expect(markdown).toContain('audit.md');
+    expect(markdown).toContain('## Resume Point');
+    expect(markdown).toContain('Never write or edit');
+    expectHeadings(markdown, [
+      '# keel-status',
+      '## Purpose',
+      '## Inputs',
+      '## Status Report Contract',
+      '## Next Command Logic',
+      '## Quality Gate'
+    ]);
   });
 });
 

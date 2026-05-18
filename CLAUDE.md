@@ -12,6 +12,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `/keel-proto` | Create and review simplified prototype |
 | `/keel-plan` | Generate implementation plan |
 | `/keel-impl [task-id]` | Implement one approved plan task |
+| `/keel-status` | Report the current phase and next command (read-only) |
 
 ## Workflow
 
@@ -21,5 +22,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 4. `/keel-proto`
 5. `/keel-plan`
 6. `/keel-impl`
+
+Run `/keel-status` at any time to report the current phase and the recommended next command (read-only).
 
 Artifacts live in `.keelson/<feature>/`. Approved `requirements.md`, `user-stories.md`, `us-mock.html`, `design.md`, and `prototype.html` form the source of truth for planning and implementation. `audit.md` records the interaction history, decisions, checks, and the next resume point for the following session.

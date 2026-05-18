@@ -8,7 +8,8 @@ export const ALL_SKILLS = [
   'keel-design',
   'keel-proto',
   'keel-plan',
-  'keel-impl'
+  'keel-impl',
+  'keel-status'
 ] as const;
 
 export type SkillName = (typeof ALL_SKILLS)[number];
@@ -19,7 +20,8 @@ export const SKILL_COMMAND = {
   'keel-design': 'design',
   'keel-proto': 'proto',
   'keel-plan': 'plan',
-  'keel-impl': 'impl [task-id]'
+  'keel-impl': 'impl [task-id]',
+  'keel-status': 'status'
 } as const satisfies Record<SkillName, string>;
 
 export type SkillCommand = (typeof SKILL_COMMAND)[SkillName];

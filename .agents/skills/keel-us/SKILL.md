@@ -57,11 +57,35 @@ Output file: `us-mock.html`
 - UI design expectations inherited from `requirements.md`
 - prototype implication for `/keel-proto`
 
-HTML requirements:
+### Review Controls
+
+The US mock is a review surface, so each story section must carry inline:
+
+- an **Approve** toggle that visibly marks that story as approved
+- a free-text **comment** field for change requests on that story
+
+The page must include a **Copy review feedback** button that collects every
+story's approval state and comment into one structured plain-text block and
+copies it to the clipboard. The reviewer pastes that block into the chat to
+return all feedback at once. Emit the block in exactly this format so the agent
+can parse it:
+
+```
+US Mock Review — <feature>
+US-001 <title>: APPROVED
+US-002 <title>: CHANGES — <comment text>
+US-003 <title>: PENDING
+```
+
+Each line is `<story-id> <title>: <APPROVED|CHANGES|PENDING>` with an optional
+` — <comment>` suffix whenever a comment was entered.
+
+### HTML Requirements
 
 - Inline CSS only; do not depend on external assets or packages.
-- No JavaScript is required; keep it static unless the user explicitly asks for interaction.
-- The file must open directly in a browser.
+- Inline JavaScript only, scoped to the review controls (approve toggles,
+  comment fields, the copy-feedback button). Do not script the scenarios.
+- The file must open directly in a browser with no build step.
 - Use `<details>` and `<summary>` so scenarios can be collapsed.
 - Add navigation links between story sections.
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- `/keel-status` skill: a read-only navigator that reads `manifest.json` and `audit.md`, reports the current phase, and recommends the next command.
+
 ## [0.4.0] - 2026-05-18
 ### Added
 - Keelson Agent Skills for the artifact-first workflow: `/keel-requirements`, `/keel-us`, `/keel-design`, `/keel-proto`, `/keel-plan`, `/keel-impl`.

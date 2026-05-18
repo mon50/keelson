@@ -43,6 +43,24 @@ The prototype must:
 - avoid protected branding or exact trade dress unless the user owns it
 - include visible empty/error/success states when the US mock requires them
 
+### Layout
+
+Pick the prototype layout from what is being mocked, and state the chosen layout
+near the top of `prototype.html`:
+
+- **Stacked (vertical)** — the default. Use when the prototype shows feature- or
+  component-level UI: individual states, forms, or partial views.
+- **Panorama (horizontal)** — use when the prototype mocks whole screens as a
+  flow, such as full smartphone screens screen by screen. Place the screens side
+  by side in a horizontally scrollable strip, each in a realistic device-width
+  frame, so the flow can be compared at a glance.
+- **Desktop screens** — full desktop screens are wide; do not force them into a
+  narrow panorama strip. Prefer one screen per row, or a small grid, at a
+  realistic viewport width.
+
+The layout must stay responsive and open directly in a browser with no build
+step. When unsure, prefer stacked and note the reason.
+
 ## Review Loop
 
 After writing `prototype.html`, ask the user whether the prototype proves the intended experience.

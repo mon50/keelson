@@ -18,5 +18,6 @@
 - `/keel-proto` — レビュー用の簡易プロトタイプを作成する
 - `/keel-plan` — 承認済みアーティファクトから `plan.md` を作成する
 - `/keel-impl [task-id]` — 承認済みタスクを 1 つ実装する
+- `/keel-status` — 現在のフェーズを報告し、次のコマンドを案内する（読み取り専用）
 
 各スキルは制御をユーザーに返す前に、`.keelson/<feature>/audit.md` に追記し、その `Resume Point` を更新します。

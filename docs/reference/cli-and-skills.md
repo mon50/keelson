@@ -18,5 +18,6 @@
 - `/keel-proto` — create the simplified prototype for review
 - `/keel-plan` — create `plan.md` from approved artifacts
 - `/keel-impl [task-id]` — implement one approved task
+- `/keel-status` — report the current phase and recommend the next command (read-only)
 
 Each skill appends to `.keelson/<feature>/audit.md` and updates its `Resume Point` before handing control back to the user.
