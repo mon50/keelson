@@ -58,7 +58,7 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
 
   const hasKeelson = await fs.pathExists(path.join(cwd, '.keelson'));
   if (!hasKeelson) {
-    warnings.push('Keelson is not installed in this repository. Run `npx keelson install` first.');
+    warnings.push('Keelson is not installed in this repository. Run `npx @keelson/cli install` first.');
   } else {
     const keelsonDir = path.join(cwd, '.keelson');
     const entries = await fs.readdir(keelsonDir, { withFileTypes: true });

@@ -4,7 +4,7 @@
 
 [English](README.md) | **日本語**
 
-[![npm](https://img.shields.io/npm/v/keelson.svg)](https://www.npmjs.com/package/keelson)
+[![npm](https://img.shields.io/npm/v/@keelson/cli)](https://www.npmjs.com/package/@keelson/cli)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -34,7 +34,7 @@ Keelson はラフなプロダクト案を、承認済みの **Requirements → U
 
 ```bash
 cd your-project
-npx keelson install
+npx @keelson/cli install
 ```
 
 Claude Code または Codex の中でワークフローを実行します。
@@ -91,7 +91,7 @@ Claude Code または Codex の中でワークフローを実行します。
 | Claude Code | `/keel-*` | ✅ 対応 |
 | Codex | `/keel-*` | ✅ 対応 |
 
-`npx keelson install` は `.claude/` と `.agents/` を検出し、存在する環境にスキルを配置します。
+`npx @keelson/cli install` は `.claude/` と `.agents/` を検出し、存在する環境にスキルを配置します。
 
 ## 設計スタンス
 

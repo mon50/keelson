@@ -8,7 +8,7 @@
 
 ## ステップ 1: Keelson をインストール
 ```bash
-npx keelson install
+npx @keelson/cli install
 ```
 
 ## ステップ 2: Requirements
