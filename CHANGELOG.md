@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
+- `/keel-steering` skill: creates and maintains project-wide steering (`product.md`, `tech.md`, `principles.md`) that every phase reads.
 - `/keel-status` skill: a read-only navigator that reads `manifest.json` and `audit.md`, reports the current phase, and recommends the next command.
 
 ## [0.4.0] - 2026-05-18

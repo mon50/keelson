@@ -24,6 +24,7 @@ describe('keel-requirements skill', () => {
     expect(markdown).toContain('manifest.json');
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('Write open questions inside the artifact that owns them.');
+    expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain('/keel-us');
     expectHeadings(markdown, [
       '# Requirements',
@@ -48,6 +49,7 @@ describe('keel-us skill', () => {
     const markdown = skill('keel-us');
 
     expect(markdown).toContain('Block if `artifacts.requirements.status` is not `approved`.');
+    expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain('user-stories.md');
     expect(markdown).toContain('us-mock.html');
     expect(markdown).toContain('Every story must have a stable id such as `US-001`');
@@ -81,6 +83,7 @@ describe('keel-design skill', () => {
       'Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.'
     );
     expect(markdown).toContain('existing implementation evidence');
+    expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain('Files To Touch');
     expect(markdown).toContain('Files Not To Touch');
     expect(markdown).toContain('route to `/keel-requirements`');
@@ -113,6 +116,7 @@ describe('keel-proto skill', () => {
       'Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, and `artifacts.design.status` are `approved`.'
     );
     expect(markdown).toContain('demonstrate each user story');
+    expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain('mark `artifacts.usMock.status` as `needs_revision`');
     expect(markdown).toContain('mark `artifacts.design.status` as `needs_revision`');
     expect(markdown).toContain('updated `audit.md`');
@@ -145,11 +149,31 @@ describe('keel-status skill', () => {
   });
 });
 
+describe('keel-steering skill', () => {
+  it('captures project-wide steering as product, tech, and principles', () => {
+    const markdown = skill('keel-steering');
+
+    expect(markdown).toContain('name: keel-steering');
+    expect(markdown).toContain('.keelson/steering/product.md');
+    expect(markdown).toContain('.keelson/steering/tech.md');
+    expect(markdown).toContain('.keelson/steering/principles.md');
+    expect(markdown).toContain('project-wide');
+    expect(markdown).toContain('not an approval gate');
+    expectHeadings(markdown, [
+      '# keel-steering',
+      '## Purpose',
+      '## Steering Contract',
+      '## Quality Gate'
+    ]);
+  });
+});
+
 describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
     const markdown = skill('keel-plan');
 
     expect(markdown).toContain('Create `plan.md`');
+    expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain(
       'Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, `artifacts.design.status`, and `artifacts.prototype.status` are `approved`.'
     );

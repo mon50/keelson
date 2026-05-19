@@ -19,6 +19,7 @@ Create `plan.md` for implementation.
 - `prototype.html`
 - `manifest.json`
 - `audit.md` if present; create it if missing.
+- `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, `artifacts.design.status`, and `artifacts.prototype.status` are `approved`.
 

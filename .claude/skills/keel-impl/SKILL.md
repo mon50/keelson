@@ -21,6 +21,7 @@ Implement one task from `plan.md` using the approved Keelson artifact bundle as 
 - `plan.md`
 - `manifest.json`
 - `audit.md` if present; create it if missing.
+- `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.plan.status` is `approved`.
 

@@ -17,6 +17,7 @@ Turn approved requirements, user stories, and US mock operations into a concrete
 - `us-mock.html`
 - `manifest.json`
 - `audit.md` if present; create it if missing.
+- `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.
 

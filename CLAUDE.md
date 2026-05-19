@@ -13,8 +13,11 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `/keel-plan` | Generate implementation plan |
 | `/keel-impl [task-id]` | Implement one approved plan task |
 | `/keel-status` | Report the current phase and next command (read-only) |
+| `/keel-steering` | Create or update project-wide steering (product, tech, principles) |
 
 ## Workflow
+
+Optionally run `/keel-steering` once first to capture project-wide product, tech, and principles that every phase reads.
 
 1. `/keel-requirements "作りたい体験や機能"`
 2. `/keel-us`

@@ -18,6 +18,7 @@ Create a simple prototype that validates the user-story experience and the desig
 - `design.md`
 - `manifest.json`
 - `audit.md` if present; create it if missing.
+- `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, and `artifacts.design.status` are `approved`.
 

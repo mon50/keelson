@@ -15,6 +15,8 @@ Turn a product idea into an AI-DLC-style Requirements artifact.
 
 Use `.keelson/<feature>/` for feature artifacts. Write open questions inside the artifact that owns them.
 
+Read `.keelson/steering/*.md` if present and honor the project's product, tech, and principles.
+
 Required files after this phase:
 
 - `requirements.md` - AI-DLC Requirements, including purpose, users, scope, constraints, acceptance signals, and open questions.
