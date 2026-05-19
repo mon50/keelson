@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import { detect } from './detector';
-import type { ArtifactRecord, KeelsonManifest } from './types';
+import type { ArtifactRecord, KeelsonManifest, QuickManifest } from './types';
 
 const WORKSPACE_INTERNAL_DIRS = new Set(['skills', 'steering']);
 
@@ -32,6 +32,17 @@ function isManifest(value: unknown): value is KeelsonManifest {
     isArtifactRecord(artifacts?.design) &&
     isArtifactRecord(artifacts?.prototype) &&
     isArtifactRecord(artifacts?.plan)
+  );
+}
+
+function isQuickManifest(value: unknown): value is QuickManifest {
+  const candidate = value as Partial<QuickManifest> | undefined;
+  return (
+    candidate?.version === 1 &&
+    typeof candidate.feature === 'string' &&
+    candidate.track === 'quick' &&
+    typeof candidate.currentPhase === 'string' &&
+    isArtifactRecord(candidate.change)
   );
 }
 
@@ -77,7 +88,9 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
       manifestCount += 1;
       try {
         const manifest = await fs.readJson(manifestPath);
-        if (!isManifest(manifest)) {
+        const isQuick = (manifest as { track?: string })?.track === 'quick';
+        const valid = isQuick ? isQuickManifest(manifest) : isManifest(manifest);
+        if (!valid) {
           warnings.push(`Feature workspace '${entry.name}' has an invalid manifest.json.`);
         }
       } catch (e) {

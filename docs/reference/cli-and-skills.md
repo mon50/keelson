@@ -20,6 +20,7 @@
 - `/keel-plan` — create `plan.md` from approved artifacts
 - `/keel-impl [task-id]` — implement one approved task
 - `/keel-verify` — audit the implementation against the approved artifacts and report gaps
+- `/keel-quick "<change>"` — lightweight track for a small change or bug fix, in one gated skill
 - `/keel-status` — report the current phase and recommend the next command (read-only)
 
 Each skill appends to `.keelson/<feature>/audit.md` and updates its `Resume Point` before handing control back to the user.

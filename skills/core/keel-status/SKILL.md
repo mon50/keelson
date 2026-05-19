@@ -27,11 +27,14 @@ Report, without editing any file:
 
 - Feature name and `currentPhase` from `manifest.json`.
 - Each artifact status: `requirements`, `userStories`, `usMock`, `design`, `prototype`, `plan` as `draft`, `needs_revision`, or `approved`.
+- For a `track: "quick"` manifest, report the single `change` artifact's status instead of the six phase artifacts.
 - Open blockers and the last validation, taken from the `## Resume Point` section of `audit.md`.
 - The recommended next command (see Next Command Logic).
 - A note when `audit.md` and `manifest.json` disagree, so the user can resolve it.
 
 ## Next Command Logic
+
+If `manifest.json` has `track: "quick"`, recommend `/keel-quick` while the `change` artifact is `draft` or `needs_revision`, and `/keel-verify` once it is `approved`. Otherwise evaluate the feature-track rules below.
 
 Evaluate in order and recommend the first match:
 
