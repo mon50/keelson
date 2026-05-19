@@ -21,7 +21,8 @@ const expectedSkills = [
   'keel-plan',
   'keel-impl',
   'keel-status',
-  'keel-steering'
+  'keel-steering',
+  'keel-verify'
 ] as const;
 
 function read(relativePath: string): string {
@@ -39,7 +40,8 @@ describe('public command contract', () => {
       'keel-plan': 'plan',
       'keel-impl': 'impl [task-id]',
       'keel-status': 'status',
-      'keel-steering': 'steering'
+      'keel-steering': 'steering',
+      'keel-verify': 'verify'
     });
   });
 });

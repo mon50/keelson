@@ -14,6 +14,7 @@ describe('keel-impl skill', () => {
     expect(markdown).toContain('argument-hint: [task-id]');
     expect(markdown).toContain('Implement one task from `plan.md`');
     expect(markdown).toContain('Block unless `artifacts.plan.status` is `approved`.');
+    expect(markdown).toContain('/keel-verify');
   });
 
   it('uses the approved artifact bundle as implementation source of truth', () => {

@@ -172,6 +172,28 @@ describe('keel-steering skill', () => {
   });
 });
 
+describe('keel-verify skill', () => {
+  it('audits the implementation against the approved artifact bundle', () => {
+    const markdown = skill('keel-verify');
+
+    expect(markdown).toContain('name: keel-verify');
+    expect(markdown).toContain('Block unless `artifacts.plan.status` is `approved`');
+    expect(markdown).toContain('verify-report.md');
+    expect(markdown).toContain('Traceability');
+    expect(markdown).toContain('Cross-artifact consistency');
+    expect(markdown).toContain('Guarantee Boundaries');
+    expect(markdown).toContain('Never edit implementation code');
+    expectHeadings(markdown, [
+      '# keel-verify',
+      '## Purpose',
+      '## What keel-verify checks',
+      '## Verify-Report Contract',
+      '## Routing',
+      '## Quality Gate'
+    ]);
+  });
+});
+
 describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
     const markdown = skill('keel-plan');
