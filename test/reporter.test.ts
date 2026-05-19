@@ -51,6 +51,7 @@ describe('report()', () => {
     expect(out).toContain('/keel-steering');
     expect(out).toContain('/keel-verify');
     expect(out).toContain('/keel-quick');
+    expect(out).toContain('/keel-discovery');
     expect(out).not.toContain('/keelson-init');
     expect(out).not.toContain('/keelson-render');
     expect(out).not.toContain('/keelson-verify');

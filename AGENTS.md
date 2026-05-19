@@ -16,8 +16,11 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `$keel-steering` | `/keel-steering` | Create or update project-wide steering (product, tech, principles) |
 | `$keel-verify` | `/keel-verify` | Audit the implementation against the approved artifacts |
 | `$keel-quick "<change>"` | `/keel-quick "<change>"` | Lightweight track for a small change or bug fix |
+| `$keel-discovery "<idea>"` | `/keel-discovery "<idea>"` | Front door: route a rough idea into one or more tracks |
 
 ## Workflow
+
+Start a rough or large idea with `$keel-discovery` (`/keel-discovery`); it routes the work into a small change, one feature, or several before the tracks below.
 
 Optionally run `$keel-steering` (`/keel-steering`) once first to capture project-wide product, tech, and principles that every phase below reads.
 
