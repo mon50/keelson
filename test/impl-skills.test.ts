@@ -30,6 +30,7 @@ describe('keel-impl skill', () => {
       expect(markdown).toContain(artifact);
     }
 
+    expect(markdown).toContain('.keelson/steering/*.md');
     expect(markdown).toContain('Do not ask new product questions during implementation.');
     expect(markdown).toContain('missing requirement: `/keel-requirements`');
     expect(markdown).toContain('missing user operation: `/keel-us`');

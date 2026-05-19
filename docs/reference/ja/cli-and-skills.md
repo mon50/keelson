@@ -12,6 +12,7 @@
 - `npx keelson-cli uninstall`: Keelson を削除します。
 
 ## スキル
+- `/keel-steering` — プロジェクト全体の steering（product / tech / principles）を作成・更新（feature 着手前に一度）
 - `/keel-requirements "<idea>"` — `requirements.md` を作成・改訂し、`manifest.json` を初期化し、`audit.md` を作成する
 - `/keel-us` — `user-stories.md` と `us-mock.html` を作成する
 - `/keel-design` — 承認済みの requirements と stories から実装デザインを作成する
