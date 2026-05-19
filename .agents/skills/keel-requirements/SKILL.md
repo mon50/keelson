@@ -108,6 +108,7 @@ Append new log entries; do not replace prior history. Update only the `## Resume
 ## Quality Gate
 
 - Do not invent users, business rules, permissions, or success criteria.
+- Never guess an unknown to move faster. Record it under `## Open Questions` or ask with AskUserQuestion; an unresolved question blocks approval.
 - Do not leave UI design expectations implicit when the feature has a user-facing surface.
 - If the user story or prototype phase found a mismatch, fold that feedback back into `requirements.md`.
 - Keep requirements implementation-neutral. Implementation choices belong in `/keel-design`.

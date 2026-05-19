@@ -72,6 +72,7 @@ After writing `prototype.html`, ask the user whether the prototype proves the in
 ## Quality Gate
 
 - Prototype covers every approved user story or explicitly marks manual-only stories.
+- Never invent UI, copy, or flows beyond `us-mock.html` and `design.md`. If the prototype needs something unspecified, record it and route back instead of guessing.
 - Prototype reflects design file boundaries and existing UI direction.
 - Prototype does not become the implementation contract by itself; `design.md` remains the implementation source.
 - `audit.md` records prototype validation outcome and the next command.
