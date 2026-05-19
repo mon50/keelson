@@ -54,10 +54,18 @@ For each task:
 
 ## Boundaries
 
-- Follow `design.md` file boundaries.
-- Respect `Files Not To Touch`.
-- Keep prototype as visual evidence, not implementation source code.
-- Do not widen scope without returning to an earlier phase.
+Before editing any file, check it against the boundaries in `design.md`:
+
+- The file must fall within `## Files To Touch`. A file outside that list is an out-of-scope edit.
+- The file must not appear in `## Files Not To Touch`.
+
+If the task genuinely needs a file outside `Files To Touch`, or one inside `Files Not To Touch`:
+
+1. Stop. Do not make the edit.
+2. Report which file is out of bounds and why the task needs it.
+3. Route back to `/keel-design` to widen `Files To Touch` deliberately, then re-plan with `/keel-plan`.
+
+Never widen scope silently. Keep the prototype as visual evidence, not implementation source code.
 
 ## Quality Gate
 

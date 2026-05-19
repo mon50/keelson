@@ -106,6 +106,7 @@ If the stories and US mock are acceptable, ask for approval. When approved, set 
 ## Quality Gate
 
 - Every in-scope requirement is covered by at least one user story.
+- Never guess to cover a gap in `requirements.md`. Ask the user, or mark `artifacts.requirements.status` as `needs_revision` and route back; unresolved unknowns stay in `## Open Issues`.
 - Every user story has a matching US mock operation.
 - Every UI-relevant story has a prototype implication.
 - UI-relevant stories reflect the `## UI Design Expectations` from `requirements.md`.

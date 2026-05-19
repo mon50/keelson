@@ -70,6 +70,7 @@ Ask for approval after writing. When approved, set `artifacts.design.status` to 
 ## Quality Gate
 
 - Design is specific enough for planning tasks.
+- Never guess the existing stack, conventions, or file locations from weak evidence. Record the unknown under `## Risks And Open Questions` or ask the user.
 - Design identifies existing implementation locations when present.
 - Design has explicit file boundaries.
 - Visual design direction is grounded in requirements and existing UI evidence, or records what remains unknown.
