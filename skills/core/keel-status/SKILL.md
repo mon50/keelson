@@ -19,7 +19,7 @@ Resolve `<feature>`:
 
 1. If exactly one `.keelson/<feature>/` workspace exists, use it.
 2. If several exist, ask the user which feature to report.
-3. If none exist, report that no workspace is present and recommend `/keel-requirements "<idea>"`.
+3. If none exist, report that no workspace is present and recommend `/keel-discovery "<idea>"` for a rough or large idea, or `/keel-requirements "<idea>"` for a clear single feature.
 
 ## Status Report Contract
 

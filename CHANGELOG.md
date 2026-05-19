@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
+- `/keel-discovery` skill: the front door — routes a rough or large idea into a small change, one feature, or several, and writes `discovery.md`.
 - `/keel-quick` skill: a lightweight track for a small change or bug fix — captures a `change.md` brief, implements, and runs checks in one gated skill, with a `track: "quick"` manifest.
 - `/keel-verify` skill: audits the implementation against the approved artifact bundle — task completion, traceability, cross-artifact consistency, and checks — and writes `verify-report.md`.
 - `/keel-steering` skill: creates and maintains project-wide steering (`product.md`, `tech.md`, `principles.md`) that every phase reads.

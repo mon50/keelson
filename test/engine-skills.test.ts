@@ -214,6 +214,24 @@ describe('keel-quick skill', () => {
   });
 });
 
+describe('keel-discovery skill', () => {
+  it('routes a rough idea into a small change, one feature, or several', () => {
+    const markdown = skill('keel-discovery');
+
+    expect(markdown).toContain('name: keel-discovery');
+    expect(markdown).toContain('argument-hint: "\\"<idea>\\""');
+    expect(markdown).toContain('.keelson/discovery.md');
+    expect(markdown).toContain('/keel-quick');
+    expect(markdown).toContain('/keel-requirements');
+    expectHeadings(markdown, [
+      '# keel-discovery',
+      '## Discovery.md Contract',
+      '## Routing',
+      '## Quality Gate'
+    ]);
+  });
+});
+
 describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
     const markdown = skill('keel-plan');

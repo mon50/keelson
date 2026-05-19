@@ -12,6 +12,7 @@
 - `npx keelson-cli uninstall`: Removes Keelson.
 
 ## Skills
+- `/keel-discovery "<idea>"` — the front door: route a rough or large idea into a small change, one feature, or several
 - `/keel-steering` — create or update project-wide steering: product, tech, principles (run once, before feature work)
 - `/keel-requirements "<idea>"` — create or revise `requirements.md`, initialize `manifest.json`, and create `audit.md`
 - `/keel-us` — create `user-stories.md` and `us-mock.html`
