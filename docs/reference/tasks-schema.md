@@ -2,7 +2,7 @@
 
 <sub>[← Keelson Docs](../README.md) · English | [日本語](ja/tasks-schema.md)</sub>
 
-Implementation tasks live in `plan.md`.
+Implementation tasks live in `05-plan/plan.md`.
 
 Each task should include:
 
@@ -16,4 +16,4 @@ Each task should include:
 - acceptance criteria
 - dependencies
 
-`/keel-impl [task-id]` implements one task at a time and records implementation notes back in `plan.md`.
+`/keel-impl [task-id]` implements one task at a time and records implementation notes back in `05-plan/plan.md`.

@@ -14,10 +14,12 @@ end-of-workflow gate. It never writes implementation code.
 
 ## Inputs
 
-- `requirements.md`, `user-stories.md`, `us-mock.html`, `design.md`, `prototype.html`, `plan.md`
-- `manifest.json`, `audit.md`
+- `01-requirements/requirements.md`, `02-user-stories/user-stories.md`, `02-user-stories/us-mock.html`, `03-design/design.md`, `04-prototype/prototype.html`, `05-plan/plan.md`
+- `manifest.json`, `audit.md` (workspace top)
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 - the repository's implemented code and tests
+
+Resolve every artifact path via `manifest.json.artifacts.*.path` rather than hardcoding bare filenames.
 
 Block unless `artifacts.plan.status` is `approved`; there is nothing to verify without an approved plan.
 
@@ -25,11 +27,11 @@ Read `audit.md` first to recover prior decisions and the current `## Resume Poin
 
 ## What keel-verify checks
 
-- **Task completion** — every task in `plan.md` is marked done with implementation notes.
+- **Task completion** — every task in `05-plan/plan.md` is marked done with implementation notes.
 - **Traceability** — every in-scope requirement and user story traces forward to a plan task and to changed files or tests.
 - **Cross-artifact consistency** — requirements, user stories, design, and plan do not contradict each other or the code.
-- **Boundary adherence** — changed files stayed within `design.md` `## Files To Touch` and avoided `## Files Not To Touch`.
-- **Checks** — run the project's tests, lint, and build when a command is known from steering `tech.md` or `design.md`; record pass, fail, or skipped.
+- **Boundary adherence** — changed files stayed within `03-design/design.md` `## Files To Touch` and avoided `## Files Not To Touch`.
+- **Checks** — run the project's tests, lint, and build when a command is known from steering `tech.md` or `03-design/design.md`; record pass, fail, or skipped.
 
 ## Guarantee Boundaries
 
@@ -39,8 +41,8 @@ security, or acceptance criteria that need human judgment. State this in the rep
 
 ## Outputs
 
-- `verify-report.md` in `.keelson/<feature>/` — the audit result.
-- updated `audit.md` — append a verification entry and update `## Resume Point`.
+- `verify-report.md` at the feature workspace top (`.keelson/<feature>/verify-report.md`) — the audit result. Kept at the top alongside `manifest.json` and `audit.md` because it summarizes the whole feature, not a single phase.
+- updated `audit.md` (workspace top) — append a verification entry and update `## Resume Point`.
 
 `verify-report.md` is a support file like `audit.md`. It is not a phase-gated artifact and has no `manifest.json` status.
 

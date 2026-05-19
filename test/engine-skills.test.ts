@@ -57,7 +57,7 @@ describe('keel-us skill', () => {
     expect(markdown).toContain('browser-readable scenario mock');
     expect(markdown).toContain('Use `<details>` and `<summary>`');
     expect(markdown).toContain('Inline CSS only');
-    expect(markdown).toContain('UI design expectations inherited from `requirements.md`');
+    expect(markdown).toContain('UI design expectations inherited from `01-requirements/requirements.md`');
     expect(markdown).toContain('prototype implication');
     expect(markdown).toContain('Never guess to cover a gap');
     expect(markdown).toContain('### Review Controls');
@@ -236,7 +236,7 @@ describe('keel-plan skill', () => {
   it('generates plan.md from the approved artifact bundle', () => {
     const markdown = skill('keel-plan');
 
-    expect(markdown).toContain('Create `plan.md`');
+    expect(markdown).toContain('Create `05-plan/plan.md`');
     expect(markdown).toContain('.keelson/steering');
     expect(markdown).toContain(
       'Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, `artifacts.design.status`, and `artifacts.prototype.status` are `approved`.'

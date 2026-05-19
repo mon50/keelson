@@ -12,8 +12,10 @@ Tell the user where the workflow stands and which command to run next. This is a
 
 ## Inputs
 
-- `.keelson/<feature>/manifest.json` - phase index and artifact statuses
+- `.keelson/<feature>/manifest.json` - phase index and artifact statuses; resolve each artifact's actual location via its `path` field rather than guessing filenames
 - `.keelson/<feature>/audit.md` - chronological log and `## Resume Point`
+
+Feature workspaces use numbered subdirectories for phase-owned files (e.g. `01-requirements/requirements.md`, `02-user-stories/us-mock.html`, …). `manifest.json`, `audit.md`, and `verify-report.md` stay at the feature top.
 
 Resolve `<feature>`:
 
@@ -34,7 +36,7 @@ Report, without editing any file:
 
 ## Next Command Logic
 
-If `manifest.json` has `track: "quick"`, recommend `/keel-quick` while the `change` artifact is `draft` or `needs_revision`, and `/keel-verify` once it is `approved`. Otherwise evaluate the feature-track rules below.
+If `manifest.json` has `track: "quick"`, recommend `/keel-quick` while the `change` artifact (`change.md` at the feature top) is `draft` or `needs_revision`, and `/keel-verify` once it is `approved`. Otherwise evaluate the feature-track rules below.
 
 Evaluate in order and recommend the first match:
 
@@ -44,7 +46,7 @@ Evaluate in order and recommend the first match:
 4. `design` not `approved` -> `/keel-design`.
 5. `prototype` not `approved` -> `/keel-proto`.
 6. `plan` not `approved` -> `/keel-plan`.
-7. All artifacts `approved` -> `/keel-impl` for the next pending task in `plan.md`.
+7. All artifacts `approved` -> `/keel-impl` for the next pending task in `05-plan/plan.md`.
 
 When several artifacts need revision, recommend the earliest phase first so upstream fixes land before downstream ones.
 

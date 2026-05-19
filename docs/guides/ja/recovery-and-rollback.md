@@ -9,12 +9,12 @@
 
 唯一の真実は、承認済みのアーティファクト束です。
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `design.md`
-- `prototype.html`
-- `plan.md`
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `03-design/design.md`
+- `04-prototype/prototype.html`
+- `05-plan/plan.md`
 
 ロールバックやアーティファクト再生成のあとは、理由と変更ファイルを `audit.md` に追記し、その `Resume Point` を正しい次のコマンドに更新します。
 

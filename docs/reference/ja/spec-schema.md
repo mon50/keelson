@@ -8,12 +8,25 @@
 .keelson/<feature>/
   manifest.json
   audit.md
-  requirements.md
-  user-stories.md
-  us-mock.html
-  design.md
-  prototype.html
-  plan.md
+  verify-report.md                   (/keel-verify 後)
+  01-requirements/requirements.md
+  02-user-stories/user-stories.md
+  02-user-stories/us-mock.html
+  03-design/design.md
+  04-prototype/prototype.html
+  04-prototype/prototype-notes.md    (optional)
+  05-plan/plan.md
+```
+
+フェーズ所有のファイルは番号付き子ディレクトリに格納します。各フェーズの添付物（スクリーンショット・ノート・参考資料・エビデンス）はその子ディレクトリの中に置きます。ワークスペース全体に対するファイル — `manifest.json`・`audit.md`・`verify-report.md` — はフィーチャー直下に置きます。
+
+`/keel-quick` で扱う小さな変更の場合、ワークスペースはフラットのままです。
+
+```text
+.keelson/<feature>/
+  manifest.json        (track: "quick")
+  audit.md
+  change.md
 ```
 
 ## マニフェスト
@@ -24,15 +37,17 @@
   "feature": "team-invitations",
   "currentPhase": "prototype",
   "artifacts": {
-    "requirements": { "path": "requirements.md", "phase": "requirements", "status": "approved" },
-    "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "approved" },
-    "usMock": { "path": "us-mock.html", "phase": "user-stories", "status": "approved" },
-    "design": { "path": "design.md", "phase": "design", "status": "approved" },
-    "prototype": { "path": "prototype.html", "phase": "prototype", "status": "draft" },
-    "plan": { "path": "plan.md", "phase": "plan", "status": "draft" }
+    "requirements": { "path": "01-requirements/requirements.md", "phase": "requirements", "status": "approved" },
+    "userStories": { "path": "02-user-stories/user-stories.md", "phase": "user-stories", "status": "approved" },
+    "usMock": { "path": "02-user-stories/us-mock.html", "phase": "user-stories", "status": "approved" },
+    "design": { "path": "03-design/design.md", "phase": "design", "status": "approved" },
+    "prototype": { "path": "04-prototype/prototype.html", "phase": "prototype", "status": "draft" },
+    "plan": { "path": "05-plan/plan.md", "phase": "plan", "status": "draft" }
   }
 }
 ```
+
+`path` は `.keelson/<feature>/` からの相対パスです。スキルはファイル名を推測するのではなく、この `path` フィールドからアーティファクトの場所を解決するため、レイアウトを変更しても全スキルを直接書き換える必要はありません。
 
 ステータスは `draft`・`needs_revision`・`approved` のいずれかです。
 

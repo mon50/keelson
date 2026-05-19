@@ -1,6 +1,6 @@
 ---
 name: keel-us
-description: Create user stories and US mock flows from approved requirements, mapping each story to operations and prototype-ready UI moments.
+description: Create user stories and US mock flows from approved requirements, mapping each story to operations and prototype-ready UI moments. (`us` is short for user-stories.)
 allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
 ---
 
@@ -13,7 +13,7 @@ Convert approved requirements into user stories and a US mock. This phase proves
 ## Inputs
 
 - `.keelson/<feature>/manifest.json`
-- `.keelson/<feature>/requirements.md`
+- `.keelson/<feature>/01-requirements/requirements.md`
 - `.keelson/<feature>/audit.md` if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
@@ -21,10 +21,12 @@ Block if `artifacts.requirements.status` is not `approved`.
 
 ## Outputs
 
-- `user-stories.md`
-- `us-mock.html`
-- updated `manifest.json`
-- updated `audit.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- updated `manifest.json` (workspace top)
+- updated `audit.md` (workspace top)
+
+Phase attachments (review screenshots, interview notes, etc.) also belong under `02-user-stories/`.
 
 ## Continuity
 
@@ -32,7 +34,7 @@ Before writing, read `audit.md` to understand prior decisions and the current `#
 
 ## User-Stories Contract
 
-`user-stories.md` must contain:
+`02-user-stories/user-stories.md` must contain:
 
 - `# User Stories`
 - `## Story Map`
@@ -45,9 +47,9 @@ Every story must have a stable id such as `US-001`, role, goal, benefit, and acc
 
 ## US Mock Contract
 
-Output file: `us-mock.html`
+Output file: `02-user-stories/us-mock.html`
 
-`us-mock.html` must translate each user story into a browser-readable scenario mock:
+`02-user-stories/us-mock.html` must translate each user story into a browser-readable scenario mock:
 
 - story id and title as section headings
 - entry point: page, route, or state where the story begins
@@ -55,7 +57,7 @@ Output file: `us-mock.html`
 - expected visible feedback, including success, failure, loading, and empty states when relevant
 - data shown or captured, including API call summaries when known
 - edge or empty state as a note, callout, or separate panel
-- UI design expectations inherited from `requirements.md`
+- UI design expectations inherited from `01-requirements/requirements.md`
 - prototype implication for `/keel-proto`
 
 ### Review Controls
@@ -98,7 +100,7 @@ If a story exposes an unclear or contradictory requirement:
 
 1. Do not paper over the issue.
 2. Mark `artifacts.requirements.status` as `needs_revision`.
-3. Record the mismatch in `us-mock.html`.
+3. Record the mismatch in `02-user-stories/us-mock.html`.
 4. Stop and route back to `/keel-requirements`.
 
 If the stories and US mock are acceptable, ask for approval. When approved, set both `artifacts.userStories.status` and `artifacts.usMock.status` to `approved`.
@@ -106,9 +108,9 @@ If the stories and US mock are acceptable, ask for approval. When approved, set 
 ## Quality Gate
 
 - Every in-scope requirement is covered by at least one user story.
-- Never guess to cover a gap in `requirements.md`. Ask the user, or mark `artifacts.requirements.status` as `needs_revision` and route back; unresolved unknowns stay in `## Open Issues`.
+- Never guess to cover a gap in `01-requirements/requirements.md`. Ask the user, or mark `artifacts.requirements.status` as `needs_revision` and route back; unresolved unknowns stay in `## Open Issues`.
 - Every user story has a matching US mock operation.
 - Every UI-relevant story has a prototype implication.
-- UI-relevant stories reflect the `## UI Design Expectations` from `requirements.md`.
+- UI-relevant stories reflect the `## UI Design Expectations` from `01-requirements/requirements.md`.
 - `audit.md` records story coverage decisions, approval or revision status, and the next command.
 - Report changed files and next gate: `/keel-design` when approved.

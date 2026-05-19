@@ -8,17 +8,17 @@ allowed-tools: Read, Write, Edit, AskUserQuestion
 
 ## Purpose
 
-Create `plan.md` for implementation.
+Create `05-plan/plan.md` for implementation.
 
 ## Inputs
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `design.md`
-- `prototype.html`
-- `manifest.json`
-- `audit.md` if present; create it if missing.
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `03-design/design.md`
+- `04-prototype/prototype.html`
+- `manifest.json` (workspace top)
+- `audit.md` (workspace top) if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, `artifacts.design.status`, and `artifacts.prototype.status` are `approved`.
@@ -27,7 +27,9 @@ Read `audit.md` first to recover previous decisions and the current `## Resume P
 
 ## Plan.md Contract
 
-`plan.md` must contain:
+Output file: `05-plan/plan.md`. Phase attachments (sequencing diagrams, dependency analysis, risk notes) belong under `05-plan/`.
+
+`05-plan/plan.md` must contain:
 
 - `# Implementation Plan`
 - `## Source Artifacts`
@@ -57,7 +59,7 @@ Append the plan approval or revision result to `audit.md`, including selected ne
 
 ## Quality Gate
 
-- No task may rely only on the prototype; each task must trace to `design.md` and at least one requirement or user story.
+- No task may rely only on the prototype; each task must trace to `03-design/design.md` and at least one requirement or user story.
 - Never invent tasks, files, or acceptance criteria that do not trace to an approved artifact. Missing detail routes back to the owning phase; it is not guessed.
 - No task may modify files listed under `Files Not To Touch`.
 - The plan must be suitable for Kiro-style implementation: one task, tests, review, then next task.

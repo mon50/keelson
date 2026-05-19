@@ -66,17 +66,17 @@ During Requirements and User Stories, make sure these decisions are explicit:
 - What acceptance criteria must be true before the feature is done?
 - Which tests or checks should verify it?
 
-Keelson records this in `requirements.md`, `user-stories.md`, `us-mock.html`, and `design.md`. `manifest.json` indexes artifact status only.
+Keelson records this in `01-requirements/requirements.md`, `02-user-stories/user-stories.md`, `02-user-stories/us-mock.html`, and `03-design/design.md`. `manifest.json` indexes artifact status only.
 
 ## Implementation
 
-After approval, `/keel-impl` reads the approved artifact bundle and `plan.md`.
+After approval, `/keel-impl` reads the approved artifact bundle and `05-plan/plan.md`.
 
 For brownfield work, the implementation skill must:
 
 - keep generated files inside `Files To Touch`
 - avoid `Files Not To Touch`
-- follow explicit repository conventions recorded in `design.md`
+- follow explicit repository conventions recorded in `03-design/design.md`
 - report if the requested implementation needs to widen the change scope
 - report which acceptance criteria were covered by files or tests
 
@@ -90,7 +90,7 @@ If the implementation would need to touch a protected or out-of-scope area, retu
 
 ## Verification
 
-Verification is task-local. `/keel-impl` runs the relevant checks for the selected task, updates `plan.md`, and reports any manual verification that remains.
+Verification is task-local. `/keel-impl` runs the relevant checks for the selected task, updates `05-plan/plan.md`, and reports any manual verification that remains.
 
 ## Common Failure
 
