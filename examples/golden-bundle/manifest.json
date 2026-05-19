@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "feature": "daily-report",
+  "currentPhase": "implementation",
+  "artifacts": {
+    "requirements": { "path": "requirements.md", "phase": "requirements", "status": "approved" },
+    "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "approved" },
+    "usMock": { "path": "us-mock.html", "phase": "user-stories", "status": "approved" },
+    "design": { "path": "design.md", "phase": "design", "status": "approved" },
+    "prototype": { "path": "prototype.html", "phase": "prototype", "status": "approved" },
+    "plan": { "path": "plan.md", "phase": "plan", "status": "approved" }
+  }
+}

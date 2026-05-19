@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Report App — US Mock</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.6 -apple-system, Segoe UI, Roboto, sans-serif;
+         color: #1f2530; background: #f4f5f7; }
+  header { background: #1f2530; color: #fff; padding: 24px; }
+  header h1 { margin: 0 0 4px; font-size: 20px; }
+  header p { margin: 0; color: #aab2c0; font-size: 14px; }
+  main { max-width: 780px; margin: 0 auto; padding: 24px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  nav a { font-size: 13px; text-decoration: none; color: #2f6feb;
+          border: 1px solid #d4d9e0; border-radius: 999px; padding: 4px 12px; background: #fff; }
+  .reviewbar { position: sticky; top: 0; z-index: 5; background: #eef4ff;
+               border: 1px solid #c7d8fb; border-radius: 10px; padding: 12px 16px;
+               margin-bottom: 20px; }
+  .reviewbar .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .reviewbar strong { font-size: 14px; }
+  .count { font-size: 13px; color: #3a5b94; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 8px;
+           padding: 8px 14px; cursor: pointer; background: #2f6feb; color: #fff; }
+  details { background: #fff; border: 1px solid #e0e3e8; border-radius: 10px;
+            margin: 0 0 16px; overflow: hidden; }
+  summary { cursor: pointer; padding: 14px 18px; font-weight: 600; background: #fbfbfd; }
+  summary .id { color: #2f6feb; font-family: ui-monospace, monospace; margin-right: 8px; }
+  summary .badge { float: right; font-size: 11px; font-weight: 700; border-radius: 999px;
+                   padding: 2px 9px; background: #e7e9ee; color: #6b7280; }
+  .badge.is-approved { background: #2f6feb; color: #fff; }
+  .badge.is-changes { background: #fdecdd; color: #b5650f; }
+  .body { padding: 4px 18px 18px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+       color: #6b7280; margin: 16px 0 6px; }
+  ol, ul { margin: 6px 0; padding-left: 22px; }
+  .callout { background: #fff7e6; border-left: 3px solid #f0a93b;
+             padding: 8px 14px; border-radius: 6px; margin: 8px 0; font-size: 14px; }
+  .proto { background: #eef4ff; border-left: 3px solid #2f6feb;
+           padding: 8px 14px; border-radius: 6px; margin: 8px 0; font-size: 14px; }
+  code { background: #eef0f3; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  .review { margin-top: 14px; border-top: 2px dashed #e0e3e8; padding-top: 12px; }
+  .review label { font-weight: 600; font-size: 14px; display: flex;
+                  align-items: center; gap: 8px; }
+  .review textarea { width: 100%; margin-top: 8px; min-height: 52px; font: inherit;
+                     padding: 8px 10px; border: 1px solid #cfd4db; border-radius: 8px;
+                     resize: vertical; }
+  #fb-out { width: 100%; min-height: 120px; margin-top: 10px; font: 13px/1.5 ui-monospace, monospace;
+            padding: 10px; border: 1px solid #c7d8fb; border-radius: 8px; display: none; }
+  .status { font-size: 13px; color: #2f6feb; }
+  footer { max-width: 780px; margin: 0 auto; padding: 8px 24px 40px; color: #8a92a0; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Daily Report App — US Mock</h1>
+  <p>Experience contract for <code>/keel-proto</code>. Approve each story or leave a comment, then copy the feedback.</p>
+</header>
+<main>
+  <nav>
+    <a href="#us-001">US-001 Submit</a>
+    <a href="#us-002">US-002 Edit</a>
+    <a href="#us-003">US-003 Feed</a>
+    <a href="#us-004">US-004 Filter</a>
+  </nav>
+
+  <div class="reviewbar">
+    <div class="row">
+      <strong>Review</strong>
+      <span class="count" id="fb-count">0 approved · 0 changes · 4 pending</span>
+      <button onclick="copyFeedback()">Copy review feedback</button>
+      <span class="status" id="fb-status"></span>
+    </div>
+    <textarea id="fb-out" readonly aria-label="Review feedback"></textarea>
+  </div>
+
+  <details id="us-001" open>
+    <summary><span class="id">US-001</span>Submit today's report<span class="badge" id="b-US-001">pending</span></summary>
+    <div class="body">
+      <h3>Entry point</h3>
+      <p>Home route <code>/</code>. The report form is the top surface; today has no report yet.</p>
+      <h3>User action sequence</h3>
+      <ol>
+        <li>Member opens <code>/</code> and sees an empty report form, date prefilled to today.</li>
+        <li>Member types the body, optional blockers, and picks a mood.</li>
+        <li>Member presses <strong>Submit report</strong>.</li>
+      </ol>
+      <h3>Expected visible feedback</h3>
+      <ul>
+        <li><strong>Loading:</strong> the Submit button shows a saving state and is disabled.</li>
+        <li><strong>Success:</strong> the form collapses to a "Today's report" summary; a new card appears at the top of the feed.</li>
+        <li><strong>Failure:</strong> an inline error keeps the typed text.</li>
+      </ul>
+      <div class="callout"><strong>Edge:</strong> a body over 1000 characters is blocked before submit.</div>
+      <div class="proto"><strong>Prototype implication:</strong> show the empty form, the saving state, and the post-submit summary.</div>
+      <div class="review">
+        <label><input type="checkbox" class="approve" data-id="US-001" data-title="Submit today's report" onchange="refresh()"> Approve this story</label>
+        <textarea class="comment" data-id="US-001" placeholder="Comment / change request (optional)" oninput="refresh()"></textarea>
+      </div>
+    </div>
+  </details>
+
+  <details id="us-002" open>
+    <summary><span class="id">US-002</span>Edit today's own report<span class="badge" id="b-US-002">pending</span></summary>
+    <div class="body">
+      <h3>Entry point</h3>
+      <p>Home route <code>/</code> after today's report exists — a "Today's report" summary with an <strong>Edit</strong> action.</p>
+      <h3>User action sequence</h3>
+      <ol>
+        <li>Member presses <strong>Edit</strong> on today's report summary.</li>
+        <li>The form reopens prefilled with the current values.</li>
+        <li>Member changes the body or blockers and presses <strong>Save changes</strong>.</li>
+      </ol>
+      <h3>Expected visible feedback</h3>
+      <ul>
+        <li><strong>Success:</strong> the matching feed card updates in place; no duplicate card.</li>
+        <li><strong>Failure:</strong> inline error; the edited text is preserved.</li>
+      </ul>
+      <div class="callout"><strong>Edge:</strong> Edit is absent on other members' cards and on past-day cards.</div>
+      <div class="proto"><strong>Prototype implication:</strong> show the summary state and the reopened, prefilled form.</div>
+      <div class="review">
+        <label><input type="checkbox" class="approve" data-id="US-002" data-title="Edit today's own report" onchange="refresh()"> Approve this story</label>
+        <textarea class="comment" data-id="US-002" placeholder="Comment / change request (optional)" oninput="refresh()"></textarea>
+      </div>
+    </div>
+  </details>
+
+  <details id="us-003" open>
+    <summary><span class="id">US-003</span>Browse the 14-day team feed<span class="badge" id="b-US-003">pending</span></summary>
+    <div class="body">
+      <h3>Entry point</h3>
+      <p>Home route <code>/</code>, feed section below the form. Same view for members and managers.</p>
+      <h3>User action sequence</h3>
+      <ol>
+        <li>User scrolls to the feed under the form.</li>
+        <li>User reads team report cards, newest first.</li>
+      </ol>
+      <h3>Expected visible feedback</h3>
+      <ul>
+        <li><strong>Loading:</strong> skeleton cards while the feed loads.</li>
+        <li><strong>Success:</strong> cards with member name, date, body, blockers badge.</li>
+        <li><strong>Empty:</strong> a friendly empty state when no reports exist.</li>
+      </ul>
+      <div class="callout"><strong>Edge:</strong> reports older than 14 days are not shown.</div>
+      <div class="proto"><strong>Prototype implication:</strong> show the populated feed, the loading skeleton, and the empty state.</div>
+      <div class="review">
+        <label><input type="checkbox" class="approve" data-id="US-003" data-title="Browse the 14-day team feed" onchange="refresh()"> Approve this story</label>
+        <textarea class="comment" data-id="US-003" placeholder="Comment / change request (optional)" oninput="refresh()"></textarea>
+      </div>
+    </div>
+  </details>
+
+  <details id="us-004" open>
+    <summary><span class="id">US-004</span>Filter the feed by member<span class="badge" id="b-US-004">pending</span></summary>
+    <div class="body">
+      <h3>Entry point</h3>
+      <p>Member selector at the top of the feed section.</p>
+      <h3>User action sequence</h3>
+      <ol>
+        <li>User opens the member selector and picks a member.</li>
+        <li>The feed narrows to that member's reports.</li>
+        <li>User clears the filter to restore the full team feed.</li>
+      </ol>
+      <h3>Expected visible feedback</h3>
+      <ul>
+        <li><strong>Success:</strong> only the selected member's cards remain.</li>
+        <li><strong>Empty:</strong> a "no reports for this member" empty state.</li>
+      </ul>
+      <div class="callout"><strong>Edge:</strong> clearing the filter must fully restore the 14-day feed.</div>
+      <div class="proto"><strong>Prototype implication:</strong> show the feed filtered to one member and the per-filter empty state.</div>
+      <div class="review">
+        <label><input type="checkbox" class="approve" data-id="US-004" data-title="Filter the feed by member" onchange="refresh()"> Approve this story</label>
+        <textarea class="comment" data-id="US-004" placeholder="Comment / change request (optional)" oninput="refresh()"></textarea>
+      </div>
+    </div>
+  </details>
+</main>
+<footer>Daily Report App — US Mock · generated by /keel-us · golden-bundle example</footer>
+
+<script>
+  var FEATURE = 'daily-report';
+
+  function rows() {
+    return [].map.call(document.querySelectorAll('.approve'), function (cb) {
+      var id = cb.dataset.id;
+      var comment = (document.querySelector('.comment[data-id="' + id + '"]').value || '').trim();
+      var state = cb.checked ? 'APPROVED' : (comment ? 'CHANGES' : 'PENDING');
+      return { id: id, title: cb.dataset.title, state: state, comment: comment };
+    });
+  }
+
+  function refresh() {
+    var data = rows();
+    var a = 0, c = 0, p = 0;
+    data.forEach(function (r) {
+      var badge = document.getElementById('b-' + r.id);
+      badge.className = 'badge';
+      if (r.state === 'APPROVED') { a++; badge.textContent = 'approved'; badge.classList.add('is-approved'); }
+      else if (r.state === 'CHANGES') { c++; badge.textContent = 'changes'; badge.classList.add('is-changes'); }
+      else { p++; badge.textContent = 'pending'; }
+    });
+    document.getElementById('fb-count').textContent =
+      a + ' approved · ' + c + ' changes · ' + p + ' pending';
+  }
+
+  function buildBlock() {
+    var lines = ['US Mock Review — ' + FEATURE];
+    rows().forEach(function (r) {
+      var line = r.id + ' ' + r.title + ': ' + r.state;
+      if (r.comment) line += ' — ' + r.comment;
+      lines.push(line);
+    });
+    return lines.join('\n');
+  }
+
+  function copyFeedback() {
+    var text = buildBlock();
+    var out = document.getElementById('fb-out');
+    out.value = text;
+    out.style.display = 'block';
+    out.focus();
+    out.select();
+    var status = document.getElementById('fb-status');
+    function ok() { status.textContent = 'Copied — paste it into the chat.'; }
+    function manual() { status.textContent = 'Select the text below and copy it manually.'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () {
+        try { document.execCommand('copy'); ok(); } catch (e) { manual(); }
+      });
+    } else {
+      try { document.execCommand('copy') ? ok() : manual(); } catch (e) { manual(); }
+    }
+  }
+
+  refresh();
+</script>
+</body>
+</html>
