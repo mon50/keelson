@@ -73,3 +73,4 @@ Never widen scope silently. Keep the prototype as visual evidence, not implement
 - Tests/checks cover the task or the report explicitly states why manual verification remains.
 - `plan.md` records what changed and what remains.
 - `audit.md` records the implementation outcome and next resume point.
+- When every task in `plan.md` is done, recommend `/keel-verify` to audit the feature against the approved artifacts.

@@ -54,6 +54,7 @@ export function report(result: InstallResult, options?: ReporterOptions): void {
   lines.push('  /keel-impl');
   lines.push('  /keel-status');
   lines.push('  /keel-steering');
+  lines.push('  /keel-verify');
   lines.push('');
 
   if (result.overwritten.length > 0) {

@@ -14,6 +14,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `$keel-impl [task-id]` | `/keel-impl [task-id]` | Implement one approved plan task |
 | `$keel-status` | `/keel-status` | Report the current phase and next command (read-only) |
 | `$keel-steering` | `/keel-steering` | Create or update project-wide steering (product, tech, principles) |
+| `$keel-verify` | `/keel-verify` | Audit the implementation against the approved artifacts |
 
 ## Workflow
 
@@ -25,6 +26,7 @@ Optionally run `$keel-steering` (`/keel-steering`) once first to capture project
 4. `$keel-proto` — produce `prototype.html` and validate the user-story experience
 5. `$keel-plan` — produce `plan.md`
 6. `$keel-impl` — implement one task at a time using a Kiro-style loop
+7. `$keel-verify` — audit the implementation against the approved artifacts once all tasks are done
 
 Run `$keel-status` (`/keel-status`) at any time to report the current phase and the recommended next command. It reads `manifest.json` and `audit.md` only and never changes artifacts.
 
