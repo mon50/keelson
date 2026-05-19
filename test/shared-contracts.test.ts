@@ -7,6 +7,7 @@ import {
   SKILL_COMMAND,
   type ArtifactRecord,
   type KeelsonManifest,
+  type QuickManifest,
   type TaskEntry,
   type TasksJson
 } from '../src/types';
@@ -22,7 +23,8 @@ const expectedSkills = [
   'keel-impl',
   'keel-status',
   'keel-steering',
-  'keel-verify'
+  'keel-verify',
+  'keel-quick'
 ] as const;
 
 function read(relativePath: string): string {
@@ -41,7 +43,8 @@ describe('public command contract', () => {
       'keel-impl': 'impl [task-id]',
       'keel-status': 'status',
       'keel-steering': 'steering',
-      'keel-verify': 'verify'
+      'keel-verify': 'verify',
+      'keel-quick': 'quick "<change>"'
     });
   });
 });
@@ -76,6 +79,19 @@ describe('artifact manifest contract', () => {
 
     expect(manifest.artifacts.prototype.path).toBe('prototype.html');
     expect(manifest.artifacts.design.status).toBe('approved');
+  });
+
+  it('accepts the lightweight quick-track manifest shape', () => {
+    const manifest: QuickManifest = {
+      version: 1,
+      feature: 'fix-pagination',
+      track: 'quick',
+      currentPhase: 'change',
+      change: { path: 'change.md', phase: 'change', status: 'approved' }
+    };
+
+    expect(manifest.track).toBe('quick');
+    expect(manifest.change.path).toBe('change.md');
   });
 
   it('keeps implementation tasks traceable to approved artifacts', () => {

@@ -15,6 +15,7 @@ AI-DLC Inception and prototype convergence for Claude Code and Codex.
 | `/keel-status` | Report the current phase and next command (read-only) |
 | `/keel-steering` | Create or update project-wide steering (product, tech, principles) |
 | `/keel-verify` | Audit the implementation against the approved artifacts |
+| `/keel-quick "<change>"` | Lightweight track for a small change or bug fix |
 
 ## Workflow
 
@@ -27,6 +28,8 @@ Optionally run `/keel-steering` once first to capture project-wide product, tech
 5. `/keel-plan`
 6. `/keel-impl`
 7. `/keel-verify`
+
+For a small change or bug fix, use `/keel-quick` instead of the full flow.
 
 Run `/keel-status` at any time to report the current phase and the recommended next command (read-only).
 

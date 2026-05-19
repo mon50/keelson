@@ -11,7 +11,8 @@ export const ALL_SKILLS = [
   'keel-impl',
   'keel-status',
   'keel-steering',
-  'keel-verify'
+  'keel-verify',
+  'keel-quick'
 ] as const;
 
 export type SkillName = (typeof ALL_SKILLS)[number];
@@ -25,7 +26,8 @@ export const SKILL_COMMAND = {
   'keel-impl': 'impl [task-id]',
   'keel-status': 'status',
   'keel-steering': 'steering',
-  'keel-verify': 'verify'
+  'keel-verify': 'verify',
+  'keel-quick': 'quick "<change>"'
 } as const satisfies Record<SkillName, string>;
 
 export type SkillCommand = (typeof SKILL_COMMAND)[SkillName];
@@ -36,7 +38,8 @@ export type KeelsonPhase =
   | 'design'
   | 'prototype'
   | 'plan'
-  | 'implementation';
+  | 'implementation'
+  | 'change';
 
 export type ArtifactStatus = 'draft' | 'needs_revision' | 'approved';
 
@@ -53,6 +56,7 @@ export interface KeelsonManifest {
   version: 1;
   feature: string;
   lang?: string;
+  track?: 'feature';
   currentPhase: KeelsonPhase;
   artifacts: {
     requirements: ArtifactRecord;
@@ -62,6 +66,16 @@ export interface KeelsonManifest {
     prototype: ArtifactRecord;
     plan: ArtifactRecord;
   };
+}
+
+/** Manifest for the lightweight keel-quick track. */
+export interface QuickManifest {
+  version: 1;
+  feature: string;
+  lang?: string;
+  track: 'quick';
+  currentPhase: KeelsonPhase;
+  change: ArtifactRecord;
 }
 
 export type TaskStatus = 'pending' | 'in_progress' | 'done';

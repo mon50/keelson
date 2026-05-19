@@ -20,6 +20,7 @@
 - `/keel-plan` — 承認済みアーティファクトから `plan.md` を作成する
 - `/keel-impl [task-id]` — 承認済みタスクを 1 つ実装する
 - `/keel-verify` — 実装を承認済みアーティファクトと照合し、ギャップを報告する
+- `/keel-quick "<change>"` — 小さな変更・バグ修正の軽量トラック（1スキルで完結）
 - `/keel-status` — 現在のフェーズを報告し、次のコマンドを案内する（読み取り専用）
 
 各スキルは制御をユーザーに返す前に、`.keelson/<feature>/audit.md` に追記し、その `Resume Point` を更新します。

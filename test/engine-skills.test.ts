@@ -142,6 +142,7 @@ describe('keel-status skill', () => {
     expect(markdown).toContain('audit.md');
     expect(markdown).toContain('## Resume Point');
     expect(markdown).toContain('Never write or edit');
+    expect(markdown).toContain('track: "quick"');
     expectHeadings(markdown, [
       '# keel-status',
       '## Purpose',
@@ -189,6 +190,25 @@ describe('keel-verify skill', () => {
       '## What keel-verify checks',
       '## Verify-Report Contract',
       '## Routing',
+      '## Quality Gate'
+    ]);
+  });
+});
+
+describe('keel-quick skill', () => {
+  it('handles a small change in a single lightweight gated skill', () => {
+    const markdown = skill('keel-quick');
+
+    expect(markdown).toContain('name: keel-quick');
+    expect(markdown).toContain('argument-hint: "\\"<change>\\""');
+    expect(markdown).toContain('"track": "quick"');
+    expect(markdown).toContain('change.md');
+    expect(markdown).toContain('/keel-requirements');
+    expectHeadings(markdown, [
+      '# keel-quick',
+      '## Change.md Contract',
+      '## Manifest Contract',
+      '## Escape Hatch',
       '## Quality Gate'
     ]);
   });
