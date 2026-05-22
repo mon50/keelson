@@ -14,7 +14,8 @@ Start with the [README](../README.md) for an overview and installation.
 
 ### Tutorials
 
-- [Hello, Keelson](tutorials/hello-keelson.md) — your first feature, end to end
+- [Hello, Keelson (Quick)](tutorials/hello-keelson-quick.md) — five-minute quick track for a small change or bug fix
+- [Hello, Keelson (Full)](tutorials/hello-keelson.md) — your first full feature, end to end
 
 ### Guides
 
@@ -30,11 +31,11 @@ Start with the [README](../README.md) for an overview and installation.
 - [Skill Reference](reference/skill-reference.md) — per-skill inputs, outputs, and constraints
 - [Artifact Schema](reference/spec-schema.md) — the `.keelson/<feature>/` artifact bundle
 - [Questions](reference/questions-schema.md) — where open questions live
-- [Plan Schema](reference/tasks-schema.md) — the structure of `plan.md` tasks
+- [Plan Schema](reference/tasks-schema.md) — the structure of `05-plan/plan.md` tasks
 - [Verify Contract](reference/verify-contract.md) — implementation verification rules
 - [Support Matrix](reference/support-matrix.md) — supported agents and environments
 - [Limitations](reference/limitations.md) — known limitations
-- [Troubleshooting](reference/troubleshooting.md) — common issues and fixes
+- [Troubleshooting](reference/troubleshooting.md) — consolidated block conditions and routing back to the owning phase
 
 ### Explanation
 
@@ -49,7 +50,8 @@ Start with the [README](../README.md) for an overview and installation.
 
 ### チュートリアル
 
-- [Hello, Keelson](tutorials/ja/hello-keelson.md) — 最初の機能をはじめから終わりまで
+- [Hello, Keelson (クイック)](tutorials/ja/hello-keelson-quick.md) — 小さな変更やバグ修正をクイックトラックで 5 分体験
+- [Hello, Keelson (フル)](tutorials/ja/hello-keelson.md) — 最初のフル機能を はじめから終わりまで
 
 ### ガイド
 
@@ -65,11 +67,11 @@ Start with the [README](../README.md) for an overview and installation.
 - [スキルリファレンス](reference/ja/skill-reference.md) — スキルごとの入力・出力・制約
 - [アーティファクトスキーマ](reference/ja/spec-schema.md) — `.keelson/<feature>/` アーティファクト束
 - [質問](reference/ja/questions-schema.md) — 未解決の疑問の置き場所
-- [プランスキーマ](reference/ja/tasks-schema.md) — `plan.md` タスクの構造
+- [プランスキーマ](reference/ja/tasks-schema.md) — `05-plan/plan.md` タスクの構造
 - [検証コントラクト](reference/ja/verify-contract.md) — 実装検証のルール
 - [サポートマトリクス](reference/ja/support-matrix.md) — 対応エージェントと環境
 - [制限事項](reference/ja/limitations.md) — 既知の制限
-- [トラブルシューティング](reference/ja/troubleshooting.md) — よくある問題と対処
+- [トラブルシューティング](reference/ja/troubleshooting.md) — ブロック条件と所有フェーズへの戻し先一覧
 
 ### 解説
 

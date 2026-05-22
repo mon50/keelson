@@ -12,7 +12,7 @@ describe('keel-impl skill', () => {
   it('declares the Kiro-style implementation command contract', () => {
     expect(markdown).toContain('name: keel-impl');
     expect(markdown).toContain('argument-hint: [task-id]');
-    expect(markdown).toContain('Implement one task from `plan.md`');
+    expect(markdown).toContain('Implement one task from `05-plan/plan.md`');
     expect(markdown).toContain('Block unless `artifacts.plan.status` is `approved`.');
     expect(markdown).toContain('/keel-verify');
   });
@@ -46,7 +46,7 @@ describe('keel-impl skill', () => {
       'Add or update tests first',
       'Implement the smallest change',
       'Run the relevant tests or checks',
-      'Update `plan.md` with task status and implementation notes',
+      'Update `05-plan/plan.md` with task status and implementation notes',
       'Append an implementation entry to `audit.md`',
       'next pending task'
     ]) {

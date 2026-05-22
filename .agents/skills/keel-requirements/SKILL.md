@@ -19,9 +19,27 @@ Read `.keelson/steering/*.md` if present and honor the project's product, tech, 
 
 Required files after this phase:
 
-- `requirements.md` - AI-DLC Requirements, including purpose, users, scope, constraints, acceptance signals, and open questions.
-- `manifest.json` - artifact index, phase status, digests when known.
-- `audit.md` - chronological interaction log and resume point for the next session.
+- `01-requirements/requirements.md` - AI-DLC Requirements, including purpose, users, scope, constraints, acceptance signals, and open questions.
+- `manifest.json` (workspace top) - artifact index, phase status, digests when known.
+- `audit.md` (workspace top) - chronological interaction log and resume point for the next session.
+
+Workspace layout for the feature (full track):
+
+```
+.keelson/<feature>/
+  manifest.json
+  audit.md
+  verify-report.md            (after keel-verify)
+  01-requirements/requirements.md
+  02-user-stories/user-stories.md
+  02-user-stories/us-mock.html
+  03-design/design.md
+  04-prototype/prototype.html
+  04-prototype/prototype-notes.md   (optional)
+  05-plan/plan.md
+```
+
+`manifest.json`, `audit.md`, and `verify-report.md` stay at the feature top because they describe the workspace as a whole. Phase-owned files live in numbered subdirectories; attachments (images, notes, references) for a phase belong inside that phase's subdirectory.
 
 `manifest.json` is an index only. The source of truth is the approved artifact text.
 `audit.md` is continuity metadata only. It is not a phase-gated specification artifact.
@@ -32,7 +50,7 @@ Required files after this phase:
 2. If no idea is provided and no requirements artifact exists, ask for one concise product idea.
 3. Inspect only lightweight repository context when the idea mentions an existing app: package/config files, route/component directories, component/style directories, README, and obvious test setup.
 4. Create `audit.md` if missing, append the initial user request and repository findings, and initialize `## Resume Point`.
-5. Write or update `requirements.md`.
+5. Write or update `01-requirements/requirements.md`.
 6. Ask the user whether the requirements are approved.
 7. If approved, set `artifacts.requirements.status` to `approved` in `manifest.json`.
 8. If not approved, set `artifacts.requirements.status` to `needs_revision` and keep the next gate as `/keel-requirements`.
@@ -40,7 +58,7 @@ Required files after this phase:
 
 ## Requirements.md Contract
 
-The file must contain these headings:
+`01-requirements/requirements.md` must contain these headings:
 
 - `# Requirements`
 - `## Product Intent`
@@ -53,7 +71,7 @@ The file must contain these headings:
 - `## Open Questions`
 - `## Next Gate`
 
-Write open questions directly in `requirements.md`.
+Write open questions directly in `01-requirements/requirements.md`.
 
 `## UI Design Expectations` must capture user-facing design requirements without choosing implementation details:
 
@@ -72,15 +90,17 @@ Minimum manifest:
   "feature": "feature-slug",
   "currentPhase": "requirements",
   "artifacts": {
-    "requirements": { "path": "requirements.md", "phase": "requirements", "status": "draft" },
-    "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "draft" },
-    "usMock": { "path": "us-mock.html", "phase": "user-stories", "status": "draft" },
-    "design": { "path": "design.md", "phase": "design", "status": "draft" },
-    "prototype": { "path": "prototype.html", "phase": "prototype", "status": "draft" },
-    "plan": { "path": "plan.md", "phase": "plan", "status": "draft" }
+    "requirements": { "path": "01-requirements/requirements.md", "phase": "requirements", "status": "draft" },
+    "userStories": { "path": "02-user-stories/user-stories.md", "phase": "user-stories", "status": "draft" },
+    "usMock": { "path": "02-user-stories/us-mock.html", "phase": "user-stories", "status": "draft" },
+    "design": { "path": "03-design/design.md", "phase": "design", "status": "draft" },
+    "prototype": { "path": "04-prototype/prototype.html", "phase": "prototype", "status": "draft" },
+    "plan": { "path": "05-plan/plan.md", "phase": "plan", "status": "draft" }
   }
 }
 ```
+
+Paths are stored relative to `.keelson/<feature>/`. Skills must use these paths from `manifest.json` rather than hardcoding bare filenames.
 
 ## Audit.md Contract
 
@@ -112,7 +132,7 @@ Append new log entries; do not replace prior history. Update only the `## Resume
 - Do not invent users, business rules, permissions, or success criteria.
 - Never guess an unknown to move faster. Record it under `## Open Questions` or ask with AskUserQuestion; an unresolved question blocks approval.
 - Do not leave UI design expectations implicit when the feature has a user-facing surface.
-- If the user story or prototype phase found a mismatch, fold that feedback back into `requirements.md`.
+- If the user story or prototype phase found a mismatch, fold that feedback back into `01-requirements/requirements.md`.
 - Keep requirements implementation-neutral. Implementation choices belong in `/keel-design`.
 - `audit.md` records what changed and identifies the next command.
 - Report changed files and next gate: `/keel-us` when approved, otherwise `/keel-requirements`.

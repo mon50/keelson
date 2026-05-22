@@ -9,12 +9,12 @@
 
 The source of truth is the approved artifact bundle:
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `design.md`
-- `prototype.html`
-- `plan.md`
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `03-design/design.md`
+- `04-prototype/prototype.html`
+- `05-plan/plan.md`
 
 After a rollback or regenerated artifact, append the reason and changed files to `audit.md`, then update its `Resume Point` to the correct next command.
 

@@ -8,12 +8,25 @@ The approved artifact bundle is the source of truth.
 .keelson/<feature>/
   manifest.json
   audit.md
-  requirements.md
-  user-stories.md
-  us-mock.html
-  design.md
-  prototype.html
-  plan.md
+  verify-report.md                   (after /keel-verify)
+  01-requirements/requirements.md
+  02-user-stories/user-stories.md
+  02-user-stories/us-mock.html
+  03-design/design.md
+  04-prototype/prototype.html
+  04-prototype/prototype-notes.md    (optional)
+  05-plan/plan.md
+```
+
+Phase-owned files live in numbered subdirectories. Each phase's attachments (screenshots, notes, references, evidence) belong inside the matching subdirectory. Workspace-level files — `manifest.json`, `audit.md`, `verify-report.md` — stay at the feature top.
+
+For a `/keel-quick` change, the workspace is flat:
+
+```text
+.keelson/<feature>/
+  manifest.json        (with track: "quick")
+  audit.md
+  change.md
 ```
 
 ## Manifest
@@ -24,15 +37,17 @@ The approved artifact bundle is the source of truth.
   "feature": "team-invitations",
   "currentPhase": "prototype",
   "artifacts": {
-    "requirements": { "path": "requirements.md", "phase": "requirements", "status": "approved" },
-    "userStories": { "path": "user-stories.md", "phase": "user-stories", "status": "approved" },
-    "usMock": { "path": "us-mock.html", "phase": "user-stories", "status": "approved" },
-    "design": { "path": "design.md", "phase": "design", "status": "approved" },
-    "prototype": { "path": "prototype.html", "phase": "prototype", "status": "draft" },
-    "plan": { "path": "plan.md", "phase": "plan", "status": "draft" }
+    "requirements": { "path": "01-requirements/requirements.md", "phase": "requirements", "status": "approved" },
+    "userStories": { "path": "02-user-stories/user-stories.md", "phase": "user-stories", "status": "approved" },
+    "usMock": { "path": "02-user-stories/us-mock.html", "phase": "user-stories", "status": "approved" },
+    "design": { "path": "03-design/design.md", "phase": "design", "status": "approved" },
+    "prototype": { "path": "04-prototype/prototype.html", "phase": "prototype", "status": "draft" },
+    "plan": { "path": "05-plan/plan.md", "phase": "plan", "status": "draft" }
   }
 }
 ```
+
+Paths are relative to `.keelson/<feature>/`. Skills resolve artifact locations via these `path` fields rather than guessing filenames, so layout changes do not require touching every skill.
 
 Statuses are `draft`, `needs_revision`, or `approved`.
 

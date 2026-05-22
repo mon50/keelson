@@ -1,6 +1,6 @@
 ---
 name: keel-impl
-description: Implement one approved plan task using a Kiro-style loop: task selection, test-first intent, implementation, verification, and implementation notes.
+description: Implement one approved plan task using a Kiro-style loop: task selection, test-first intent, implementation, verification, and implementation notes. (`impl` is short for implement.)
 allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
 argument-hint: [task-id]
 ---
@@ -9,19 +9,21 @@ argument-hint: [task-id]
 
 ## Purpose
 
-Implement one task from `plan.md` using the approved Keelson artifact bundle as source of truth.
+Implement one task from `05-plan/plan.md` using the approved Keelson artifact bundle as source of truth.
 
 ## Inputs
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `design.md`
-- `prototype.html`
-- `plan.md`
-- `manifest.json`
-- `audit.md` if present; create it if missing.
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `03-design/design.md`
+- `04-prototype/prototype.html`
+- `05-plan/plan.md`
+- `manifest.json` (workspace top)
+- `audit.md` (workspace top) if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
+
+Resolve every artifact path via `manifest.json.artifacts.*.path` rather than hardcoding bare filenames.
 
 Block unless `artifacts.plan.status` is `approved`.
 
@@ -29,7 +31,7 @@ Read `audit.md` first to recover prior decisions and the current `## Resume Poin
 
 ## Task Selection
 
-If `[task-id]` is provided, implement that task. Otherwise choose the first unchecked or pending task in `plan.md`.
+If `[task-id]` is provided, implement that task. Otherwise choose the first unchecked or pending task in `05-plan/plan.md`.
 
 Do not ask new product questions during implementation. If a task cannot be implemented from the approved artifacts, stop and route to the phase that owns the gap:
 
@@ -47,14 +49,14 @@ For each task:
 3. Add or update tests first when the repository has a matching test pattern.
 4. Implement the smallest change that satisfies the task.
 5. Run the relevant tests or checks.
-6. Update `plan.md` with task status and implementation notes.
+6. Update `05-plan/plan.md` with task status and implementation notes.
 7. Append an implementation entry to `audit.md` with task id, files changed, checks run, and remaining work.
 8. Update `## Resume Point` in `audit.md` to the next pending task or the owning phase if blocked.
 9. Report files changed, checks run, and any remaining manual verification.
 
 ## Boundaries
 
-Before editing any file, check it against the boundaries in `design.md`:
+Before editing any file, check it against the boundaries in `03-design/design.md`:
 
 - The file must fall within `## Files To Touch`. A file outside that list is an out-of-scope edit.
 - The file must not appear in `## Files Not To Touch`.
@@ -71,6 +73,6 @@ Never widen scope silently. Keep the prototype as visual evidence, not implement
 
 - The implemented task traces to requirements, user stories, design, and plan.
 - Tests/checks cover the task or the report explicitly states why manual verification remains.
-- `plan.md` records what changed and what remains.
+- `05-plan/plan.md` records what changed and what remains.
 - `audit.md` records the implementation outcome and next resume point.
-- When every task in `plan.md` is done, recommend `/keel-verify` to audit the feature against the approved artifacts.
+- When every task in `05-plan/plan.md` is done, recommend `/keel-verify` to audit the feature against the approved artifacts.

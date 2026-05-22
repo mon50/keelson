@@ -14,11 +14,11 @@
 ## スキル
 - `/keel-discovery "<idea>"` — 入口: ラフな/大きな構想を小変更・単一/複数 feature に振り分ける
 - `/keel-steering` — プロジェクト全体の steering（product / tech / principles）を作成・更新（feature 着手前に一度）
-- `/keel-requirements "<idea>"` — `requirements.md` を作成・改訂し、`manifest.json` を初期化し、`audit.md` を作成する
-- `/keel-us` — `user-stories.md` と `us-mock.html` を作成する
-- `/keel-design` — 承認済みの requirements と stories から実装デザインを作成する
-- `/keel-proto` — レビュー用の簡易プロトタイプを作成する
-- `/keel-plan` — 承認済みアーティファクトから `plan.md` を作成する
+- `/keel-requirements "<idea>"` — `01-requirements/requirements.md` を作成・改訂し、`manifest.json` を初期化し、`audit.md` を作成する
+- `/keel-us` — `02-user-stories/user-stories.md` と `02-user-stories/us-mock.html` を作成する
+- `/keel-design` — 承認済みの requirements と stories から `03-design/design.md` を作成する
+- `/keel-proto` — レビュー用の `04-prototype/prototype.html`（簡易プロトタイプ）を作成する
+- `/keel-plan` — 承認済みアーティファクトから `05-plan/plan.md` を作成する
 - `/keel-impl [task-id]` — 承認済みタスクを 1 つ実装する
 - `/keel-verify` — 実装を承認済みアーティファクトと照合し、ギャップを報告する
 - `/keel-quick "<change>"` — 小さな変更・バグ修正の軽量トラック（1スキルで完結）

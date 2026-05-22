@@ -8,7 +8,7 @@
 | `keel-us` | User Stories | User Stories と US モックを作成 |
 | `keel-design` | Design | 既存実装を踏まえた実装設計を作成 |
 | `keel-proto` | Prototype | 体験確認用の簡易プロトタイプを作成 |
-| `keel-plan` | Plan | `plan.md` に実装タスクを生成 |
+| `keel-plan` | Plan | `05-plan/plan.md` に実装タスクを生成 |
 | `keel-impl` | Implementation | Kiro 風に 1 task ずつ実装 |
 
 ## Audit Trail

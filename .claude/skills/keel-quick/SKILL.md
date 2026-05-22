@@ -35,6 +35,8 @@ user-facing surface, new user operations, or meaningful product ambiguity.
 
 ## Change.md Contract
 
+`change.md` lives at the feature workspace top (`.keelson/<feature>/change.md`). Quick track stays flat — no numbered subdirectories — because a small change is a single file by design.
+
 `change.md` must contain:
 
 - `# Change`

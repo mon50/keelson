@@ -54,6 +54,6 @@ These files are project-wide. They are not phase-gated and carry no approval sta
 ## Quality Gate
 
 - Never guess the stack, conventions, or rules from weak evidence; ask the user.
-- Keep steering project-wide. Feature-specific detail belongs in `requirements.md`, not steering.
+- Keep steering project-wide. Feature-specific detail belongs in `01-requirements/requirements.md`, not steering.
 - Steering is advisory context, not an approval gate; a feature can still start without it.
 - Report the steering files written and recommend `/keel-requirements` as the next step.

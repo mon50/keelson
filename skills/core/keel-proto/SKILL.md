@@ -1,6 +1,6 @@
 ---
 name: keel-proto
-description: Create or revise the simplified prototype from approved user stories, US mock, and design.
+description: Create or revise the simplified prototype from approved user stories, US mock, and design. (`proto` is short for prototype.)
 allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion
 ---
 
@@ -12,22 +12,24 @@ Create a simple prototype that validates the user-story experience and the desig
 
 ## Inputs
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `design.md`
-- `manifest.json`
-- `audit.md` if present; create it if missing.
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `03-design/design.md`
+- `manifest.json` (workspace top)
+- `audit.md` (workspace top) if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, `artifacts.usMock.status`, and `artifacts.design.status` are `approved`.
 
 ## Outputs
 
-- `prototype.html`
-- optional `prototype-notes.md`
-- updated `manifest.json`
-- updated `audit.md`
+- `04-prototype/prototype.html`
+- optional `04-prototype/prototype-notes.md`
+- updated `manifest.json` (workspace top)
+- updated `audit.md` (workspace top)
+
+Phase attachments (screenshots, design references, user feedback notes) belong under `04-prototype/`.
 
 ## Continuity
 
@@ -37,9 +39,9 @@ Read `audit.md` before prototyping to recover prior decisions and the current `#
 
 The prototype must:
 
-- demonstrate each user story's core operation from `us-mock.html`
+- demonstrate each user story's core operation from `02-user-stories/us-mock.html`
 - use copy and states aligned with requirements
-- follow the UI composition and existing-implementation evidence in `design.md`
+- follow the UI composition and existing-implementation evidence in `03-design/design.md`
 - stay simple: static HTML/CSS/JS is enough
 - avoid protected branding or exact trade dress unless the user owns it
 - include visible empty/error/success states when the US mock requires them
@@ -47,7 +49,7 @@ The prototype must:
 ### Layout
 
 Pick the prototype layout from what is being mocked, and state the chosen layout
-near the top of `prototype.html`:
+near the top of `04-prototype/prototype.html`:
 
 - **Stacked (vertical)** — the default. Use when the prototype shows feature- or
   component-level UI: individual states, forms, or partial views.
@@ -64,7 +66,7 @@ step. When unsure, prefer stacked and note the reason.
 
 ## Review Loop
 
-After writing `prototype.html`, ask the user whether the prototype proves the intended experience.
+After writing `04-prototype/prototype.html`, ask the user whether the prototype proves the intended experience.
 
 - If the experience is wrong, mark `artifacts.usMock.status` as `needs_revision` and route to `/keel-us`.
 - If the prototype contradicts implementation design or existing UI evidence, mark `artifacts.design.status` as `needs_revision` and route to `/keel-design`.
@@ -73,8 +75,8 @@ After writing `prototype.html`, ask the user whether the prototype proves the in
 ## Quality Gate
 
 - Prototype covers every approved user story or explicitly marks manual-only stories.
-- Never invent UI, copy, or flows beyond `us-mock.html` and `design.md`. If the prototype needs something unspecified, record it and route back instead of guessing.
+- Never invent UI, copy, or flows beyond `02-user-stories/us-mock.html` and `03-design/design.md`. If the prototype needs something unspecified, record it and route back instead of guessing.
 - Prototype reflects design file boundaries and existing UI direction.
-- Prototype does not become the implementation contract by itself; `design.md` remains the implementation source.
+- Prototype does not become the implementation contract by itself; `03-design/design.md` remains the implementation source.
 - `audit.md` records prototype validation outcome and the next command.
 - Report changed files and next gate: `/keel-plan`.

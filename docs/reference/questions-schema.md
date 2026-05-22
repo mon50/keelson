@@ -4,9 +4,9 @@
 
 Open questions live in the artifact that owns them:
 
-- Requirements questions: `requirements.md`
-- User story and operation questions: `user-stories.md` or `us-mock.html`
-- Implementation/design questions: `design.md`
-- Prototype review questions: `prototype-notes.md` when needed
+- Requirements questions: `01-requirements/requirements.md`
+- User story and operation questions: `02-user-stories/user-stories.md` or `02-user-stories/us-mock.html`
+- Implementation/design questions: `03-design/design.md`
+- Prototype review questions: `04-prototype/prototype-notes.md` when needed
 
 Unresolved questions block approval for that phase.

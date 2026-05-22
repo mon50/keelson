@@ -12,11 +12,11 @@ Turn approved requirements, user stories, and US mock operations into a concrete
 
 ## Inputs
 
-- `requirements.md`
-- `user-stories.md`
-- `us-mock.html`
-- `manifest.json`
-- `audit.md` if present; create it if missing.
+- `01-requirements/requirements.md`
+- `02-user-stories/user-stories.md`
+- `02-user-stories/us-mock.html`
+- `manifest.json` (workspace top)
+- `audit.md` (workspace top) if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block unless `artifacts.requirements.status`, `artifacts.userStories.status`, and `artifacts.usMock.status` are `approved`.
@@ -40,7 +40,9 @@ Do not claim full repository understanding. Record evidence and uncertainty.
 
 ## Design.md Contract
 
-`design.md` must contain:
+Output file: `03-design/design.md`. Phase attachments (architecture diagrams, reference screenshots, evidence dumps) belong under `03-design/`.
+
+`03-design/design.md` must contain:
 
 - `# Design`
 - `## Source Artifacts`
@@ -57,7 +59,7 @@ Do not claim full repository understanding. Record evidence and uncertainty.
 - `## Prototype Guidance`
 - `## Risks And Open Questions`
 
-The design must trace back to user story ids, US mock operations, and `requirements.md` UI design expectations.
+The design must trace back to user story ids, US mock operations, and `01-requirements/requirements.md` UI design expectations.
 
 ## Revision Loop
 

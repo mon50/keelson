@@ -2,7 +2,7 @@
 
 <sub>[← Keelson ドキュメント](../../README.md) · [English](../tasks-schema.md) | 日本語</sub>
 
-実装タスクは `plan.md` に置きます。
+実装タスクは `05-plan/plan.md` に置きます。
 
 各タスクには次を含めるべきです。
 
@@ -16,4 +16,4 @@
 - 受け入れ基準
 - 依存関係
 
-`/keel-impl [task-id]` はタスクを一度に 1 つ実装し、実装メモを `plan.md` に書き戻します。
+`/keel-impl [task-id]` はタスクを一度に 1 つ実装し、実装メモを `05-plan/plan.md` に書き戻します。

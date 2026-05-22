@@ -8,7 +8,7 @@
 | `keel-us` | User Stories | Create user stories and US mock operations |
 | `keel-design` | Design | Produce implementation design from stories and existing code evidence |
 | `keel-proto` | Prototype | Create a simplified prototype for experience review |
-| `keel-plan` | Plan | Generate implementation tasks in `plan.md` |
+| `keel-plan` | Plan | Generate implementation tasks in `05-plan/plan.md` |
 | `keel-impl` | Implementation | Implement one approved task with a Kiro-style loop |
 
 ## Phase Gates
