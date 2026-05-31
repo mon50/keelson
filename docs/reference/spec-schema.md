@@ -4,8 +4,11 @@
 
 The approved artifact bundle is the source of truth.
 
+Project-local canonical skills live separately in `.keelson/system/skills/`. Feature
+artifacts live under `.keelson/features/`:
+
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md                   (after /keel-verify)
@@ -23,7 +26,7 @@ Phase-owned files live in numbered subdirectories. Each phase's attachments (scr
 For a `/keel-quick` change, the workspace is flat:
 
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json        (with track: "quick")
   audit.md
   change.md
@@ -47,7 +50,7 @@ For a `/keel-quick` change, the workspace is flat:
 }
 ```
 
-Paths are relative to `.keelson/<feature>/`. Skills resolve artifact locations via these `path` fields rather than guessing filenames, so layout changes do not require touching every skill.
+Paths are relative to `.keelson/features/<feature>/`. Skills resolve artifact locations via these `path` fields rather than guessing filenames, so layout changes do not require touching every skill.
 
 Statuses are `draft`, `needs_revision`, or `approved`.
 

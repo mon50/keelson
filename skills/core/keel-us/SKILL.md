@@ -12,9 +12,9 @@ Convert approved requirements into user stories and a US mock. This phase proves
 
 ## Inputs
 
-- `.keelson/<feature>/manifest.json`
-- `.keelson/<feature>/01-requirements/requirements.md`
-- `.keelson/<feature>/audit.md` if present; create it if missing.
+- `.keelson/features/<feature>/manifest.json`
+- `.keelson/features/<feature>/01-requirements/requirements.md`
+- `.keelson/features/<feature>/audit.md` if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 
 Block if `artifacts.requirements.status` is not `approved`.

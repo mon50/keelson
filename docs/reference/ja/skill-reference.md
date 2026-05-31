@@ -13,4 +13,4 @@
 
 ## Audit Trail
 
-すべての skill は `.keelson/<feature>/audit.md` を更新します。ここにはユーザー入力、主な判断、変更した artifact、検証、次セッションの開始位置を示す `Resume Point` を記録します。
+すべての skill は `.keelson/features/<feature>/audit.md` を更新します。ここにはユーザー入力、主な判断、変更した artifact、検証、次セッションの開始位置を示す `Resume Point` を記録します。

@@ -2,7 +2,7 @@
 
 This directory is a complete, approved Keelson artifact bundle for a sample
 feature: a small **daily report app** for teams. It shows what a finished
-`.keelson/<feature>/` workspace looks like after the full workflow.
+`.keelson/features/<feature>/` workspace looks like after the full workflow.
 
 | File | Phase | Produced by |
 |---|---|---|

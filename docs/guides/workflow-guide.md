@@ -16,7 +16,7 @@ Keelson is an artifact-first AI-DLC Inception workflow.
 ## Artifacts
 
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md                   (after /keel-verify)
@@ -48,4 +48,4 @@ Implementation follows a Kiro-style loop: select one task, inspect code, add or 
 
 ## Session Continuity
 
-At the start of a resumed workflow, read `.keelson/<feature>/audit.md` first, then load the artifacts named in its `Resume Point`. If `audit.md` is missing in an older workspace, recreate it from `manifest.json` and the current artifacts before advancing.
+At the start of a resumed workflow, read `.keelson/features/<feature>/audit.md` first, then load the artifacts named in its `Resume Point`. If `audit.md` is missing in an older workspace, recreate it from `manifest.json` and the current artifacts before advancing.

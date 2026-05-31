@@ -53,7 +53,7 @@ describe('installable forwarder templates', () => {
         'allowed-tools: Read, Bash, Write, Edit, Glob, AskUserQuestion'
       );
       expect(markdown).toContain(`# ${skillName}`);
-      expect(markdown).toContain(`.keelson/skills/${skillName}/SKILL.md`);
+      expect(markdown).toContain(`.keelson/system/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
       expect(markdown).toContain('npx keelson-cli install');
     }
@@ -77,7 +77,7 @@ describe('installable forwarder templates', () => {
       );
       expect(frontmatter).not.toContain('allowed-tools:');
       expect(markdown).toContain(`# ${skillName}`);
-      expect(markdown).toContain(`.keelson/skills/${skillName}/SKILL.md`);
+      expect(markdown).toContain(`.keelson/system/skills/${skillName}/SKILL.md`);
       expect(markdown).toContain('follow its instructions exactly');
       expect(markdown).toContain('npx keelson-cli install');
     }

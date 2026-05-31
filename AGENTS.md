@@ -38,7 +38,7 @@ Run `$keel-status` (`/keel-status`) at any time to report the current phase and 
 
 ## Workspace Files
 
-Keelson writes feature artifacts to `.keelson/<feature>/`. Phase-owned files live in numbered subdirectories; workspace-level files (`manifest.json`, `audit.md`, `verify-report.md`) stay at the feature top:
+Keelson stores project-local canonical skills in `.keelson/system/skills/` and writes feature artifacts to `.keelson/features/<feature>/`. Phase-owned files live in numbered subdirectories; workspace-level files (`manifest.json`, `audit.md`, `verify-report.md`) stay at the feature top:
 
 | File | Purpose |
 |---|---|

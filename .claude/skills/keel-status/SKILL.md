@@ -12,14 +12,14 @@ Tell the user where the workflow stands and which command to run next. This is a
 
 ## Inputs
 
-- `.keelson/<feature>/manifest.json` - phase index and artifact statuses; resolve each artifact's actual location via its `path` field rather than guessing filenames
-- `.keelson/<feature>/audit.md` - chronological log and `## Resume Point`
+- `.keelson/features/<feature>/manifest.json` - phase index and artifact statuses; resolve each artifact's actual location via its `path` field rather than guessing filenames
+- `.keelson/features/<feature>/audit.md` - chronological log and `## Resume Point`
 
 Feature workspaces use numbered subdirectories for phase-owned files (e.g. `01-requirements/requirements.md`, `02-user-stories/us-mock.html`, …). `manifest.json`, `audit.md`, and `verify-report.md` stay at the feature top.
 
 Resolve `<feature>`:
 
-1. If exactly one `.keelson/<feature>/` workspace exists, use it.
+1. If exactly one `.keelson/features/<feature>/` workspace exists, use it.
 2. If several exist, ask the user which feature to report.
 3. If none exist, report that no workspace is present and recommend `/keel-discovery "<idea>"` for a rough or large idea, or `/keel-requirements "<idea>"` for a clear single feature.
 

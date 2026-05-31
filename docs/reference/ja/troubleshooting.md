@@ -8,7 +8,7 @@ Keelson の各フェーズには明示的なブロック条件と、ギャップ
 
 | 状況 | 所有フェーズ | 実行コマンド |
 |---|---|---|
-| `.keelson/<feature>/` ワークスペースがまだない | (entry) | ラフ／大きいアイデアは `/keel-discovery "<idea>"`、明確な単機能は `/keel-requirements "<idea>"` |
+| `.keelson/features/<feature>/` ワークスペースがまだない | (entry) | ラフ／大きいアイデアは `/keel-discovery "<idea>"`、明確な単機能は `/keel-requirements "<idea>"` |
 | `/keel-us` がブロック: `artifacts.requirements.status` が `approved` でない | requirements | `/keel-requirements` |
 | `/keel-design` がブロック: `requirements`・`userStories`・`usMock` のいずれかが `approved` でない | 未承認の最も早いフェーズ | `/keel-requirements` → `/keel-us` |
 | `/keel-proto` がブロック: `design`（または前のいずれか）が `approved` でない | 未承認の最も早いフェーズ | `/keel-design` とその前段 |

@@ -8,7 +8,7 @@ Every Keelson phase has explicit block conditions and explicit routes back to th
 
 | Situation | Owning phase | Command to run |
 |---|---|---|
-| No `.keelson/<feature>/` workspace exists yet | (entry) | `/keel-discovery "<idea>"` for a rough or large idea, otherwise `/keel-requirements "<idea>"` |
+| No `.keelson/features/<feature>/` workspace exists yet | (entry) | `/keel-discovery "<idea>"` for a rough or large idea, otherwise `/keel-requirements "<idea>"` |
 | `/keel-us` blocks: `artifacts.requirements.status` is not `approved` | requirements | `/keel-requirements` |
 | `/keel-design` blocks: `requirements`, `userStories`, or `usMock` is not `approved` | the earliest unapproved one | `/keel-requirements` → `/keel-us` |
 | `/keel-proto` blocks: `design` (or any earlier artifact) is not `approved` | the earliest unapproved one | `/keel-design` and predecessors |

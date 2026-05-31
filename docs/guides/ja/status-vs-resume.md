@@ -4,7 +4,7 @@
 
 **対象読者:** ワークフローを学習中のユーザー。
 **症状:** 次に何をすべきか分からない。
-**コマンド:** `.keelson/<feature>/audit.md` を開き、続けて `.keelson/<feature>/manifest.json` と `Resume Point` に挙げられたアーティファクトを読み込む。
+**コマンド:** `.keelson/features/<feature>/audit.md` を開き、続けて `.keelson/features/<feature>/manifest.json` と `Resume Point` に挙げられたアーティファクトを読み込む。
 **成功の合図:** エージェントがちょうど 1 フェーズ進むか、修正のために所有元フェーズへ戻る。
 **よくある失敗:** 上流のアーティファクトがまだ `draft` または `needs_revision` のまま実装を続けようとする。
 

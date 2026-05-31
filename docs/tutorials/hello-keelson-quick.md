@@ -41,7 +41,7 @@ All four checks pass, so discovery routes to `/keel-quick` and writes `.keelson/
 /keel-quick "Fix README typo: recieve -> receive"
 ```
 
-`/keel-quick` writes `.keelson/<feature>/change.md` with the change brief: intent, scope, affected files, acceptance, and risks. It then asks you to approve the brief before any code is touched.
+`/keel-quick` writes `.keelson/features/<feature>/change.md` with the change brief: intent, scope, affected files, acceptance, and risks. It then asks you to approve the brief before any code is touched.
 
 Approve the brief in the chat (for example, reply `approved`). `/keel-quick` then:
 
@@ -64,7 +64,7 @@ For a single-file typo fix the quick-track checks are usually enough, and `/keel
 You went from a rough idea to an approved, implemented, and verified change without touching any other phase. The workspace contains:
 
 ```
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json        (track: "quick")
   audit.md
   change.md

@@ -75,7 +75,7 @@ describe('root keelson package scaffold', () => {
       process.stdout.write = originalWrite;
     }
 
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills/keel-requirements/SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, '.claude/skills/keel-requirements/SKILL.md'))).toBe(true);
     expect(stdout.join('\n')).toContain('Available commands:');
     expect(stdout.join('\n')).toContain('/keel-requirements "<作りたい体験や機能>"');

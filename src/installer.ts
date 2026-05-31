@@ -1,9 +1,17 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import type { InstallError, InstallResult, PackageAssets } from './types';
-import { ALL_SKILLS } from './types';
+import {
+  ALL_SKILLS,
+  KEELSON_DIR,
+  KEELSON_FEATURES_DIR,
+  KEELSON_SYSTEM_SKILLS_DIR
+} from './types';
 import { detect } from './detector';
 import { copyLocalSkills, copyForwarders } from './copier';
+
+const LEGACY_SKILLS_DIR = `${KEELSON_DIR}/skills`;
+const LEGACY_RESERVED_DIRS = new Set(['skills', 'steering']);
 
 export interface InstallOptions {
   assets?: PackageAssets;
@@ -44,13 +52,78 @@ function emptyResult(overrides?: Partial<InstallResult>): InstallResult {
   };
 }
 
-async function ensureInstallDirs(cwd: string): Promise<InstallError | undefined> {
-  const keelsonDir = path.join(cwd, '.keelson');
+async function ensureKeelsonDir(cwd: string): Promise<InstallError | undefined> {
+  const keelsonDir = path.join(cwd, KEELSON_DIR);
   try {
-    await fs.ensureDir(path.join(keelsonDir, 'skills'));
+    await fs.ensureDir(keelsonDir);
     return undefined;
   } catch (err: unknown) {
     return toInstallError(keelsonDir, err);
+  }
+}
+
+async function migrateLegacyFeatureDirs(cwd: string): Promise<InstallError | undefined> {
+  const keelsonDir = path.join(cwd, KEELSON_DIR);
+  const featuresDir = path.join(cwd, KEELSON_FEATURES_DIR);
+  try {
+    if (await fs.pathExists(path.join(featuresDir, 'manifest.json'))) {
+      return toInstallError(
+        featuresDir,
+        new Error("Cannot migrate legacy feature workspace named 'features' automatically.")
+      );
+    }
+    await fs.ensureDir(featuresDir);
+
+    const entries = await fs.readdir(keelsonDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.name === 'features') {
+        continue;
+      }
+
+      const legacyFeatureDir = path.join(keelsonDir, entry.name);
+      if (!(await fs.pathExists(path.join(legacyFeatureDir, 'manifest.json')))) {
+        continue;
+      }
+      if (LEGACY_RESERVED_DIRS.has(entry.name)) {
+        return toInstallError(
+          legacyFeatureDir,
+          new Error(`Cannot migrate legacy feature workspace named '${entry.name}' automatically.`)
+        );
+      }
+
+      const featureDir = path.join(featuresDir, entry.name);
+      if (await fs.pathExists(featureDir)) {
+        return toInstallError(
+          legacyFeatureDir,
+          new Error(`Cannot migrate legacy feature workspace because ${featureDir} already exists.`)
+        );
+      }
+      await fs.move(legacyFeatureDir, featureDir, { overwrite: false });
+    }
+    return undefined;
+  } catch (err: unknown) {
+    return toInstallError(keelsonDir, err);
+  }
+}
+
+async function ensureInstallDirs(cwd: string): Promise<InstallError | undefined> {
+  const keelsonDir = path.join(cwd, KEELSON_DIR);
+  try {
+    await fs.ensureDir(path.join(cwd, KEELSON_SYSTEM_SKILLS_DIR));
+    await fs.ensureDir(path.join(cwd, KEELSON_FEATURES_DIR));
+    return undefined;
+  } catch (err: unknown) {
+    return toInstallError(keelsonDir, err);
+  }
+}
+
+async function removeLegacySkillsDir(cwd: string): Promise<InstallError | undefined> {
+  const legacySkillsDir = path.join(cwd, LEGACY_SKILLS_DIR);
+  try {
+    await fs.remove(legacySkillsDir);
+    return undefined;
+  } catch (err: unknown) {
+    return toInstallError(legacySkillsDir, err);
   }
 }
 
@@ -89,6 +162,14 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
 
   try {
     const environments = await detect(cwd);
+    const rootError = await ensureKeelsonDir(cwd);
+    if (rootError) {
+      return emptyResult({ error: rootError });
+    }
+    const migrationError = await migrateLegacyFeatureDirs(cwd);
+    if (migrationError) {
+      return emptyResult({ error: migrationError });
+    }
     const initError = await ensureInstallDirs(cwd);
     if (initError) {
       return emptyResult({ error: initError });
@@ -102,6 +183,10 @@ export async function install(cwd: string, options?: InstallOptions): Promise<In
     const allOverwritten: string[] = [...localResult.overwritten];
     if (localResult.error) {
       return emptyResult({ overwritten: allOverwritten, error: localResult.error });
+    }
+    const legacySkillsError = await removeLegacySkillsDir(cwd);
+    if (legacySkillsError) {
+      return emptyResult({ overwritten: allOverwritten, error: legacySkillsError });
     }
 
     const forwardingInstalled: InstallResult['forwardingInstalled'] = {};

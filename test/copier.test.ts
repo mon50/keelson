@@ -28,17 +28,17 @@ describe('copyLocalSkills()', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('コピー後に .keelson/skills/keel-requirements/SKILL.md が存在する', async () => {
+  it('コピー後に .keelson/system/skills/keel-requirements/SKILL.md が存在する', async () => {
     const assets = makeAssets();
     await copyLocalSkills(tmpDir, assets);
-    const skillMd = path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md');
+    const skillMd = path.join(tmpDir, '.keelson/system/skills/keel-requirements/SKILL.md');
     expect(fs.existsSync(skillMd)).toBe(true);
   });
 
-  it('全スキルが .keelson/skills/ 配下にコピーされる', async () => {
+  it('全スキルが .keelson/system/skills/ 配下にコピーされる', async () => {
     const assets = makeAssets();
     await copyLocalSkills(tmpDir, assets);
-    const skillsDir = path.join(tmpDir, '.keelson/skills');
+    const skillsDir = path.join(tmpDir, '.keelson/system/skills');
     const dirs = fs.readdirSync(skillsDir).filter((entry) => {
       return fs.statSync(path.join(skillsDir, entry)).isDirectory();
     });
@@ -97,11 +97,11 @@ describe('copyForwarders() - Claude Code', () => {
     expect(skillFiles.length).toBe(ALL_SKILLS.length);
   });
 
-  it('生成された SKILL.md がフォワーダー形式（.keelson/skills/keel-requirements/SKILL.md を含む）', async () => {
+  it('生成された SKILL.md がフォワーダー形式（.keelson/system/skills/keel-requirements/SKILL.md を含む）', async () => {
     await copyForwarders(tmpDir, 'claude-code', assets);
     const skillMd = path.join(tmpDir, '.claude/skills/keel-requirements/SKILL.md');
     const content = fs.readFileSync(skillMd, 'utf8');
-    expect(content).toContain('.keelson/skills/keel-requirements/SKILL.md');
+    expect(content).toContain('.keelson/system/skills/keel-requirements/SKILL.md');
   });
 
   it('既存ファイルを上書きした場合 result.overwritten にパスが含まれる', async () => {

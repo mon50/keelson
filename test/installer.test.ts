@@ -44,13 +44,13 @@ describe('install()', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('.claude/ のみ存在する環境で install() 後 .keelson/skills/keel-requirements/SKILL.md が存在する', async () => {
+  it('.claude/ のみ存在する環境で install() 後 .keelson/system/skills/keel-requirements/SKILL.md が存在する', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
     const result = await install(tmpDir, { assets: makeAssets() });
 
     expect(result.success).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills/keel-requirements/SKILL.md'))).toBe(true);
   });
 
   it('.claude/ のみ存在する環境で install() 後 .claude/skills/keel-requirements/SKILL.md が存在する', async () => {
@@ -134,6 +134,70 @@ describe('install()', () => {
     expect(fs.readFileSync(path.join(tmpDir, '.gitignore'), 'utf8')).toContain('.keelson/');
   });
 
+  it('install() 後 .keelson/features/ が初期化される', async () => {
+    const result = await install(tmpDir, { assets: makeAssets() });
+
+    expect(result.success).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/features'))).toBe(true);
+  });
+
+  it('旧 .keelson/skills/ を新しい正本コピー後に削除する', async () => {
+    await fse.ensureDir(path.join(tmpDir, '.keelson/skills/legacy-skill'));
+    await fse.writeFile(path.join(tmpDir, '.keelson/skills/legacy-skill/SKILL.md'), 'legacy');
+
+    const result = await install(tmpDir, { assets: makeAssets() });
+
+    expect(result.success).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills'))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills/keel-requirements'))).toBe(true);
+  });
+
+  it('旧 .keelson/<feature>/ workspace を .keelson/features/<feature>/ に移動する', async () => {
+    const legacyFeatureDir = path.join(tmpDir, '.keelson/team-invitations');
+    await fse.ensureDir(legacyFeatureDir);
+    await fse.writeJson(path.join(legacyFeatureDir, 'manifest.json'), { feature: 'team-invitations' });
+
+    const result = await install(tmpDir, { assets: makeAssets() });
+
+    expect(result.success).toBe(true);
+    expect(fs.existsSync(legacyFeatureDir)).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/features/team-invitations/manifest.json'))).toBe(
+      true
+    );
+  });
+
+  it("旧 .keelson/system/ workspace は feature 名 'system' として安全に移動する", async () => {
+    const legacyFeatureDir = path.join(tmpDir, '.keelson/system');
+    await fse.ensureDir(legacyFeatureDir);
+    await fse.writeJson(path.join(legacyFeatureDir, 'manifest.json'), { feature: 'system' });
+
+    const result = await install(tmpDir, { assets: makeAssets() });
+
+    expect(result.success).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/features/system/manifest.json'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills/keel-requirements'))).toBe(true);
+  });
+
+  it('旧 workspace と新 workspace が衝突する場合はデータを上書きしない', async () => {
+    const legacyFeatureDir = path.join(tmpDir, '.keelson/team-invitations');
+    const featureDir = path.join(tmpDir, '.keelson/features/team-invitations');
+    await fse.ensureDir(legacyFeatureDir);
+    await fse.ensureDir(featureDir);
+    await fse.writeJson(path.join(legacyFeatureDir, 'manifest.json'), { source: 'legacy' });
+    await fse.writeJson(path.join(featureDir, 'manifest.json'), { source: 'current' });
+
+    const result = await install(tmpDir, { assets: makeAssets() });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.path).toBe(legacyFeatureDir);
+    expect(await fse.readJson(path.join(legacyFeatureDir, 'manifest.json'))).toEqual({
+      source: 'legacy'
+    });
+    expect(await fse.readJson(path.join(featureDir, 'manifest.json'))).toEqual({
+      source: 'current'
+    });
+  });
+
   it('既存 .gitignore に .keelson がある場合は重複追加しない', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
     await fse.writeFile(path.join(tmpDir, '.gitignore'), 'node_modules/\n.keelson/\n');
@@ -164,7 +228,7 @@ describe('install()', () => {
     expect(result.skillsInstalled).toEqual([...ALL_SKILLS]);
   });
 
-  it('コピー前に .keelson/skills を初期化し、コピー失敗でも例外を投げない', async () => {
+  it('コピー前に .keelson/system/skills を初期化し、コピー失敗でも例外を投げない', async () => {
     await fse.ensureDir(path.join(tmpDir, '.claude'));
 
     const assets = makeAssets({ coreSkillsDir: path.join(tmpDir, 'missing-skills') });
@@ -172,7 +236,7 @@ describe('install()', () => {
 
     expect(result.success).toBe(false);
     expect(result.error?.path).toBe(assets.coreSkillsDir);
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills'))).toBe(true);
   });
 
   it('install() 後 Claude Code に全スキルを登録する', async () => {
@@ -200,7 +264,7 @@ describe('install()', () => {
       process.stdout.write = originalWrite;
     }
 
-    expect(fs.existsSync(path.join(tmpDir, '.keelson/skills/keel-requirements/SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, '.keelson/system/skills/keel-requirements/SKILL.md'))).toBe(true);
     expectAllSkillsInstalled(tmpDir, '.claude');
     expect(stdout.join('\n')).toContain('Available commands:');
   });

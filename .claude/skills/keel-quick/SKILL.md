@@ -18,8 +18,8 @@ user-facing surface, new user operations, or meaningful product ambiguity.
 
 ## Inputs
 
-- `.keelson/<feature>/change.md` and `manifest.json` if the change already exists.
-- `.keelson/<feature>/audit.md` if present; create it if missing.
+- `.keelson/features/<feature>/change.md` and `manifest.json` if the change already exists.
+- `.keelson/features/<feature>/audit.md` if present; create it if missing.
 - `.keelson/steering/*.md` if present — honor the project's product, tech, and principles.
 - lightweight repository evidence for the affected area.
 
@@ -35,7 +35,7 @@ user-facing surface, new user operations, or meaningful product ambiguity.
 
 ## Change.md Contract
 
-`change.md` lives at the feature workspace top (`.keelson/<feature>/change.md`). Quick track stays flat — no numbered subdirectories — because a small change is a single file by design.
+`change.md` lives at the feature workspace top (`.keelson/features/<feature>/change.md`). Quick track stays flat — no numbered subdirectories — because a small change is a single file by design.
 
 `change.md` must contain:
 

@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `/keel-steering` skill: creates and maintains project-wide steering (`product.md`, `tech.md`, `principles.md`) that every phase reads.
 - `/keel-status` skill: a read-only navigator that reads `manifest.json` and `audit.md`, reports the current phase, and recommends the next command.
 
+## [0.5.1] - 2026-05-31
+### Changed
+- Separate project-local system skills from feature artifacts: canonical skills now live in `.keelson/system/skills`, while feature workspaces live in `.keelson/features/<feature>`.
+- Migrate legacy `.keelson/<feature>` workspaces during install and remove the generated legacy `.keelson/skills` directory after the new canonical skills are copied.
+
 ## [0.4.0] - 2026-05-18
 ### Added
 - Keelson Agent Skills for the artifact-first workflow: `/keel-requirements`, `/keel-us`, `/keel-design`, `/keel-proto`, `/keel-plan`, `/keel-impl`.

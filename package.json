@@ -1,11 +1,11 @@
 {
   "name": "keelson-cli",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Installer CLI for Keelson skills",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
-    "keelson": "dist/bin/cli.js"
+    "keelson": "./dist/bin/cli.js"
   },
   "files": [
     "dist",

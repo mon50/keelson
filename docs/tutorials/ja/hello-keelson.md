@@ -85,7 +85,7 @@ Keelson は Kiro 流のループで 1 タスクを実装します。コードを
 アイデアを `/keel-discovery` でルーティングし、6 つの承認済みアーティファクトを作成し、すべてのプランタスクを実装し、結果を検証しました。ワークスペースの中身は次の通りです。
 
 ```
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md

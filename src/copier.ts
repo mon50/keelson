@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import type { InstallError, PackageAssets, TargetEnvironment } from './types';
-import { ALL_SKILLS, ENV_SKILL_DIR } from './types';
+import { ALL_SKILLS, ENV_SKILL_DIR, KEELSON_SYSTEM_SKILLS_DIR } from './types';
 import { loadForwarderTemplate, renderForwarder } from './forwarder';
 
 export interface CopyResult {
@@ -13,7 +13,7 @@ export async function copyLocalSkills(
   cwd: string,
   assets: PackageAssets
 ): Promise<CopyResult> {
-  const destDir = path.join(cwd, '.keelson/skills');
+  const destDir = path.join(cwd, KEELSON_SYSTEM_SKILLS_DIR);
   try {
     await fs.ensureDir(destDir);
     for (const skillName of ALL_SKILLS) {
@@ -62,4 +62,3 @@ export async function copyForwarders(
     };
   }
 }
-

@@ -16,7 +16,7 @@ Keelson は artifact-first の AI-DLC Inception ワークフローです。
 ## 成果物
 
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md                   (/keel-verify 後)
@@ -37,4 +37,4 @@ Keelson は artifact-first の AI-DLC Inception ワークフローです。
 
 ## セッション継続
 
-再開時は最初に `.keelson/<feature>/audit.md` を読み、`Resume Point` に書かれた artifact を読み込みます。古い workspace に `audit.md` がない場合は、`manifest.json` と現在の artifact から作成してから進めます。
+再開時は最初に `.keelson/features/<feature>/audit.md` を読み、`Resume Point` に書かれた artifact を読み込みます。古い workspace に `audit.md` がない場合は、`manifest.json` と現在の artifact から作成してから進めます。

@@ -7,7 +7,7 @@
 **Expected Outcome:** Know which command to use when.
 
 ## CLI
-- `npx keelson-cli install`: Copies canonical skills to `.keelson/skills`, installs forwarders to `.claude/skills` or `.agents/skills`, and adds `.keelson/` to `.gitignore` when missing.
+- `npx keelson-cli install`: Copies canonical skills to `.keelson/system/skills`, initializes `.keelson/features`, installs forwarders to `.claude/skills` or `.agents/skills`, and adds `.keelson/` to `.gitignore` when missing. Existing `.keelson/<feature>` workspaces are migrated into `.keelson/features/<feature>`.
 - `npx keelson-cli doctor`: Validates workspace.
 - `npx keelson-cli uninstall`: Removes Keelson.
 
@@ -24,4 +24,4 @@
 - `/keel-quick "<change>"` — lightweight track for a small change or bug fix, in one gated skill
 - `/keel-status` — report the current phase and recommend the next command (read-only)
 
-Each skill appends to `.keelson/<feature>/audit.md` and updates its `Resume Point` before handing control back to the user.
+Each skill appends to `.keelson/features/<feature>/audit.md` and updates its `Resume Point` before handing control back to the user.

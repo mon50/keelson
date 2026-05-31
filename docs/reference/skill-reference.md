@@ -23,4 +23,4 @@ Later phases route back to the owning phase when they uncover ambiguity or misma
 
 ## Audit Trail
 
-Every skill updates `.keelson/<feature>/audit.md`. The log captures user inputs, key decisions, changed artifacts, checks, and a `Resume Point` showing the next command for a future session.
+Every skill updates `.keelson/features/<feature>/audit.md`. The log captures user inputs, key decisions, changed artifacts, checks, and a `Resume Point` showing the next command for a future session.

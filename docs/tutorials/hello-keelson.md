@@ -85,7 +85,7 @@ Once every task is done, `/keel-verify` audits the implementation against the ap
 You routed an idea through `/keel-discovery`, produced six approved artifacts, implemented every plan task, and verified the result. The workspace contains:
 
 ```
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md

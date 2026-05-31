@@ -41,7 +41,7 @@ AI エージェント内で:
 /keel-quick "README のタイポ修正: recieve -> receive"
 ```
 
-`/keel-quick` は `.keelson/<feature>/change.md` に変更ブリーフ（intent / scope / affected files / acceptance / risks）を書き、コードを触る前にブリーフの承認を求めます。
+`/keel-quick` は `.keelson/features/<feature>/change.md` に変更ブリーフ（intent / scope / affected files / acceptance / risks）を書き、コードを触る前にブリーフの承認を求めます。
 
 チャットでブリーフを承認します（例: `approved` と返信）。承認後、`/keel-quick` は次を行います。
 
@@ -64,7 +64,7 @@ AI エージェント内で:
 ラフなアイデアから、承認 → 実装 → 検証までを、他のフェーズに触れずに通り抜けました。ワークスペースの中身は次の通りです。
 
 ```
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json        (track: "quick")
   audit.md
   change.md

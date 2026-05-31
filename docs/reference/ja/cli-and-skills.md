@@ -7,7 +7,7 @@
 **到達点:** いつどのコマンドを使うかが分かる。
 
 ## CLI
-- `npx keelson-cli install`: 正準スキルを `.keelson/skills` にコピーし、フォワーダーを `.claude/skills` または `.agents/skills` にインストールし、`.gitignore` に `.keelson/` がなければ追加します。
+- `npx keelson-cli install`: 正準スキルを `.keelson/system/skills` にコピーし、`.keelson/features` を初期化し、フォワーダーを `.claude/skills` または `.agents/skills` にインストールし、`.gitignore` に `.keelson/` がなければ追加します。既存の `.keelson/<feature>` ワークスペースは `.keelson/features/<feature>` に移行します。
 - `npx keelson-cli doctor`: ワークスペースを検証します。
 - `npx keelson-cli uninstall`: Keelson を削除します。
 
@@ -24,4 +24,4 @@
 - `/keel-quick "<change>"` — 小さな変更・バグ修正の軽量トラック（1スキルで完結）
 - `/keel-status` — 現在のフェーズを報告し、次のコマンドを案内する（読み取り専用）
 
-各スキルは制御をユーザーに返す前に、`.keelson/<feature>/audit.md` に追記し、その `Resume Point` を更新します。
+各スキルは制御をユーザーに返す前に、`.keelson/features/<feature>/audit.md` に追記し、その `Resume Point` を更新します。

@@ -4,8 +4,11 @@
 
 唯一の真実は、承認済みのアーティファクト束です。
 
+プロジェクトローカルの正準スキルは `.keelson/system/skills/` に分離して配置します。
+フィーチャーアーティファクトは `.keelson/features/` 配下に配置します。
+
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md                   (/keel-verify 後)
@@ -23,7 +26,7 @@
 `/keel-quick` で扱う小さな変更の場合、ワークスペースはフラットのままです。
 
 ```text
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json        (track: "quick")
   audit.md
   change.md
@@ -47,7 +50,7 @@
 }
 ```
 
-`path` は `.keelson/<feature>/` からの相対パスです。スキルはファイル名を推測するのではなく、この `path` フィールドからアーティファクトの場所を解決するため、レイアウトを変更しても全スキルを直接書き換える必要はありません。
+`path` は `.keelson/features/<feature>/` からの相対パスです。スキルはファイル名を推測するのではなく、この `path` フィールドからアーティファクトの場所を解決するため、レイアウトを変更しても全スキルを直接書き換える必要はありません。
 
 ステータスは `draft`・`needs_revision`・`approved` のいずれかです。
 

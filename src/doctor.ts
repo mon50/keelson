@@ -2,8 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import { detect } from './detector';
 import type { ArtifactRecord, KeelsonManifest, QuickManifest } from './types';
-
-const WORKSPACE_INTERNAL_DIRS = new Set(['skills', 'steering']);
+import { KEELSON_DIR, KEELSON_FEATURES_DIR } from './types';
 
 function isArtifactRecord(value: unknown): value is ArtifactRecord {
   const candidate = value as Partial<ArtifactRecord> | undefined;
@@ -67,19 +66,19 @@ export async function doctor(cwd: string, json: boolean = false): Promise<number
     warnings.push('No AI coding agent environment detected (.claude/ or .agents/). Keelson skills may not be visible.');
   }
 
-  const hasKeelson = await fs.pathExists(path.join(cwd, '.keelson'));
+  const hasKeelson = await fs.pathExists(path.join(cwd, KEELSON_DIR));
   if (!hasKeelson) {
     warnings.push('Keelson is not installed in this repository. Run `npx keelson-cli install` first.');
   } else {
-    const keelsonDir = path.join(cwd, '.keelson');
-    const entries = await fs.readdir(keelsonDir, { withFileTypes: true });
-    const featureDirs = entries.filter((entry) => {
-      return entry.isDirectory() && !WORKSPACE_INTERNAL_DIRS.has(entry.name);
-    });
+    const featuresDir = path.join(cwd, KEELSON_FEATURES_DIR);
+    const entries = (await fs.pathExists(featuresDir))
+      ? await fs.readdir(featuresDir, { withFileTypes: true })
+      : [];
+    const featureDirs = entries.filter((entry) => entry.isDirectory());
 
     let manifestCount = 0;
     for (const entry of featureDirs) {
-      const manifestPath = path.join(keelsonDir, entry.name, 'manifest.json');
+      const manifestPath = path.join(featuresDir, entry.name, 'manifest.json');
       if (!(await fs.pathExists(manifestPath))) {
         warnings.push(`Feature workspace '${entry.name}' is missing manifest.json.`);
         continue;

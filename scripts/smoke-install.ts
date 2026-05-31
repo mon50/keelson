@@ -27,6 +27,22 @@ async function main() {
       throw new Error('keel-requirements skill was not installed');
     }
 
+    const canonicalSkill = path.join(
+      testDir,
+      '.keelson',
+      'system',
+      'skills',
+      'keel-requirements',
+      'SKILL.md'
+    );
+    if (!await fs.pathExists(canonicalSkill)) {
+      throw new Error('Canonical skills were not installed in .keelson/system/skills');
+    }
+
+    if (!await fs.pathExists(path.join(testDir, '.keelson', 'features'))) {
+      throw new Error('.keelson/features was not initialized');
+    }
+
     const gitignorePath = path.join(testDir, '.gitignore');
     const gitignore = await fs.readFile(gitignorePath, 'utf8');
     if (!gitignore.split(/\r?\n/).includes('.keelson/')) {

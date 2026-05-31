@@ -41,7 +41,7 @@ security, or acceptance criteria that need human judgment. State this in the rep
 
 ## Outputs
 
-- `verify-report.md` at the feature workspace top (`.keelson/<feature>/verify-report.md`) — the audit result. Kept at the top alongside `manifest.json` and `audit.md` because it summarizes the whole feature, not a single phase.
+- `verify-report.md` at the feature workspace top (`.keelson/features/<feature>/verify-report.md`) — the audit result. Kept at the top alongside `manifest.json` and `audit.md` because it summarizes the whole feature, not a single phase.
 - updated `audit.md` (workspace top) — append a verification entry and update `## Resume Point`.
 
 `verify-report.md` is a support file like `audit.md`. It is not a phase-gated artifact and has no `manifest.json` status.

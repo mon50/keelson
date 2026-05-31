@@ -102,6 +102,8 @@ export const ENV_SKILL_DIR = {
 } as const satisfies Record<TargetEnvironment, string>;
 
 export const KEELSON_DIR = '.keelson' as const;
+export const KEELSON_SYSTEM_SKILLS_DIR = `${KEELSON_DIR}/system/skills` as const;
+export const KEELSON_FEATURES_DIR = `${KEELSON_DIR}/features` as const;
 
 export interface SelectorOptions {
   input?: NodeJS.ReadableStream;

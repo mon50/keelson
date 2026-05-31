@@ -26,7 +26,7 @@ Keelson turns a rough product idea into approved **Requirements → User Stories
 ## Why Keelson
 
 - **Approve before you build.** Each phase ends at a human approval gate. Implementation reads only from approved artifacts.
-- **One source of truth.** The approved artifact bundle in `.keelson/<feature>/` *is* the specification — not a single JSON file, not the chat history.
+- **One source of truth.** The approved artifact bundle in `.keelson/features/<feature>/` *is* the specification — not a single JSON file, not the chat history.
 - **No drift, no guessing.** Open questions are written into the artifact that owns them and resolved explicitly, never filled in by assumption.
 - **Mismatches route home.** When a later phase exposes a problem, Keelson sends you back to the artifact that owns it instead of patching ad hoc.
 
@@ -128,22 +128,25 @@ The source of truth is the approved artifact bundle:
 
 ```text
 .keelson/
+  system/
+    skills/                            (project-local canonical skills)
   discovery.md                       (workspace-wide, optional)
   steering/                          (workspace-wide, optional)
     product.md
     tech.md
     principles.md
-  <feature>/
-    manifest.json                    index: paths, phase status, digests
-    audit.md                         continuity log + Resume Point
-    verify-report.md                 audit result (after /keel-verify)
-    01-requirements/requirements.md
-    02-user-stories/user-stories.md
-    02-user-stories/us-mock.html
-    03-design/design.md
-    04-prototype/prototype.html
-    04-prototype/prototype-notes.md  (optional)
-    05-plan/plan.md
+  features/
+    <feature>/
+      manifest.json                    index: paths, phase status, digests
+      audit.md                         continuity log + Resume Point
+      verify-report.md                 audit result (after /keel-verify)
+      01-requirements/requirements.md
+      02-user-stories/user-stories.md
+      02-user-stories/us-mock.html
+      03-design/design.md
+      04-prototype/prototype.html
+      04-prototype/prototype-notes.md  (optional)
+      05-plan/plan.md
 ```
 
 Phase-owned files live in numbered subdirectories so each phase groups its own attachments (screenshots, notes, references). Workspace-level files — `manifest.json`, `audit.md`, `verify-report.md` — stay at the feature top because they describe the workspace as a whole.

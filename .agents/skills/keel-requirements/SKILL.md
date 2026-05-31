@@ -13,7 +13,7 @@ Turn a product idea into an AI-DLC-style Requirements artifact.
 
 ## Workspace
 
-Use `.keelson/<feature>/` for feature artifacts. Write open questions inside the artifact that owns them.
+Use `.keelson/features/<feature>/` for feature artifacts. Write open questions inside the artifact that owns them.
 
 Read `.keelson/steering/*.md` if present and honor the project's product, tech, and principles.
 
@@ -26,7 +26,7 @@ Required files after this phase:
 Workspace layout for the feature (full track):
 
 ```
-.keelson/<feature>/
+.keelson/features/<feature>/
   manifest.json
   audit.md
   verify-report.md            (after keel-verify)
@@ -46,7 +46,7 @@ Workspace layout for the feature (full track):
 
 ## Flow
 
-1. Resolve `<feature>` from the argument or an existing `.keelson/<feature>/manifest.json`.
+1. Resolve `<feature>` from the argument or an existing `.keelson/features/<feature>/manifest.json`.
 2. If no idea is provided and no requirements artifact exists, ask for one concise product idea.
 3. Inspect only lightweight repository context when the idea mentions an existing app: package/config files, route/component directories, component/style directories, README, and obvious test setup.
 4. Create `audit.md` if missing, append the initial user request and repository findings, and initialize `## Resume Point`.
@@ -100,7 +100,7 @@ Minimum manifest:
 }
 ```
 
-Paths are stored relative to `.keelson/<feature>/`. Skills must use these paths from `manifest.json` rather than hardcoding bare filenames.
+Paths are stored relative to `.keelson/features/<feature>/`. Skills must use these paths from `manifest.json` rather than hardcoding bare filenames.
 
 ## Audit.md Contract
 

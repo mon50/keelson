@@ -29,7 +29,7 @@ Start with the [README](../README.md) for an overview and installation.
 
 - [CLI and Skills](reference/cli-and-skills.md) — the `keelson` CLI and every `/keel-*` skill
 - [Skill Reference](reference/skill-reference.md) — per-skill inputs, outputs, and constraints
-- [Artifact Schema](reference/spec-schema.md) — the `.keelson/<feature>/` artifact bundle
+- [Artifact Schema](reference/spec-schema.md) — the `.keelson/features/<feature>/` artifact bundle
 - [Questions](reference/questions-schema.md) — where open questions live
 - [Plan Schema](reference/tasks-schema.md) — the structure of `05-plan/plan.md` tasks
 - [Verify Contract](reference/verify-contract.md) — implementation verification rules
@@ -65,7 +65,7 @@ Start with the [README](../README.md) for an overview and installation.
 
 - [CLI とスキル](reference/ja/cli-and-skills.md) — `keelson` CLI と全 `/keel-*` スキル
 - [スキルリファレンス](reference/ja/skill-reference.md) — スキルごとの入力・出力・制約
-- [アーティファクトスキーマ](reference/ja/spec-schema.md) — `.keelson/<feature>/` アーティファクト束
+- [アーティファクトスキーマ](reference/ja/spec-schema.md) — `.keelson/features/<feature>/` アーティファクト束
 - [質問](reference/ja/questions-schema.md) — 未解決の疑問の置き場所
 - [プランスキーマ](reference/ja/tasks-schema.md) — `05-plan/plan.md` タスクの構造
 - [検証コントラクト](reference/ja/verify-contract.md) — 実装検証のルール
